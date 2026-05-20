@@ -2,543 +2,898 @@
 <html lang="th">
 <head>
 
-  <meta charset="UTF-8" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  />
+<title>LALIZA Operations Portal</title>
 
-  <title>
-    Laliza Operations Portal
-  </title>
+<link
+href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+rel="stylesheet"
+/>
 
-  <style>
+<style>
 
-    *{
-      margin:0;
-      padding:0;
-      box-sizing:border-box;
-      font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        sans-serif;
-    }
+/* =========================================
+   RESET
+========================================= */
 
-    body{
-      background:#f5f7fb;
-      color:#111827;
-    }
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
 
-    .app{
+body{
+  font-family:'Inter',sans-serif;
+  background:#F4F7FB;
+  color:#0F172A;
+}
 
-      min-height:100vh;
+/* =========================================
+   APP LAYOUT
+========================================= */
 
-      display:grid;
+.app{
 
-      grid-template-columns:
-        260px 1fr;
-    }
+  display:grid;
 
-    /* =========================
-       SIDEBAR
-    ========================= */
+  grid-template-columns:
+    260px 1fr;
 
-    .sidebar{
+  min-height:100vh;
+}
 
-      background:#111827;
+/* =========================================
+   SIDEBAR
+========================================= */
 
-      color:#fff;
+.sidebar{
 
-      padding:24px;
+  background:#0F172A;
 
-      display:flex;
+  color:#fff;
 
-      flex-direction:column;
+  padding:24px;
+}
 
-      gap:18px;
-    }
+.logo{
 
-    .logo{
+  font-size:28px;
+  font-weight:800;
 
-      font-size:24px;
+  margin-bottom:32px;
+}
 
-      font-weight:700;
+.nav{
 
-      margin-bottom:12px;
-    }
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
 
-    .menu{
+.nav button{
 
-      display:flex;
+  border:none;
 
-      flex-direction:column;
+  background:transparent;
 
-      gap:12px;
-    }
+  color:#CBD5E1;
 
-    .menu button{
+  height:48px;
 
-      height:46px;
+  border-radius:14px;
 
-      border:none;
+  text-align:left;
 
-      border-radius:14px;
+  padding:0 16px;
 
-      background:#1f2937;
+  font-size:15px;
 
-      color:#fff;
+  font-weight:600;
 
-      cursor:pointer;
+  cursor:pointer;
 
-      font-size:15px;
+  transition:0.2s;
+}
 
-      font-weight:600;
+.nav button:hover{
 
-      text-align:left;
+  background:#1E293B;
+}
 
-      padding:0 16px;
+.nav button.active{
 
-      transition:0.2s;
-    }
+  background:#5B5FF6;
 
-    .menu button:hover{
+  color:#fff;
+}
 
-      background:#374151;
-    }
+/* =========================================
+   MAIN
+========================================= */
 
-    .menu button.active{
+.main{
 
-      background:#4f46e5;
-    }
+  padding:28px;
+}
 
-    /* =========================
-       MAIN
-    ========================= */
+/* =========================================
+   HEADER
+========================================= */
 
-    .main{
+.topbar{
 
-      padding:28px;
-    }
+  display:flex;
 
-    .topbar{
+  justify-content:space-between;
 
-      display:flex;
+  align-items:center;
 
-      justify-content:space-between;
+  margin-bottom:24px;
+}
 
-      align-items:center;
+.header-left small{
 
-      margin-bottom:28px;
-    }
+  color:#64748B;
 
-    .title-wrap small{
+  letter-spacing:2px;
 
-      color:#64748b;
+  font-size:12px;
+}
 
-      letter-spacing:2px;
+.header-left h1{
 
-      font-size:12px;
-    }
+  margin-top:6px;
 
-    .title-wrap h1{
+  font-size:36px;
 
-      margin-top:6px;
+  font-weight:800;
+}
 
-      font-size:34px;
+.save-btn{
 
-      font-weight:700;
-    }
+  height:48px;
 
-    .save-btn{
+  padding:0 24px;
 
-      height:48px;
+  border:none;
 
-      padding:0 22px;
+  border-radius:16px;
 
-      border:none;
+  background:#5B5FF6;
 
-      border-radius:14px;
+  color:#fff;
 
-      background:#4f46e5;
+  font-weight:700;
 
-      color:#fff;
+  cursor:pointer;
 
-      font-size:15px;
+  box-shadow:
+    0 10px 30px rgba(91,95,246,0.2);
+}
 
-      font-weight:600;
+/* =========================================
+   GRID
+========================================= */
 
-      cursor:pointer;
-    }
+.content-grid{
 
-    /* =========================
-       SUMMARY
-    ========================= */
+  display:grid;
 
-    .summary{
+  grid-template-columns:
+    1.2fr 420px;
 
-      display:grid;
+  gap:24px;
+}
 
-      grid-template-columns:
-        repeat(auto-fit,minmax(220px,1fr));
+/* =========================================
+   CARD
+========================================= */
 
-      gap:18px;
+.card{
 
-      margin-bottom:28px;
-    }
+  background:#fff;
 
-    .summary-card{
+  border-radius:24px;
 
-      background:#fff;
+  padding:24px;
 
-      border-radius:20px;
+  border:1px solid #E2E8F0;
 
-      padding:22px;
+  box-shadow:
+    0 10px 30px rgba(15,23,42,0.04);
+}
 
-      border:1px solid #e5e7eb;
-    }
+.card-title{
 
-    .summary-card small{
+  font-size:20px;
 
-      color:#64748b;
+  font-weight:800;
 
-      font-size:13px;
-    }
+  margin-bottom:24px;
+}
 
-    .summary-card h2{
+/* =========================================
+   FORM
+========================================= */
 
-      margin-top:10px;
+.form-grid{
 
-      font-size:30px;
+  display:grid;
 
-      font-weight:700;
-    }
+  grid-template-columns:
+    repeat(2,1fr);
 
-    /* =========================
-       FORM
-    ========================= */
+  gap:16px;
+}
 
-    .form-section{
+.field{
 
-      background:#fff;
+  display:flex;
 
-      border-radius:22px;
+  flex-direction:column;
 
-      padding:24px;
+  gap:8px;
+}
 
-      margin-bottom:24px;
+.field label{
 
-      border:1px solid #e5e7eb;
-    }
+  font-size:13px;
 
-    .form-section h3{
+  color:#64748B;
 
-      margin-bottom:22px;
+  font-weight:600;
+}
 
-      font-size:22px;
-    }
+.field input{
 
-    .grid{
+  height:48px;
 
-      display:grid;
+  border:1px solid #CBD5E1;
 
-      grid-template-columns:
-        repeat(auto-fit,minmax(220px,1fr));
+  border-radius:14px;
 
-      gap:18px;
-    }
+  padding:0 14px;
 
-    .field{
+  font-size:15px;
 
-      display:flex;
+  transition:0.2s;
+}
 
-      flex-direction:column;
+.field input:focus{
 
-      gap:8px;
-    }
+  outline:none;
 
-    .field label{
+  border-color:#5B5FF6;
 
-      font-size:14px;
+  box-shadow:
+    0 0 0 4px rgba(91,95,246,0.08);
+}
 
-      color:#64748b;
-    }
+/* =========================================
+   SUMMARY
+========================================= */
 
-    .field input{
+.summary{
 
-      height:46px;
+  display:flex;
 
-      border:1px solid #dbe2ea;
+  flex-direction:column;
 
-      border-radius:14px;
+  gap:18px;
+}
 
-      padding:0 14px;
+.summary-card{
 
-      font-size:15px;
-    }
+  background:#F8FAFC;
 
-    /* =========================
-       MOBILE
-    ========================= */
+  border-radius:20px;
 
-    @media(max-width:900px){
+  padding:22px;
 
-      .app{
+  border:1px solid #E2E8F0;
+}
 
-        grid-template-columns:1fr;
-      }
+.summary-label{
 
-      .sidebar{
+  font-size:13px;
 
-        flex-direction:row;
+  color:#64748B;
 
-        overflow:auto;
-      }
+  font-weight:600;
+}
 
-      .menu{
+.summary-value{
 
-        flex-direction:row;
-      }
+  margin-top:8px;
 
-      .menu button{
+  font-size:34px;
 
-        min-width:180px;
-      }
+  font-weight:800;
+}
 
-    }
+.summary-sub{
 
-  </style>
+  margin-top:8px;
+
+  font-size:13px;
+
+  color:#64748B;
+}
+
+/* =========================================
+   KPI
+========================================= */
+
+.kpi-grid{
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(2,1fr);
+
+  gap:16px;
+
+  margin-top:20px;
+}
+
+.kpi{
+
+  background:#fff;
+
+  border-radius:18px;
+
+  padding:18px;
+
+  border:1px solid #E2E8F0;
+}
+
+.kpi small{
+
+  color:#64748B;
+
+  font-size:12px;
+}
+
+.kpi h3{
+
+  margin-top:8px;
+
+  font-size:28px;
+
+  font-weight:800;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media(max-width:1200px){
+
+  .content-grid{
+
+    grid-template-columns:1fr;
+  }
+
+}
+
+@media(max-width:900px){
+
+  .app{
+
+    grid-template-columns:1fr;
+  }
+
+  .sidebar{
+
+    display:none;
+  }
+
+  .form-grid{
+
+    grid-template-columns:1fr;
+  }
+
+}
+
+</style>
 
 </head>
 
 <body>
 
-  <div class="app">
+<div class="app">
 
-    <!-- =====================
-         SIDEBAR
-    ====================== -->
+  <!-- ===================================
+       SIDEBAR
+  ==================================== -->
 
-    <aside class="sidebar">
+  <aside class="sidebar">
 
-      <div class="logo">
-        LALIZA
+    <div class="logo">
+      LALIZA
+    </div>
+
+    <div class="nav">
+
+      <button class="active">
+        📊 Daily Revenue
+      </button>
+
+      <button>
+        ☎️ Confirm Tracking
+      </button>
+
+      <button>
+        👨‍⚕️ Doctor Finance
+      </button>
+
+      <button>
+        🧾 Billing KPI
+      </button>
+
+      <button>
+        📈 Analytics
+      </button>
+
+      <button>
+        📤 Export
+      </button>
+
+    </div>
+
+  </aside>
+
+  <!-- ===================================
+       MAIN
+  ==================================== -->
+
+  <main class="main">
+
+    <!-- ===============================
+         HEADER
+    ================================ -->
+
+    <div class="topbar">
+
+      <div class="header-left">
+
+        <small>
+          DAILY OPERATIONS
+        </small>
+
+        <h1>
+          Revenue Operations
+        </h1>
+
       </div>
 
-      <div class="menu">
+      <button
+        class="save-btn"
+        onclick="saveData()"
+      >
+        Save Report
+      </button>
 
-        <button class="active">
-          📊 Operations
-        </button>
+    </div>
 
-        <button>
-          👩‍💼 HR
-        </button>
+    <!-- ===============================
+         CONTENT
+    ================================ -->
 
-        <button>
-          🩺 Doctor
-        </button>
+    <div class="content-grid">
 
-        <button>
-          📈 Analytics
-        </button>
+      <!-- ===========================
+           FORM
+      ============================ -->
 
-      </div>
+      <div class="card">
 
-    </aside>
+        <div class="card-title">
+          Daily Revenue Input
+        </div>
 
-    <!-- =====================
-         MAIN
-    ====================== -->
+        <div class="form-grid">
 
-    <main class="main">
+          <div class="field">
+            <label>หัตถการ</label>
+            <input
+              id="procedureRevenue"
+              type="number"
+              value="0"
+            />
+          </div>
 
-      <div class="topbar">
+          <div class="field">
+            <label>ขายยา</label>
+            <input
+              id="medicineRevenue"
+              type="number"
+              value="0"
+            />
+          </div>
 
-        <div class="title-wrap">
+          <div class="field">
+            <label>Treatment</label>
+            <input
+              id="treatmentRevenue"
+              type="number"
+              value="0"
+            />
+          </div>
 
-          <small>
-            DAILY OPERATIONS
-          </small>
+          <div class="field">
+            <label>สินค้า</label>
+            <input
+              id="productRevenue"
+              type="number"
+              value="0"
+            />
+          </div>
 
-          <h1>
-            Operations Portal
-          </h1>
+          <div class="field">
+            <label>Member</label>
+            <input
+              id="memberRevenue"
+              type="number"
+              value="0"
+            />
+          </div>
+
+          <div class="field">
+            <label>HD Mall</label>
+            <input
+              id="hdMallRevenue"
+              type="number"
+              value="0"
+            />
+          </div>
+
+          <div class="field">
+            <label>Gowabi</label>
+            <input
+              id="gowabiRevenue"
+              type="number"
+              value="0"
+            />
+          </div>
+
+          <div class="field">
+            <label>รายได้อื่น</label>
+            <input
+              id="otherRevenue"
+              type="number"
+              value="0"
+            />
+          </div>
+
+          <div class="field">
+            <label>คนไข้ใหม่</label>
+            <input
+              id="newPatients"
+              type="number"
+              value="0"
+            />
+          </div>
+
+          <div class="field">
+            <label>คนไข้เก่า</label>
+            <input
+              id="oldPatients"
+              type="number"
+              value="0"
+            />
+          </div>
 
         </div>
 
-        <button class="save-btn">
-          Save Daily Report
-        </button>
-
       </div>
 
-      <!-- =====================
-           SUMMARY
-      ====================== -->
+      <!-- ===========================
+           LIVE PREVIEW
+      ============================ -->
 
       <div class="summary">
 
         <div class="summary-card">
 
-          <small>
+          <div class="summary-label">
             Revenue Today
-          </small>
+          </div>
 
-          <h2>
-            ฿0
-          </h2>
+          <div
+            class="summary-value"
+            id="previewTotalRevenue"
+          >
+            ฿0.00
+          </div>
+
+          <div class="summary-sub">
+            Live preview summary
+          </div>
 
         </div>
 
-        <div class="summary-card">
+        <div class="kpi-grid">
 
-          <small>
-            Leads
-          </small>
+          <div class="kpi">
 
-          <h2>
-            0
-          </h2>
+            <small>
+              New Patients
+            </small>
 
-        </div>
+            <h3 id="previewNewPatients">
+              0
+            </h3>
 
-        <div class="summary-card">
-
-          <small>
-            Customers
-          </small>
-
-          <h2>
-            0
-          </h2>
-
-        </div>
-
-      </div>
-
-      <!-- =====================
-           SALES
-      ====================== -->
-
-      <div class="form-section">
-
-        <h3>
-          Sales
-        </h3>
-
-        <div class="grid">
-
-          <div class="field">
-            <label>ยอดขายรวม</label>
-            <input type="text">
           </div>
 
-          <div class="field">
-            <label>เงินสด</label>
-            <input type="text">
+          <div class="kpi">
+
+            <small>
+              Old Patients
+            </small>
+
+            <h3 id="previewOldPatients">
+              0
+            </h3>
+
           </div>
 
-          <div class="field">
-            <label>ยอดโอน</label>
-            <input type="text">
+          <div class="kpi">
+
+            <small>
+              Total Patients
+            </small>
+
+            <h3 id="previewTotalPatients">
+              0
+            </h3>
+
           </div>
 
-          <div class="field">
-            <label>คอร์ส</label>
-            <input type="text">
-          </div>
+          <div class="kpi">
 
-          <div class="field">
-            <label>สินค้า</label>
-            <input type="text">
+            <small>
+              Avg Revenue / Patient
+            </small>
+
+            <h3 id="previewAvgRevenue">
+              ฿0
+            </h3>
+
           </div>
 
         </div>
 
       </div>
 
-      <!-- =====================
-           MARKETING
-      ====================== -->
+    </div>
 
-      <div class="form-section">
+  </main>
 
-        <h3>
-          Marketing
-        </h3>
+</div>
 
-        <div class="grid">
+<script>
 
-          <div class="field">
-            <label>FB Leads</label>
-            <input type="text">
-          </div>
+/* =====================================
+   HELPERS
+===================================== */
 
-          <div class="field">
-            <label>LINE Leads</label>
-            <input type="text">
-          </div>
+function toNumber(value){
 
-          <div class="field">
-            <label>TikTok Leads</label>
-            <input type="text">
-          </div>
+  if(
+    value === '' ||
+    value === null ||
+    value === undefined ||
+    isNaN(Number(value))
+  ){
+    return 0;
+  }
 
-          <div class="field">
-            <label>Ads Spend</label>
-            <input type="text">
-          </div>
+  return Number(value);
 
-          <div class="field">
-            <label>Campaign</label>
-            <input type="text">
-          </div>
+}
 
-        </div>
+function money(value){
 
-      </div>
+  return value.toLocaleString(
+    'th-TH',
+    {
+      minimumFractionDigits:2,
+      maximumFractionDigits:2
+    }
+  );
 
-      <!-- =====================
-           HR
-      ====================== -->
+}
 
-      <div class="form-section">
+/* =====================================
+   LIVE PREVIEW
+===================================== */
 
-        <h3>
-          HR
-        </h3>
+function updatePreview(){
 
-        <div class="grid">
+  const procedure =
+    toNumber(
+      document.getElementById('procedureRevenue').value
+    );
 
-          <div class="field">
-            <label>พนักงานเข้างาน</label>
-            <input type="text">
-          </div>
+  const medicine =
+    toNumber(
+      document.getElementById('medicineRevenue').value
+    );
 
-          <div class="field">
-            <label>ลางาน</label>
-            <input type="text">
-          </div>
+  const treatment =
+    toNumber(
+      document.getElementById('treatmentRevenue').value
+    );
 
-          <div class="field">
-            <label>มาสาย</label>
-            <input type="text">
-          </div>
+  const product =
+    toNumber(
+      document.getElementById('productRevenue').value
+    );
 
-          <div class="field">
-            <label>OT</label>
-            <input type="text">
-          </div>
+  const member =
+    toNumber(
+      document.getElementById('memberRevenue').value
+    );
 
-        </div>
+  const hdMall =
+    toNumber(
+      document.getElementById('hdMallRevenue').value
+    );
 
-      </div>
+  const gowabi =
+    toNumber(
+      document.getElementById('gowabiRevenue').value
+    );
 
-    </main>
+  const other =
+    toNumber(
+      document.getElementById('otherRevenue').value
+    );
 
-  </div>
+  const newPatients =
+    toNumber(
+      document.getElementById('newPatients').value
+    );
+
+  const oldPatients =
+    toNumber(
+      document.getElementById('oldPatients').value
+    );
+
+  const totalRevenue =
+      procedure
+    + medicine
+    + treatment
+    + product
+    + member
+    + hdMall
+    + gowabi
+    + other;
+
+  const totalPatients =
+      newPatients
+    + oldPatients;
+
+  const avgRevenue =
+    totalPatients > 0
+      ? totalRevenue / totalPatients
+      : 0;
+
+  document.getElementById(
+    'previewTotalRevenue'
+  ).innerText =
+    `฿${money(totalRevenue)}`;
+
+  document.getElementById(
+    'previewNewPatients'
+  ).innerText =
+    newPatients;
+
+  document.getElementById(
+    'previewOldPatients'
+  ).innerText =
+    oldPatients;
+
+  document.getElementById(
+    'previewTotalPatients'
+  ).innerText =
+    totalPatients;
+
+  document.getElementById(
+    'previewAvgRevenue'
+  ).innerText =
+    `฿${money(avgRevenue)}`;
+
+}
+
+/* =====================================
+   AUTO BIND
+===================================== */
+
+document
+  .querySelectorAll('input')
+  .forEach(input => {
+
+    input.addEventListener(
+      'input',
+      updatePreview
+    );
+
+  });
+
+/* =====================================
+   SAVE
+===================================== */
+
+function saveData(){
+
+  const payload = {
+
+    procedureRevenue:
+      toNumber(
+        document.getElementById('procedureRevenue').value
+      ),
+
+    medicineRevenue:
+      toNumber(
+        document.getElementById('medicineRevenue').value
+      ),
+
+    treatmentRevenue:
+      toNumber(
+        document.getElementById('treatmentRevenue').value
+      ),
+
+    productRevenue:
+      toNumber(
+        document.getElementById('productRevenue').value
+      ),
+
+    memberRevenue:
+      toNumber(
+        document.getElementById('memberRevenue').value
+      ),
+
+    hdMallRevenue:
+      toNumber(
+        document.getElementById('hdMallRevenue').value
+      ),
+
+    gowabiRevenue:
+      toNumber(
+        document.getElementById('gowabiRevenue').value
+      ),
+
+    otherRevenue:
+      toNumber(
+        document.getElementById('otherRevenue').value
+      ),
+
+    newPatients:
+      toNumber(
+        document.getElementById('newPatients').value
+      ),
+
+    oldPatients:
+      toNumber(
+        document.getElementById('oldPatients').value
+      )
+
+  };
+
+  console.log(payload);
+
+  alert('Saved Successfully');
+
+}
+
+updatePreview();
+
+</script>
 
 </body>
 </html>
