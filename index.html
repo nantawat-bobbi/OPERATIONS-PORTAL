@@ -1,341 +1,10 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
-
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-
-<title>LALIZA Operations Portal</title>
-
-<link
-href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-rel="stylesheet"
-/>
-
-<style>
-
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-}
-
-body{
-  font-family:'Inter',sans-serif;
-  background:#F4F7FB;
-  color:#0F172A;
-}
-
-.app{
-  min-height:100vh;
-  display:grid;
-  grid-template-columns:260px 1fr;
-}
-
-/* SIDEBAR */
-
-.sidebar{
-  background:#0F172A;
-  color:#fff;
-  padding:24px;
-}
-
-.logo{
-  font-size:28px;
-  font-weight:800;
-  margin-bottom:32px;
-}
-
-.nav{
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-}
-
-.nav-btn{
-  border:none;
-  background:transparent;
-  color:#CBD5E1;
-  height:48px;
-  border-radius:14px;
-  text-align:left;
-  padding:0 16px;
-  font-size:15px;
-  font-weight:600;
-  cursor:pointer;
-  transition:0.2s;
-}
-
-.nav-btn:hover{
-  background:#1E293B;
-}
-
-.nav-btn.active{
-  background:#5B5FF6;
-  color:#fff;
-}
-
-/* MAIN */
-
-.main{
-  padding:28px;
-}
-
-.topbar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:24px;
-}
-
-.header-left small{
-  color:#64748B;
-  letter-spacing:2px;
-  font-size:12px;
-}
-
-.header-left h1{
-  margin-top:6px;
-  font-size:36px;
-  font-weight:800;
-}
-
-.save-btn{
-  height:48px;
-  padding:0 24px;
-  border:none;
-  border-radius:16px;
-  background:#5B5FF6;
-  color:#fff;
-  font-weight:700;
-  cursor:pointer;
-  box-shadow:0 10px 30px rgba(91,95,246,0.2);
-}
-
-.content-grid{
-  display:grid;
-  grid-template-columns:1.2fr 420px;
-  gap:24px;
-}
-
-.card{
-  background:#fff;
-  border-radius:24px;
-  padding:24px;
-  border:1px solid #E2E8F0;
-  box-shadow:0 10px 30px rgba(15,23,42,0.04);
-}
-
-.card-title{
-  font-size:20px;
-  font-weight:800;
-  margin-bottom:24px;
-}
-
-.form-grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:16px;
-}
-
-.field{
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-}
-
-.field label{
-  font-size:13px;
-  color:#64748B;
-  font-weight:600;
-}
-
-.field input{
-  height:48px;
-  border:1px solid #CBD5E1;
-  border-radius:14px;
-  padding:0 14px;
-  font-size:15px;
-}
-
-.field input:focus{
-  outline:none;
-  border-color:#5B5FF6;
-  box-shadow:0 0 0 4px rgba(91,95,246,0.08);
-}
-
-.summary{
-  display:flex;
-  flex-direction:column;
-  gap:18px;
-}
-
-.summary-card{
-  background:#fff;
-  border-radius:24px;
-  padding:24px;
-  border:1px solid #E2E8F0;
-}
-
-.summary-label{
-  font-size:13px;
-  color:#64748B;
-  font-weight:600;
-}
-
-.summary-value{
-  margin-top:8px;
-  font-size:36px;
-  font-weight:800;
-}
-
-.summary-sub{
-  margin-top:8px;
-  color:#64748B;
-  font-size:13px;
-}
-
-.kpi-grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:16px;
-}
-
-.kpi{
-  background:#fff;
-  border-radius:20px;
-  padding:18px;
-  border:1px solid #E2E8F0;
-}
-
-.kpi small{
-  color:#64748B;
-  font-size:12px;
-}
-
-.kpi h3{
-  margin-top:8px;
-  font-size:28px;
-  font-weight:800;
-}
-
-@media(max-width:1200px){
-
-  .content-grid{
-    grid-template-columns:1fr;
-  }
-
-}
-
-@media(max-width:900px){
-
-  .app{
-    grid-template-columns:1fr;
-  }
-
-  .sidebar{
-    display:none;
-  }
-
-  .form-grid{
-    grid-template-columns:1fr;
-  }
-
-}
-
-</style>
-
-</head>
-<body>
-
-<div class="app">
-
-  <aside class="sidebar">
-
-    <div class="logo">
-      LALIZA
-    </div>
-
-    <div class="nav">
-
-      <button class="nav-btn active" onclick="openModule('revenue',event)">
-        📊 Daily Revenue
-      </button>
-
-      <button class="nav-btn" onclick="openModule('confirm',event)">
-        ☎️ Confirm Tracking
-      </button>
-
-      <button class="nav-btn" onclick="openModule('doctor',event)">
-        👨‍⚕️ Doctor Finance
-      </button>
-
-      <button class="nav-btn" onclick="openModule('billing',event)">
-        🧾 Billing KPI
-      </button>
-
-    </div>
-
-  </aside>
-
-  <main class="main">
-
-    <div class="topbar">
-
-      <div class="header-left">
-        <small>OPERATIONS PORTAL</small>
-        <h1 id="pageTitle">Daily Revenue</h1>
-      </div>
-
-      <button class="save-btn" onclick="saveData()">
-        Save Report
-      </button>
-
-    </div>
-
-    <div class="content-grid">
-
-      <div class="card">
-
-        <div class="card-title" id="formTitle">
-          Daily Revenue Input
-        </div>
-
-        <div id="moduleForm"></div>
-
-      </div>
-
-      <div class="summary">
-
-        <div class="summary-card">
-
-          <div class="summary-label">
-            Live Preview
-          </div>
-
-          <div class="summary-value" id="previewMain">
-            ฿0.00
-          </div>
-
-          <div class="summary-sub" id="previewSub">
-            ระบบสรุปข้อมูลอัตโนมัติ
-          </div>
-
-        </div>
-
-        <div class="kpi-grid" id="kpiGrid"></div>
-
-      </div>
-
-    </div>
-
-  </main>
-
-</div>
-
 <script>
 
 let currentModule = 'revenue';
+
+/* ==============================
+   SAFE NUMBER
+============================== */
 
 function toNumber(value){
 
@@ -354,7 +23,7 @@ function toNumber(value){
 
 function money(value){
 
-  return value.toLocaleString(
+  return Number(value).toLocaleString(
     'th-TH',
     {
       minimumFractionDigits:2,
@@ -364,53 +33,103 @@ function money(value){
 
 }
 
+/* ==============================
+   NAVIGATION
+============================== */
+
+document
+  .querySelectorAll('.nav-btn')
+  .forEach(btn => {
+
+    btn.addEventListener('click', () => {
+
+      document
+        .querySelectorAll('.nav-btn')
+        .forEach(el => {
+          el.classList.remove('active');
+        });
+
+      btn.classList.add('active');
+
+      const module =
+        btn.dataset.module;
+
+      openModule(module);
+
+    });
+
+  });
+
+/* ==============================
+   OPEN MODULE
+============================== */
+
+function openModule(module){
+
+  currentModule = module;
+
+  switch(module){
+
+    case 'revenue':
+      renderRevenueModule();
+      break;
+
+    case 'confirm':
+      renderConfirmModule();
+      break;
+
+    case 'doctor':
+      renderDoctorModule();
+      break;
+
+    case 'billing':
+      renderBillingModule();
+      break;
+
+  }
+
+}
+
+/* ==============================
+   REVENUE
+============================== */
+
 function renderRevenueModule(){
 
-  document.getElementById('pageTitle').innerText = 'Daily Revenue';
-  document.getElementById('formTitle').innerText = 'Revenue Input';
+  document.getElementById(
+    'pageTitle'
+  ).innerText =
+    'Daily Revenue';
 
-  document.getElementById('moduleForm').innerHTML = `
+  document.getElementById(
+    'formTitle'
+  ).innerText =
+    'Revenue Input';
+
+  document.getElementById(
+    'moduleForm'
+  ).innerHTML = `
 
     <div class="form-grid">
 
       <div class="field">
         <label>หัตถการ</label>
-        <input id="procedureRevenue" type="number" value="0" />
+        <input id="procedureRevenue" type="number" value="0">
       </div>
 
       <div class="field">
         <label>ขายยา</label>
-        <input id="medicineRevenue" type="number" value="0" />
+        <input id="medicineRevenue" type="number" value="0">
       </div>
 
       <div class="field">
         <label>Treatment</label>
-        <input id="treatmentRevenue" type="number" value="0" />
+        <input id="treatmentRevenue" type="number" value="0">
       </div>
 
       <div class="field">
         <label>สินค้า</label>
-        <input id="productRevenue" type="number" value="0" />
-      </div>
-
-      <div class="field">
-        <label>Member</label>
-        <input id="memberRevenue" type="number" value="0" />
-      </div>
-
-      <div class="field">
-        <label>HD Mall</label>
-        <input id="hdMallRevenue" type="number" value="0" />
-      </div>
-
-      <div class="field">
-        <label>Gowabi</label>
-        <input id="gowabiRevenue" type="number" value="0" />
-      </div>
-
-      <div class="field">
-        <label>รายได้อื่น</label>
-        <input id="otherRevenue" type="number" value="0" />
+        <input id="productRevenue" type="number" value="0">
       </div>
 
     </div>
@@ -418,42 +137,41 @@ function renderRevenueModule(){
   `;
 
   bindInputs(updateRevenuePreview);
+
   updateRevenuePreview();
 
 }
 
+/* ==============================
+   CONFIRM
+============================== */
+
 function renderConfirmModule(){
 
-  document.getElementById('pageTitle').innerText = 'Confirm Tracking';
-  document.getElementById('formTitle').innerText = 'Call Center Tracking';
+  document.getElementById(
+    'pageTitle'
+  ).innerText =
+    'Confirm Tracking';
 
-  document.getElementById('moduleForm').innerHTML = `
+  document.getElementById(
+    'formTitle'
+  ).innerText =
+    'Call Center Tracking';
+
+  document.getElementById(
+    'moduleForm'
+  ).innerHTML = `
 
     <div class="form-grid">
 
       <div class="field">
         <label>CF มา</label>
-        <input id="confirmed" type="number" value="0" />
-      </div>
-
-      <div class="field">
-        <label>CF ขอเลื่อน</label>
-        <input id="reschedule" type="number" value="0" />
-      </div>
-
-      <div class="field">
-        <label>Walk-in</label>
-        <input id="walkin" type="number" value="0" />
-      </div>
-
-      <div class="field">
-        <label>ไม่รับสาย</label>
-        <input id="noanswer" type="number" value="0" />
+        <input id="confirmed" type="number" value="0">
       </div>
 
       <div class="field">
         <label>โทรทั้งหมด</label>
-        <input id="totalcalls" type="number" value="0" />
+        <input id="totalcalls" type="number" value="0">
       </div>
 
     </div>
@@ -461,37 +179,41 @@ function renderConfirmModule(){
   `;
 
   bindInputs(updateConfirmPreview);
+
   updateConfirmPreview();
 
 }
 
+/* ==============================
+   DOCTOR
+============================== */
+
 function renderDoctorModule(){
 
-  document.getElementById('pageTitle').innerText = 'Doctor Finance';
-  document.getElementById('formTitle').innerText = 'Doctor DF Settlement';
+  document.getElementById(
+    'pageTitle'
+  ).innerText =
+    'Doctor Finance';
 
-  document.getElementById('moduleForm').innerHTML = `
+  document.getElementById(
+    'formTitle'
+  ).innerText =
+    'Doctor Settlement';
+
+  document.getElementById(
+    'moduleForm'
+  ).innerHTML = `
 
     <div class="form-grid">
 
       <div class="field">
         <label>ยอดขาย</label>
-        <input id="doctorRevenue" type="number" value="0" />
+        <input id="doctorRevenue" type="number" value="0">
       </div>
 
       <div class="field">
         <label>DF</label>
-        <input id="doctorDF" type="number" value="0" />
-      </div>
-
-      <div class="field">
-        <label>เวลาเข้า</label>
-        <input id="startTime" type="time" />
-      </div>
-
-      <div class="field">
-        <label>เวลาออก</label>
-        <input id="endTime" type="time" />
+        <input id="doctorDF" type="number" value="0">
       </div>
 
     </div>
@@ -499,27 +221,36 @@ function renderDoctorModule(){
   `;
 
   bindInputs(updateDoctorPreview);
+
   updateDoctorPreview();
 
 }
 
+/* ==============================
+   BILLING
+============================== */
+
 function renderBillingModule(){
 
-  document.getElementById('pageTitle').innerText = 'Billing KPI';
-  document.getElementById('formTitle').innerText = 'Billing Productivity';
+  document.getElementById(
+    'pageTitle'
+  ).innerText =
+    'Billing KPI';
 
-  document.getElementById('moduleForm').innerHTML = `
+  document.getElementById(
+    'formTitle'
+  ).innerText =
+    'Billing Productivity';
+
+  document.getElementById(
+    'moduleForm'
+  ).innerHTML = `
 
     <div class="form-grid">
 
       <div class="field">
         <label>จำนวนบิล</label>
-        <input id="billCount" type="number" value="0" />
-      </div>
-
-      <div class="field">
-        <label>หมายเหตุ</label>
-        <input id="billingNote" type="text" />
+        <input id="billCount" type="number" value="0">
       </div>
 
     </div>
@@ -527,14 +258,19 @@ function renderBillingModule(){
   `;
 
   bindInputs(updateBillingPreview);
+
   updateBillingPreview();
 
 }
 
+/* ==============================
+   INPUT BIND
+============================== */
+
 function bindInputs(callback){
 
   document
-    .querySelectorAll('input')
+    .querySelectorAll('#moduleForm input')
     .forEach(input => {
 
       input.addEventListener(
@@ -546,47 +282,124 @@ function bindInputs(callback){
 
 }
 
+/* ==============================
+   PREVIEW
+============================== */
+
 function updateRevenuePreview(){
 
   const total =
       toNumber(document.getElementById('procedureRevenue')?.value)
     + toNumber(document.getElementById('medicineRevenue')?.value)
     + toNumber(document.getElementById('treatmentRevenue')?.value)
-    + toNumber(document.getElementById('productRevenue')?.value)
-    + toNumber(document.getElementById('memberRevenue')?.value)
-    + toNumber(document.getElementById('hdMallRevenue')?.value)
-    + toNumber(document.getElementById('gowabiRevenue')?.value)
-    + toNumber(document.getElementById('otherRevenue')?.value);
+    + toNumber(document.getElementById('productRevenue')?.value);
 
-  document.getElementById('previewMain').innerText = `฿${money(total)}`;
-  document.getElementById('previewSub').innerText = 'Revenue Summary Today';
+  document.getElementById(
+    'previewMain'
+  ).innerText =
+    `฿${money(total)}`;
 
-  document.getElementById('kpiGrid').innerHTML = `
-
-    <div class="kpi">
-      <small>Procedure</small>
-      <h3>฿${money(toNumber(document.getElementById('procedureRevenue')?.value))}</h3>
-    </div>
-
-    <div class="kpi">
-      <small>Medicine</small>
-      <h3>฿${money(toNumber(document.getElementById('medicineRevenue')?.value))}</h3>
-    </div>
-
-    <div class="kpi">
-      <small>Treatment</small>
-      <h3>฿${money(toNumber(document.getElementById('treatmentRevenue')?.value))}</h3>
-    </div>
-
-    <div class="kpi">
-      <small>Product</small>
-      <h3>฿${money(toNumber(document.getElementById('productRevenue')?.value))}</h3>
-    </div>
-
-  `;
+  document.getElementById(
+    'previewSub'
+  ).innerText =
+    'Revenue Summary';
 
 }
 
 function updateConfirmPreview(){
 
-  const confirmed = toNumber(
+  const confirmed =
+    toNumber(document.getElementById('confirmed')?.value);
+
+  const totalcalls =
+    toNumber(document.getElementById('totalcalls')?.value);
+
+  const rate =
+    totalcalls > 0
+      ? (confirmed / totalcalls) * 100
+      : 0;
+
+  document.getElementById(
+    'previewMain'
+  ).innerText =
+    `${rate.toFixed(1)}%`;
+
+  document.getElementById(
+    'previewSub'
+  ).innerText =
+    'Show Rate';
+
+}
+
+function updateDoctorPreview(){
+
+  const df =
+    toNumber(document.getElementById('doctorDF')?.value);
+
+  document.getElementById(
+    'previewMain'
+  ).innerText =
+    `฿${money(df)}`;
+
+  document.getElementById(
+    'previewSub'
+  ).innerText =
+    'Doctor DF';
+
+}
+
+function updateBillingPreview(){
+
+  const bills =
+    toNumber(document.getElementById('billCount')?.value);
+
+  document.getElementById(
+    'previewMain'
+  ).innerText =
+    bills;
+
+  document.getElementById(
+    'previewSub'
+  ).innerText =
+    'Bills Today';
+
+}
+
+/* ==============================
+   SAVE
+============================== */
+
+function saveData(){
+
+  alert(
+    currentModule + ' saved'
+  );
+
+}
+
+/* ==============================
+   INIT
+============================== */
+
+renderRevenueModule();
+
+</script>
+<div class="nav">
+
+  <button class="nav-btn active" data-module="revenue">
+    📊 Daily Revenue
+  </button>
+
+  <button class="nav-btn" data-module="confirm">
+    ☎️ Confirm Tracking
+  </button>
+
+  <button class="nav-btn" data-module="doctor">
+    👨‍⚕️ Doctor Finance
+  </button>
+
+  <button class="nav-btn" data-module="billing">
+    🧾 Billing KPI
+  </button>
+
+</div>
