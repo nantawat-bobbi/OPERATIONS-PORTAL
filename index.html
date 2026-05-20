@@ -14,10 +14,6 @@ rel="stylesheet"
 
 <style>
 
-/* =========================================
-   RESET
-========================================= */
-
 *{
   margin:0;
   padding:0;
@@ -30,349 +26,202 @@ body{
   color:#0F172A;
 }
 
-/* =========================================
-   APP LAYOUT
-========================================= */
-
 .app{
-
-  display:grid;
-
-  grid-template-columns:
-    260px 1fr;
-
   min-height:100vh;
+  display:grid;
+  grid-template-columns:260px 1fr;
 }
 
-/* =========================================
-   SIDEBAR
-========================================= */
+/* SIDEBAR */
 
 .sidebar{
-
   background:#0F172A;
-
   color:#fff;
-
   padding:24px;
 }
 
 .logo{
-
   font-size:28px;
   font-weight:800;
-
   margin-bottom:32px;
 }
 
 .nav{
-
   display:flex;
   flex-direction:column;
   gap:12px;
 }
 
-.nav button{
-
+.nav-btn{
   border:none;
-
   background:transparent;
-
   color:#CBD5E1;
-
   height:48px;
-
   border-radius:14px;
-
   text-align:left;
-
   padding:0 16px;
-
   font-size:15px;
-
   font-weight:600;
-
   cursor:pointer;
-
   transition:0.2s;
 }
 
-.nav button:hover{
-
+.nav-btn:hover{
   background:#1E293B;
 }
 
-.nav button.active{
-
+.nav-btn.active{
   background:#5B5FF6;
-
   color:#fff;
 }
 
-/* =========================================
-   MAIN
-========================================= */
+/* MAIN */
 
 .main{
-
   padding:28px;
 }
 
-/* =========================================
-   HEADER
-========================================= */
-
 .topbar{
-
   display:flex;
-
   justify-content:space-between;
-
   align-items:center;
-
   margin-bottom:24px;
 }
 
 .header-left small{
-
   color:#64748B;
-
   letter-spacing:2px;
-
   font-size:12px;
 }
 
 .header-left h1{
-
   margin-top:6px;
-
   font-size:36px;
-
   font-weight:800;
 }
 
 .save-btn{
-
   height:48px;
-
   padding:0 24px;
-
   border:none;
-
   border-radius:16px;
-
   background:#5B5FF6;
-
   color:#fff;
-
   font-weight:700;
-
   cursor:pointer;
-
-  box-shadow:
-    0 10px 30px rgba(91,95,246,0.2);
+  box-shadow:0 10px 30px rgba(91,95,246,0.2);
 }
 
-/* =========================================
-   GRID
-========================================= */
-
 .content-grid{
-
   display:grid;
-
-  grid-template-columns:
-    1.2fr 420px;
-
+  grid-template-columns:1.2fr 420px;
   gap:24px;
 }
 
-/* =========================================
-   CARD
-========================================= */
-
 .card{
-
   background:#fff;
-
   border-radius:24px;
-
   padding:24px;
-
   border:1px solid #E2E8F0;
-
-  box-shadow:
-    0 10px 30px rgba(15,23,42,0.04);
+  box-shadow:0 10px 30px rgba(15,23,42,0.04);
 }
 
 .card-title{
-
   font-size:20px;
-
   font-weight:800;
-
   margin-bottom:24px;
 }
 
-/* =========================================
-   FORM
-========================================= */
-
 .form-grid{
-
   display:grid;
-
-  grid-template-columns:
-    repeat(2,1fr);
-
+  grid-template-columns:repeat(2,1fr);
   gap:16px;
 }
 
 .field{
-
   display:flex;
-
   flex-direction:column;
-
   gap:8px;
 }
 
 .field label{
-
   font-size:13px;
-
   color:#64748B;
-
   font-weight:600;
 }
 
 .field input{
-
   height:48px;
-
   border:1px solid #CBD5E1;
-
   border-radius:14px;
-
   padding:0 14px;
-
   font-size:15px;
-
-  transition:0.2s;
 }
 
 .field input:focus{
-
   outline:none;
-
   border-color:#5B5FF6;
-
-  box-shadow:
-    0 0 0 4px rgba(91,95,246,0.08);
+  box-shadow:0 0 0 4px rgba(91,95,246,0.08);
 }
 
-/* =========================================
-   SUMMARY
-========================================= */
-
 .summary{
-
   display:flex;
-
   flex-direction:column;
-
   gap:18px;
 }
 
 .summary-card{
-
-  background:#F8FAFC;
-
-  border-radius:20px;
-
-  padding:22px;
-
+  background:#fff;
+  border-radius:24px;
+  padding:24px;
   border:1px solid #E2E8F0;
 }
 
 .summary-label{
-
   font-size:13px;
-
   color:#64748B;
-
   font-weight:600;
 }
 
 .summary-value{
-
   margin-top:8px;
-
-  font-size:34px;
-
+  font-size:36px;
   font-weight:800;
 }
 
 .summary-sub{
-
   margin-top:8px;
-
-  font-size:13px;
-
   color:#64748B;
+  font-size:13px;
 }
 
-/* =========================================
-   KPI
-========================================= */
-
 .kpi-grid{
-
   display:grid;
-
-  grid-template-columns:
-    repeat(2,1fr);
-
+  grid-template-columns:repeat(2,1fr);
   gap:16px;
-
-  margin-top:20px;
 }
 
 .kpi{
-
   background:#fff;
-
-  border-radius:18px;
-
+  border-radius:20px;
   padding:18px;
-
   border:1px solid #E2E8F0;
 }
 
 .kpi small{
-
   color:#64748B;
-
   font-size:12px;
 }
 
 .kpi h3{
-
   margin-top:8px;
-
   font-size:28px;
-
   font-weight:800;
 }
-
-/* =========================================
-   RESPONSIVE
-========================================= */
 
 @media(max-width:1200px){
 
   .content-grid{
-
     grid-template-columns:1fr;
   }
 
@@ -381,17 +230,14 @@ body{
 @media(max-width:900px){
 
   .app{
-
     grid-template-columns:1fr;
   }
 
   .sidebar{
-
     display:none;
   }
 
   .form-grid{
-
     grid-template-columns:1fr;
   }
 
@@ -400,14 +246,9 @@ body{
 </style>
 
 </head>
-
 <body>
 
 <div class="app">
-
-  <!-- ===================================
-       SIDEBAR
-  ==================================== -->
 
   <aside class="sidebar">
 
@@ -417,255 +258,72 @@ body{
 
     <div class="nav">
 
-      <button class="active">
+      <button class="nav-btn active" onclick="openModule('revenue',event)">
         📊 Daily Revenue
       </button>
 
-      <button>
+      <button class="nav-btn" onclick="openModule('confirm',event)">
         ☎️ Confirm Tracking
       </button>
 
-      <button>
+      <button class="nav-btn" onclick="openModule('doctor',event)">
         👨‍⚕️ Doctor Finance
       </button>
 
-      <button>
+      <button class="nav-btn" onclick="openModule('billing',event)">
         🧾 Billing KPI
-      </button>
-
-      <button>
-        📈 Analytics
-      </button>
-
-      <button>
-        📤 Export
       </button>
 
     </div>
 
   </aside>
 
-  <!-- ===================================
-       MAIN
-  ==================================== -->
-
   <main class="main">
-
-    <!-- ===============================
-         HEADER
-    ================================ -->
 
     <div class="topbar">
 
       <div class="header-left">
-
-        <small>
-          DAILY OPERATIONS
-        </small>
-
-        <h1>
-          Revenue Operations
-        </h1>
-
+        <small>OPERATIONS PORTAL</small>
+        <h1 id="pageTitle">Daily Revenue</h1>
       </div>
 
-      <button
-        class="save-btn"
-        onclick="saveData()"
-      >
+      <button class="save-btn" onclick="saveData()">
         Save Report
       </button>
 
     </div>
 
-    <!-- ===============================
-         CONTENT
-    ================================ -->
-
     <div class="content-grid">
-
-      <!-- ===========================
-           FORM
-      ============================ -->
 
       <div class="card">
 
-        <div class="card-title">
+        <div class="card-title" id="formTitle">
           Daily Revenue Input
         </div>
 
-        <div class="form-grid">
-
-          <div class="field">
-            <label>หัตถการ</label>
-            <input
-              id="procedureRevenue"
-              type="number"
-              value="0"
-            />
-          </div>
-
-          <div class="field">
-            <label>ขายยา</label>
-            <input
-              id="medicineRevenue"
-              type="number"
-              value="0"
-            />
-          </div>
-
-          <div class="field">
-            <label>Treatment</label>
-            <input
-              id="treatmentRevenue"
-              type="number"
-              value="0"
-            />
-          </div>
-
-          <div class="field">
-            <label>สินค้า</label>
-            <input
-              id="productRevenue"
-              type="number"
-              value="0"
-            />
-          </div>
-
-          <div class="field">
-            <label>Member</label>
-            <input
-              id="memberRevenue"
-              type="number"
-              value="0"
-            />
-          </div>
-
-          <div class="field">
-            <label>HD Mall</label>
-            <input
-              id="hdMallRevenue"
-              type="number"
-              value="0"
-            />
-          </div>
-
-          <div class="field">
-            <label>Gowabi</label>
-            <input
-              id="gowabiRevenue"
-              type="number"
-              value="0"
-            />
-          </div>
-
-          <div class="field">
-            <label>รายได้อื่น</label>
-            <input
-              id="otherRevenue"
-              type="number"
-              value="0"
-            />
-          </div>
-
-          <div class="field">
-            <label>คนไข้ใหม่</label>
-            <input
-              id="newPatients"
-              type="number"
-              value="0"
-            />
-          </div>
-
-          <div class="field">
-            <label>คนไข้เก่า</label>
-            <input
-              id="oldPatients"
-              type="number"
-              value="0"
-            />
-          </div>
-
-        </div>
+        <div id="moduleForm"></div>
 
       </div>
-
-      <!-- ===========================
-           LIVE PREVIEW
-      ============================ -->
 
       <div class="summary">
 
         <div class="summary-card">
 
           <div class="summary-label">
-            Revenue Today
+            Live Preview
           </div>
 
-          <div
-            class="summary-value"
-            id="previewTotalRevenue"
-          >
+          <div class="summary-value" id="previewMain">
             ฿0.00
           </div>
 
-          <div class="summary-sub">
-            Live preview summary
+          <div class="summary-sub" id="previewSub">
+            ระบบสรุปข้อมูลอัตโนมัติ
           </div>
 
         </div>
 
-        <div class="kpi-grid">
-
-          <div class="kpi">
-
-            <small>
-              New Patients
-            </small>
-
-            <h3 id="previewNewPatients">
-              0
-            </h3>
-
-          </div>
-
-          <div class="kpi">
-
-            <small>
-              Old Patients
-            </small>
-
-            <h3 id="previewOldPatients">
-              0
-            </h3>
-
-          </div>
-
-          <div class="kpi">
-
-            <small>
-              Total Patients
-            </small>
-
-            <h3 id="previewTotalPatients">
-              0
-            </h3>
-
-          </div>
-
-          <div class="kpi">
-
-            <small>
-              Avg Revenue / Patient
-            </small>
-
-            <h3 id="previewAvgRevenue">
-              ฿0
-            </h3>
-
-          </div>
-
-        </div>
+        <div class="kpi-grid" id="kpiGrid"></div>
 
       </div>
 
@@ -677,9 +335,7 @@ body{
 
 <script>
 
-/* =====================================
-   HELPERS
-===================================== */
+let currentModule = 'revenue';
 
 function toNumber(value){
 
@@ -708,192 +364,229 @@ function money(value){
 
 }
 
-/* =====================================
-   LIVE PREVIEW
-===================================== */
+function renderRevenueModule(){
 
-function updatePreview(){
+  document.getElementById('pageTitle').innerText = 'Daily Revenue';
+  document.getElementById('formTitle').innerText = 'Revenue Input';
 
-  const procedure =
-    toNumber(
-      document.getElementById('procedureRevenue').value
-    );
+  document.getElementById('moduleForm').innerHTML = `
 
-  const medicine =
-    toNumber(
-      document.getElementById('medicineRevenue').value
-    );
+    <div class="form-grid">
 
-  const treatment =
-    toNumber(
-      document.getElementById('treatmentRevenue').value
-    );
+      <div class="field">
+        <label>หัตถการ</label>
+        <input id="procedureRevenue" type="number" value="0" />
+      </div>
 
-  const product =
-    toNumber(
-      document.getElementById('productRevenue').value
-    );
+      <div class="field">
+        <label>ขายยา</label>
+        <input id="medicineRevenue" type="number" value="0" />
+      </div>
 
-  const member =
-    toNumber(
-      document.getElementById('memberRevenue').value
-    );
+      <div class="field">
+        <label>Treatment</label>
+        <input id="treatmentRevenue" type="number" value="0" />
+      </div>
 
-  const hdMall =
-    toNumber(
-      document.getElementById('hdMallRevenue').value
-    );
+      <div class="field">
+        <label>สินค้า</label>
+        <input id="productRevenue" type="number" value="0" />
+      </div>
 
-  const gowabi =
-    toNumber(
-      document.getElementById('gowabiRevenue').value
-    );
+      <div class="field">
+        <label>Member</label>
+        <input id="memberRevenue" type="number" value="0" />
+      </div>
 
-  const other =
-    toNumber(
-      document.getElementById('otherRevenue').value
-    );
+      <div class="field">
+        <label>HD Mall</label>
+        <input id="hdMallRevenue" type="number" value="0" />
+      </div>
 
-  const newPatients =
-    toNumber(
-      document.getElementById('newPatients').value
-    );
+      <div class="field">
+        <label>Gowabi</label>
+        <input id="gowabiRevenue" type="number" value="0" />
+      </div>
 
-  const oldPatients =
-    toNumber(
-      document.getElementById('oldPatients').value
-    );
+      <div class="field">
+        <label>รายได้อื่น</label>
+        <input id="otherRevenue" type="number" value="0" />
+      </div>
 
-  const totalRevenue =
-      procedure
-    + medicine
-    + treatment
-    + product
-    + member
-    + hdMall
-    + gowabi
-    + other;
+    </div>
 
-  const totalPatients =
-      newPatients
-    + oldPatients;
+  `;
 
-  const avgRevenue =
-    totalPatients > 0
-      ? totalRevenue / totalPatients
-      : 0;
-
-  document.getElementById(
-    'previewTotalRevenue'
-  ).innerText =
-    `฿${money(totalRevenue)}`;
-
-  document.getElementById(
-    'previewNewPatients'
-  ).innerText =
-    newPatients;
-
-  document.getElementById(
-    'previewOldPatients'
-  ).innerText =
-    oldPatients;
-
-  document.getElementById(
-    'previewTotalPatients'
-  ).innerText =
-    totalPatients;
-
-  document.getElementById(
-    'previewAvgRevenue'
-  ).innerText =
-    `฿${money(avgRevenue)}`;
+  bindInputs(updateRevenuePreview);
+  updateRevenuePreview();
 
 }
 
-/* =====================================
-   AUTO BIND
-===================================== */
+function renderConfirmModule(){
 
-document
-  .querySelectorAll('input')
-  .forEach(input => {
+  document.getElementById('pageTitle').innerText = 'Confirm Tracking';
+  document.getElementById('formTitle').innerText = 'Call Center Tracking';
 
-    input.addEventListener(
-      'input',
-      updatePreview
-    );
+  document.getElementById('moduleForm').innerHTML = `
 
-  });
+    <div class="form-grid">
 
-/* =====================================
-   SAVE
-===================================== */
+      <div class="field">
+        <label>CF มา</label>
+        <input id="confirmed" type="number" value="0" />
+      </div>
 
-function saveData(){
+      <div class="field">
+        <label>CF ขอเลื่อน</label>
+        <input id="reschedule" type="number" value="0" />
+      </div>
 
-  const payload = {
+      <div class="field">
+        <label>Walk-in</label>
+        <input id="walkin" type="number" value="0" />
+      </div>
 
-    procedureRevenue:
-      toNumber(
-        document.getElementById('procedureRevenue').value
-      ),
+      <div class="field">
+        <label>ไม่รับสาย</label>
+        <input id="noanswer" type="number" value="0" />
+      </div>
 
-    medicineRevenue:
-      toNumber(
-        document.getElementById('medicineRevenue').value
-      ),
+      <div class="field">
+        <label>โทรทั้งหมด</label>
+        <input id="totalcalls" type="number" value="0" />
+      </div>
 
-    treatmentRevenue:
-      toNumber(
-        document.getElementById('treatmentRevenue').value
-      ),
+    </div>
 
-    productRevenue:
-      toNumber(
-        document.getElementById('productRevenue').value
-      ),
+  `;
 
-    memberRevenue:
-      toNumber(
-        document.getElementById('memberRevenue').value
-      ),
-
-    hdMallRevenue:
-      toNumber(
-        document.getElementById('hdMallRevenue').value
-      ),
-
-    gowabiRevenue:
-      toNumber(
-        document.getElementById('gowabiRevenue').value
-      ),
-
-    otherRevenue:
-      toNumber(
-        document.getElementById('otherRevenue').value
-      ),
-
-    newPatients:
-      toNumber(
-        document.getElementById('newPatients').value
-      ),
-
-    oldPatients:
-      toNumber(
-        document.getElementById('oldPatients').value
-      )
-
-  };
-
-  console.log(payload);
-
-  alert('Saved Successfully');
+  bindInputs(updateConfirmPreview);
+  updateConfirmPreview();
 
 }
 
-updatePreview();
+function renderDoctorModule(){
 
-</script>
+  document.getElementById('pageTitle').innerText = 'Doctor Finance';
+  document.getElementById('formTitle').innerText = 'Doctor DF Settlement';
 
-</body>
-</html>
+  document.getElementById('moduleForm').innerHTML = `
+
+    <div class="form-grid">
+
+      <div class="field">
+        <label>ยอดขาย</label>
+        <input id="doctorRevenue" type="number" value="0" />
+      </div>
+
+      <div class="field">
+        <label>DF</label>
+        <input id="doctorDF" type="number" value="0" />
+      </div>
+
+      <div class="field">
+        <label>เวลาเข้า</label>
+        <input id="startTime" type="time" />
+      </div>
+
+      <div class="field">
+        <label>เวลาออก</label>
+        <input id="endTime" type="time" />
+      </div>
+
+    </div>
+
+  `;
+
+  bindInputs(updateDoctorPreview);
+  updateDoctorPreview();
+
+}
+
+function renderBillingModule(){
+
+  document.getElementById('pageTitle').innerText = 'Billing KPI';
+  document.getElementById('formTitle').innerText = 'Billing Productivity';
+
+  document.getElementById('moduleForm').innerHTML = `
+
+    <div class="form-grid">
+
+      <div class="field">
+        <label>จำนวนบิล</label>
+        <input id="billCount" type="number" value="0" />
+      </div>
+
+      <div class="field">
+        <label>หมายเหตุ</label>
+        <input id="billingNote" type="text" />
+      </div>
+
+    </div>
+
+  `;
+
+  bindInputs(updateBillingPreview);
+  updateBillingPreview();
+
+}
+
+function bindInputs(callback){
+
+  document
+    .querySelectorAll('input')
+    .forEach(input => {
+
+      input.addEventListener(
+        'input',
+        callback
+      );
+
+    });
+
+}
+
+function updateRevenuePreview(){
+
+  const total =
+      toNumber(document.getElementById('procedureRevenue')?.value)
+    + toNumber(document.getElementById('medicineRevenue')?.value)
+    + toNumber(document.getElementById('treatmentRevenue')?.value)
+    + toNumber(document.getElementById('productRevenue')?.value)
+    + toNumber(document.getElementById('memberRevenue')?.value)
+    + toNumber(document.getElementById('hdMallRevenue')?.value)
+    + toNumber(document.getElementById('gowabiRevenue')?.value)
+    + toNumber(document.getElementById('otherRevenue')?.value);
+
+  document.getElementById('previewMain').innerText = `฿${money(total)}`;
+  document.getElementById('previewSub').innerText = 'Revenue Summary Today';
+
+  document.getElementById('kpiGrid').innerHTML = `
+
+    <div class="kpi">
+      <small>Procedure</small>
+      <h3>฿${money(toNumber(document.getElementById('procedureRevenue')?.value))}</h3>
+    </div>
+
+    <div class="kpi">
+      <small>Medicine</small>
+      <h3>฿${money(toNumber(document.getElementById('medicineRevenue')?.value))}</h3>
+    </div>
+
+    <div class="kpi">
+      <small>Treatment</small>
+      <h3>฿${money(toNumber(document.getElementById('treatmentRevenue')?.value))}</h3>
+    </div>
+
+    <div class="kpi">
+      <small>Product</small>
+      <h3>฿${money(toNumber(document.getElementById('productRevenue')?.value))}</h3>
+    </div>
+
+  `;
+
+}
+
+function updateConfirmPreview(){
+
+  const confirmed = toNumber(
