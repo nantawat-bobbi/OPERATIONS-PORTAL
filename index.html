@@ -920,6 +920,64 @@
     document.getElementById('grand-total-disp').value = grand.toLocaleString('th-TH', { minimumFractionDigits: 2 });
   }
 </script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
+<script>
+  // 1. ตั้งค่าการเชื่อมต่อฐานข้อมูลคลินิกของคุณ
+  const firebaseConfig = {
+    apiKey: "AIzaSyDetHuoARpuhqRp-o9mVzECi1nzWAEo-O4",
+    authDomain: "operations-portal-d60a5.firebaseapp.com",
+    databaseURL: "https://operations-portal-d60a5-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "operations-portal-d60a5",
+    storageBucket: "operations-portal-d60a5.firebasestorage.app",
+    messagingSenderId: "821300876730",
+    appId: "1:821300876730:web:608260e1871c7260463983",
+    measurementId: "G-XG665W7YFZ"
+  };
+
+  // 2. สั่งเริ่มระบบ Firebase
+  if (firebase.apps.length === 0) {
+    firebase.initializeApp(firebaseConfig);
+  }
+  const database = firebase.database();
+  
+  // 3. ดึงรายชื่อจาก Firebase มาใส่ช่องเลือกเดิมในหน้าเว็บของคุณ
+  document.addEventListener("DOMContentLoaded", () => {
+    database.ref('system_settings').on('value', (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        
+        // ⚠️ บรรทัดเหล่านี้จะวิ่งไปหา ID ในหน้าเว็บเดิมของคุณ 
+        // (ถ้า ID โค้ดเดิมเป็นชื่ออื่น ให้เปลี่ยนในเครื่องหมาย ' ' ให้ตรงกันครับ)
+        if (data.doctors) {
+          fillDropdownData('doctor1-select', data.doctors, '-- ระบุชื่อแพทย์... --');
+          fillDropdownData('doctor2-select', data.doctors, '-- ระบุชื่อแพทย์ (ถ้ามี)... --');
+        }
+        if (data.cashiers) {
+          fillDropdownData('cashier-select', data.cashiers, '-- เลือกลายเซ็นแคชเชียร์ --');
+        }
+        if (data.managers) {
+          fillDropdownData('manager-select', data.managers, '-- เลือกลายเซ็นผู้จัดการ --');
+        }
+      }
+    });
+  });
+
+  // ฟังก์ชันช่วยเปลี่ยนช่องพิมพ์/ช่องเลือกเดิม ให้กลายเป็น Dropdown อัตโนมัติ
+  function fillDropdownData(elementId, nameList, placeholder) {
+    const selectEl = document.getElementById(elementId);
+    if (!selectEl) return; // หากหา ID ไม่เจอ โค้ดจะไม่พังและข้ามไปทำงานส่วนอื่นต่อ
+    
+    const currentValue = selectEl.value;
+    selectEl.innerHTML = `<option value="">${placeholder}</option>`;
+    nameList.forEach(name => {
+      selectEl.innerHTML += `<option value="${name}">${name}</option>`;
+    });
+    if (nameList.includes(currentValue)) {
+      selectEl.value = currentValue;
+    }
+  }
+</script>
 </body>
 </html>
