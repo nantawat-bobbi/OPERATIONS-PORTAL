@@ -3,51 +3,68 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>LALIZA - ตารางสรุปยอด</title>
+<title>LALIZA - Table UI (Preview)</title>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
 <style>
   body { 
     font-family: 'Sarabun', sans-serif; 
     background-color: #f0f2f5; 
-    margin: 0; padding: 20px; 
+    margin: 0; padding: 20px 0; 
     color: #000;
   }
   
   .container {
-    max-width: 1100px;
+    width: 210mm; /* ขนาดความกว้าง A4 */
+    min-height: 297mm; /* ขนาดความสูง A4 */
     margin: 0 auto;
     background: #fff;
-    padding: 30px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    padding: 10mm;
+    box-sizing: border-box;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
   }
 
   /* --- แถบเครื่องมือด้านบน (ซ่อนตอนพรินต์) --- */
   .toolbar {
     display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 20px; padding-bottom: 20px; border-bottom: 2px dashed #ccc;
+    margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px dashed #ccc;
   }
-  .btn-print {
-    background: #4F46E5; color: white; border: none; padding: 10px 20px;
-    font-size: 16px; font-family: inherit; cursor: pointer; border-radius: 6px;
+  .btn {
+    padding: 8px 16px; font-size: 15px; font-family: inherit; font-weight: 600;
+    cursor: pointer; border-radius: 6px; border: none; transition: 0.2s;
   }
+  .btn-print { background: #4F46E5; color: white; }
   .btn-print:hover { background: #4338CA; }
+  .btn-png { background: #10B981; color: white; }
+  .btn-png:hover { background: #059669; }
+  .btn-add { background: #F3F4F6; color: #4B5563; border: 1px solid #D1D5DB; font-size: 12px; padding: 4px 8px; margin-top: 5px;}
+  .btn-add:hover { background: #E5E7EB; }
 
   /* --- หัวกระดาษ --- */
-  .doc-header {
-    display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px;
-  }
+  .doc-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px; }
   .doc-title { font-size: 22px; font-weight: bold; }
-  .doc-info { font-size: 15px; display: flex; gap: 20px; align-items: center;}
-  .input-line { border: none; border-bottom: 1px dotted #000; font-family: inherit; font-size: 15px; outline: none; text-align: center;}
+  
+  /* --- ตั้งค่า Input (ตัวหนังสือสีน้ำเงิน) --- */
+  input, select, textarea {
+    color: #2563EB !important; /* สีน้ำเงินเข้ม */
+    font-family: 'Sarabun', sans-serif;
+    outline: none;
+    background: transparent;
+  }
+  input::placeholder, textarea::placeholder { color: #9CA3AF !important; }
+  
+  /* ช่องกรอกเฉพาะสีแดง */
+  .input-red { color: #DC2626 !important; /* สีแดง */ }
+
+  .input-line { border: none; border-bottom: 1px dotted #000; font-size: 15px; text-align: center; }
+  .input-text { border: none; font-size: 14px; width: 100%; }
 
   /* --- ตารางหลัก --- */
-  table {
-    width: 100%; border-collapse: collapse; font-size: 14px; margin-bottom: 20px;
-  }
-  th, td { border: 1px solid #000; padding: 4px 8px; vertical-align: middle; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; margin-bottom: 15px; }
+  th, td { border: 1px solid #000; padding: 4px 6px; vertical-align: middle; }
   th { background-color: #f9fafb; text-align: center; font-weight: bold; }
   
-  /* ตกแต่งสีหัวตารางตามรูป */
   .text-red { color: red; font-weight: bold; }
   .bg-gray { background-color: #e5e7eb; }
   .text-center { text-align: center; }
@@ -55,191 +72,230 @@
   .text-bold { font-weight: bold; }
 
   /* --- ช่องกรอกตัวเลขในตาราง --- */
-  .cell-input {
-    width: 100%; border: none; background: transparent; 
-    font-family: inherit; font-size: 14px; text-align: right; outline: none;
-    color: #000; padding: 4px;
-  }
-  .cell-input:hover { background: #fef08a; cursor: text; } /* สีเหลืองอ่อนเวลามองเมาส์ผ่านให้รู้ว่าพิมพ์ได้ */
-  .cell-input:focus { background: #fff; }
+  .cell-input { width: 100%; border: none; font-size: 14px; text-align: right; padding: 2px;}
+  .cell-input:hover { background: #FEF08A; cursor: text; }
+  .cell-input:focus { background: #fff; border-bottom: 1px solid #2563EB; }
 
-  /* --- ส่วนท้าย (หมายเหตุ/ลายเซ็น) --- */
-  .footer-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-  .footer-table td { border: 1px solid #000; padding: 6px 8px; vertical-align: top; height: 50px;}
-  .footer-input { width: 90%; border: none; border-bottom: 1px dotted #000; outline: none; font-family: inherit; font-size: 14px;}
-  .footer-note { width: 100%; border: none; outline: none; font-family: inherit; font-size: 14px; resize: none; margin-top: 5px;}
+  /* --- ส่วนท้าย --- */
+  .footer-table td { height: 40px; vertical-align: top; }
+  .footer-input { width: 100%; border: none; border-bottom: 1px dotted #000; font-size: 14px; text-align: center;}
+  .footer-note { width: 100%; border: none; font-size: 14px; resize: none; margin-top: 5px;}
 
-  /* --- โหมด Print --- */
+  /* --- โหมด Print (ซ่อน UI) --- */
   @media print {
-    body { background-color: #fff; padding: 0; }
-    .container { box-shadow: none; padding: 0; max-width: 100%; }
-    .toolbar { display: none; }
+    @page { size: A4 portrait; margin: 10mm; }
+    body { background-color: #fff; padding: 0; margin: 0; }
+    .container { box-shadow: none; padding: 0; width: 100%; min-height: auto; margin: 0; }
+    .toolbar, .btn-add, .no-print { display: none !important; }
     .cell-input:hover { background: transparent; }
-    /* ซ่อน Placeholder ตอนพรินต์ */
-    input::placeholder, textarea::placeholder { color: transparent; }
+    .cell-input:focus { border: none; }
+    input::placeholder, textarea::placeholder { color: transparent !important; }
+    /* เพื่อให้สีพื้นหลังสีเทาพิมพ์ออกมาได้ */
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
   }
 </style>
 </head>
 <body>
 
-<div class="container">
-  <div class="toolbar">
+<div class="container" id="captureArea">
+  
+  <div class="toolbar no-print">
     <div>
-      <h2 style="margin:0; color:#4F46E5;">ระบบกรอกข้อมูล (Table UI)</h2>
-      <p style="margin:5px 0 0 0; color:#666;">คลิกที่ช่องว่างในตารางเพื่อพิมพ์ตัวเลขได้เลย</p>
+      <h2 style="margin:0; color:#4F46E5;">จำลองหน้าระบบ (Table UI)</h2>
+      <p style="margin:5px 0 0 0; color:#666; font-size:14px;">ตัวหนังสือเป็นสีน้ำเงิน / เพิ่มแถวได้ / คำนวณออโต้</p>
     </div>
-    <button class="btn-print" onclick="window.print()">🖨️ พิมพ์เอกสาร (Print)</button>
+    <div style="display: flex; gap: 10px;">
+      <button class="btn btn-png" onclick="exportPNG()">🖼️ โหลดเป็น PNG</button>
+      <button class="btn btn-print" onclick="window.print()">🖨️ พิมพ์ / Save PDF</button>
+    </div>
   </div>
 
   <div class="doc-header">
     <div class="doc-title">ใบสรุปยอดแคชเชียร์และบัตรเครดิต</div>
-    <div class="doc-info">
-      <div>สาขา <select class="input-line" style="width: 150px; cursor: pointer;">
+    <div style="font-size: 15px;">
+      สาขา <select class="input-line" style="width: 150px; font-weight:bold;">
         <option>เซ็นทรัลพระราม 9</option><option>ซีคอนบางแค</option><option>เซ็นทรัลปิ่นเกล้า</option>
-      </select></div>
+      </select>
     </div>
   </div>
   
-  <div class="doc-header" style="margin-bottom: 15px;">
-    <div class="doc-info" style="width: 100%;">
-      ประจำวันที่ <input type="date" class="input-line" style="width: 130px;"/>
-      <span style="margin-left: 20px;">แพทย์คนที่ 1</span> <input type="text" class="input-line" style="width: 150px;"/>
-      <span style="margin-left: 20px;">แพทย์คนที่ 2</span> <input type="text" class="input-line" style="width: 150px;"/>
+  <div class="doc-header" style="margin-bottom: 10px; font-size: 15px;">
+    <div style="width: 100%; display: flex; align-items: center;">
+      ประจำวันที่ <input type="date" class="input-line" style="width: 130px; margin: 0 10px;"/>
+      แพทย์ <input type="text" class="input-line" placeholder="คนที่ 1" style="width: 120px; margin-right: 5px;"/>
+      <input type="text" class="input-line" placeholder="คนที่ 2 (ถ้ามี)" style="width: 120px;"/>
     </div>
   </div>
 
   <table>
     <thead>
       <tr>
-        <th width="10%">ยอดหน้าร้าน</th>
-        <th width="15%">Program</th>
+        <th width="12%">ยอดหน้าร้าน</th>
+        <th width="18%">Program</th>
         <th width="12%">จำนวนเงิน</th>
         <th width="12%"><span class="text-red">ยอดหักบัตร<br>(VIP+VOCHUER)</span></th>
         <th width="20%">เครดิต</th>
         <th width="12%">จำนวนเงิน</th>
-        <th width="14%">เงินสด/โอน</th>
+        <th width="14%">เงินสด</th>
       </tr>
     </thead>
-    <tbody>
+    <tbody id="tableBody">
       <tr>
-        <td rowspan="15" class="bg-gray"></td> <td>Co2</td>
-        <td><input type="number" class="cell-input amt-proc" placeholder="0"/></td>
-        <td><input type="number" class="cell-input amt-vip" placeholder="0"/></td>
+        <td rowspan="18" class="bg-gray"></td> <td>Co2</td>
+        <td><input type="number" class="cell-input calc-proc" placeholder="0"/></td>
+        <td><input type="number" class="cell-input" placeholder="0"/></td>
         <td>1. KBANK (กสิกร)</td>
         <td class="bg-gray"></td>
-        <td rowspan="3" style="vertical-align: top;">
-          เงินสด<br>
-          <input type="number" class="cell-input" style="font-size:18px; margin-top:20px; font-weight:bold;" placeholder="0"/>
+        <td rowspan="3" style="vertical-align: bottom; padding-bottom:10px;">
+          <input type="number" class="cell-input calc-grand" style="font-size:16px; font-weight:bold; text-align:center;" placeholder="0"/>
         </td>
       </tr>
       <tr>
         <td>Pico</td>
-        <td><input type="number" class="cell-input amt-proc" placeholder="0"/></td>
-        <td><input type="number" class="cell-input amt-vip" placeholder="0"/></td>
+        <td><input type="number" class="cell-input calc-proc" placeholder="0"/></td>
+        <td><input type="number" class="cell-input" placeholder="0"/></td>
         <td>1.1 Credit (เครดิต)</td>
-        <td><input type="number" class="cell-input amt-cc" placeholder="0"/></td>
+        <td><input type="number" class="cell-input calc-cc" placeholder="0"/></td>
       </tr>
       <tr>
         <td>Vbeam</td>
-        <td><input type="number" class="cell-input amt-proc" placeholder="0"/></td>
-        <td><input type="number" class="cell-input amt-vip" placeholder="0"/></td>
+        <td><input type="number" class="cell-input calc-proc" placeholder="0"/></td>
+        <td><input type="number" class="cell-input" placeholder="0"/></td>
         <td>1.2 กสิกร(สแกน/โอน)</td>
-        <td><input type="number" class="cell-input amt-cc" placeholder="0"/></td>
+        <td><input type="number" class="cell-input calc-cc" placeholder="0"/></td>
       </tr>
       <tr>
         <td>Elos</td>
-        <td><input type="number" class="cell-input amt-proc" placeholder="0"/></td>
-        <td><input type="number" class="cell-input amt-vip" placeholder="0"/></td>
+        <td><input type="number" class="cell-input calc-proc" placeholder="0"/></td>
+        <td><input type="number" class="cell-input" placeholder="0"/></td>
         <td>2. KTC (กรุงไทย)</td>
-        <td><input type="number" class="cell-input amt-cc" placeholder="0"/></td>
-        <td rowspan="4" style="vertical-align: top;">
-          แอปพลิเคชัน<br>
-          <input type="number" class="cell-input" style="font-size:18px; margin-top:30px; font-weight:bold;" placeholder="0"/>
-        </td>
+        <td><input type="number" class="cell-input calc-cc" placeholder="0"/></td>
+        <td rowspan="4" style="vertical-align: top;">แอปพลิเคชัน<br><br><input type="number" class="cell-input calc-grand" style="font-size:16px; font-weight:bold; text-align:center;" placeholder="0"/></td>
       </tr>
       <tr>
         <td>Botox</td>
-        <td><input type="number" class="cell-input amt-proc" placeholder="0"/></td>
-        <td><input type="number" class="cell-input amt-vip" placeholder="0"/></td>
+        <td><input type="number" class="cell-input calc-proc" placeholder="0"/></td>
+        <td><input type="number" class="cell-input" placeholder="0"/></td>
         <td>3. BAY (กรุงศรี)</td>
-        <td><input type="number" class="cell-input amt-cc" placeholder="0"/></td>
+        <td><input type="number" class="cell-input calc-cc" placeholder="0"/></td>
       </tr>
       <tr>
         <td>Filler</td>
-        <td><input type="number" class="cell-input amt-proc" placeholder="0"/></td>
-        <td><input type="number" class="cell-input amt-vip" placeholder="0"/></td>
+        <td><input type="number" class="cell-input calc-proc" placeholder="0"/></td>
+        <td><input type="number" class="cell-input" placeholder="0"/></td>
         <td>4. SCB (ไทยพาณิชย์)</td>
-        <td><input type="number" class="cell-input amt-cc" placeholder="0"/></td>
+        <td><input type="number" class="cell-input calc-cc" placeholder="0"/></td>
       </tr>
       <tr>
         <td>Meso</td>
-        <td><input type="number" class="cell-input amt-proc" placeholder="0"/></td>
-        <td><input type="number" class="cell-input amt-vip" placeholder="0"/></td>
-        <td>อื่นๆ ระบุ <input type="text" style="width:60px; border:none; border-bottom:1px dotted #000; outline:none; font-family:inherit;"/></td>
-        <td><input type="number" class="cell-input amt-cc" placeholder="0"/></td>
+        <td><input type="number" class="cell-input calc-proc" placeholder="0"/></td>
+        <td><input type="number" class="cell-input" placeholder="0"/></td>
+        <td>อื่นๆ ระบุ <input type="text" class="input-line" style="width:50px;"/></td>
+        <td><input type="number" class="cell-input calc-cc" placeholder="0"/></td>
       </tr>
       <tr>
         <td>Thermage</td>
-        <td><input type="number" class="cell-input amt-proc" placeholder="0"/></td>
-        <td><input type="number" class="cell-input amt-vip" placeholder="0"/></td>
+        <td><input type="number" class="cell-input calc-proc" placeholder="0"/></td>
+        <td><input type="number" class="cell-input" placeholder="0"/></td>
         <td colspan="2" class="bg-gray"></td>
-        <td rowspan="4" style="vertical-align: top;">
-          ยอดเงินโอน<br>
-          <input type="number" class="cell-input" style="font-size:18px; margin-top:30px; font-weight:bold;" placeholder="0"/>
-        </td>
+        <td rowspan="4" style="vertical-align: top;">ยอดเงินโอน<br><br><input type="number" class="cell-input calc-grand" style="font-size:16px; font-weight:bold; text-align:center;" placeholder="0"/></td>
       </tr>
       <tr>
         <td>Ulthera</td>
-        <td><input type="number" class="cell-input amt-proc" placeholder="0"/></td>
-        <td><input type="number" class="cell-input amt-vip" placeholder="0"/></td>
-        <td class="text-right text-bold">ยอดรวมเครดิต</td>
-        <td class="text-right text-bold bg-gray" id="total-cc">-</td>
+        <td><input type="number" class="cell-input calc-proc" placeholder="0"/></td>
+        <td><input type="number" class="cell-input" placeholder="0"/></td>
+        <td colspan="2" class="bg-gray"></td>
       </tr>
       <tr>
         <td>Treatment</td>
-        <td><input type="number" class="cell-input amt-proc" placeholder="0"/></td>
-        <td><input type="number" class="cell-input amt-vip" placeholder="0"/></td>
-        <td rowspan="3" colspan="2" style="vertical-align: top; padding: 10px;">
-          <div style="margin-bottom: 10px;">ยอดชำระรวม</div>
-          <div class="text-right text-bold" style="font-size: 20px;" id="grand-total">-</div>
+        <td><input type="number" class="cell-input calc-proc" placeholder="0"/></td>
+        <td><input type="number" class="cell-input" placeholder="0"/></td>
+        <td class="text-right text-bold">ยอดรวมเครดิต</td>
+        <td class="text-right text-bold"><input type="text" id="total-cc-disp" class="input-text text-bold text-right" readonly value="0.00" style="color:#000 !important;"/></td>
+      </tr>
+      <tr>
+        <td>Drip Vitamin (Nures)</td>
+        <td><input type="number" class="cell-input calc-proc" placeholder="0"/></td>
+        <td><input type="number" class="cell-input" placeholder="0"/></td>
+        <td colspan="2" rowspan="3" style="vertical-align: top;">
+          <div style="margin-bottom: 5px;">ยอดชำระรวม</div>
+          <input type="number" id="grand-total-input" class="input-text text-bold text-right" style="font-size: 20px; border-bottom:1px solid #ccc;" placeholder="0"/>
         </td>
       </tr>
       <tr>
-        <td>ขายยา / สินค้า</td>
-        <td><input type="number" class="cell-input amt-proc" placeholder="0"/></td>
-        <td><input type="number" class="cell-input amt-vip" placeholder="0"/></td>
-      </tr>
-      <tr>
-        <td>หัตถการอื่นๆ</td>
-        <td><input type="number" class="cell-input amt-proc" placeholder="0"/></td>
-        <td><input type="number" class="cell-input amt-vip" placeholder="0"/></td>
+        <td>Product</td>
+        <td><input type="number" class="cell-input calc-proc" placeholder="0"/></td>
+        <td><input type="number" class="cell-input" placeholder="0"/></td>
         <td class="bg-gray"></td>
       </tr>
-      <tr>
-        <td class="text-right text-bold">ยอดรวมสุทธิ</td>
-        <td class="text-right text-bold bg-gray" id="total-proc">-</td>
+      
+      <tr class="other-proc-row">
+        <td>
+          <input type="text" class="input-text" placeholder="ระบุหัตถการอื่นๆ..." value="หัตถการอื่นๆ"/>
+          <button class="btn-add no-print" onclick="addOtherRow(this)">+ เพิ่มหัตถการ</button>
+        </td>
+        <td><input type="number" class="cell-input calc-proc" placeholder="0"/></td>
+        <td><input type="number" class="cell-input" placeholder="0"/></td>
         <td class="bg-gray"></td>
-        <td class="bg-gray text-center text-bold" colspan="3">คะแนน (Point)</td>
+      </tr>
+      
+      <tr>
+        <td>ชาร์จ 3%</td>
+        <td><input type="number" class="cell-input calc-proc" placeholder="0"/></td>
+        <td><input type="number" class="cell-input" placeholder="0"/></td>
+        <td colspan="3" class="bg-gray"></td>
+      </tr>
+
+      <tr>
+        <td class="text-right text-bold">ยอดรวม</td>
+        <td class="text-right text-bold"><input type="text" id="total-proc-disp" class="input-text text-bold text-right" readonly value="0.00" style="color:#000 !important;"/></td>
+        
+        <td colspan="2" class="text-center text-bold bg-gray" style="display:flex; justify-content:space-between; align-items:center; border:none; border-bottom:1px solid #000;">
+          <span>คะแนน (Point)</span>
+          <input type="number" class="cell-input" style="width: 80px; text-align:center; background:#fff; border:1px solid #ccc; font-weight:bold;" placeholder="0"/>
+        </td>
+        
+        <td colspan="3" class="bg-gray"></td>
       </tr>
     </tbody>
   </table>
 
   <table class="footer-table">
     <tr>
-      <td colspan="2">เลขที่บิลเริ่ม <input type="text" class="footer-input" style="width:100px;"/> ถึง <input type="text" class="footer-input" style="width:100px;"/></td>
-      <td>รวมบิลที่ใช้ <input type="number" class="footer-input" style="width:50px; text-align:center;"/> บิล</td>
-      <td width="25%">แคชเชียร์<br><br><br></td>
+      <td colspan="2" width="40%">
+        เลขที่บิลเริ่ม <input type="text" id="bill-start" class="input-line" style="width:80px;" onblur="checkBillDuplicate(this)"/> 
+        ถึง <input type="text" id="bill-end" class="input-line" style="width:80px;" onblur="checkBillDuplicate(this)"/>
+        <div id="bill-warning" class="no-print" style="color:red; font-size:12px; margin-top:5px; display:none;">⚠️ ตรวจสอบพบเลขบิลซ้ำในระบบ!</div>
+      </td>
+      <td width="20%">
+        รวมบิลที่ใช้ <input type="number" class="input-line" style="width:50px; text-align:center;"/> บิล
+      </td>
+      <td width="40%">
+        แคชเชียร์ 
+        <select class="input-line" style="width: 80%; display:block; margin-top:10px; cursor:pointer;">
+          <option value="">-- ดึงรายชื่อจาก HR --</option>
+          <option>สมศรี รักงาน (พนักงาน)</option>
+          <option>มาลี ดีใจ (พนักงาน)</option>
+        </select>
+      </td>
     </tr>
     <tr>
-      <td width="25%">ยอดเงินขาด<br><input type="number" class="cell-input" style="margin-top:15px;"/></td>
-      <td width="25%">ยอดเงินเกิน<br><input type="number" class="cell-input" style="margin-top:15px;"/></td>
-      <td width="25%">สาเหตุ<br><input type="text" class="footer-input" style="width:100%; margin-top:15px;"/></td>
-      <td>ผู้จัดการ<br><br><br></td>
+      <td width="20%">ยอดเงินขาด<br><input type="number" class="cell-input" style="margin-top:15px;"/></td>
+      <td width="20%">ยอดเงินเกิน<br><input type="number" class="cell-input" style="margin-top:15px;"/></td>
+      <td width="20%">สาเหตุ<br><input type="text" class="input-line input-red" style="width:100%; margin-top:15px;"/></td>
+      <td>
+        ผู้จัดการ
+        <select class="input-line" style="width: 80%; display:block; margin-top:10px; cursor:pointer;">
+          <option value="">-- ดึงรายชื่อจาก HR --</option>
+          <option>คุณสมชาย (ผจก.)</option>
+          <option>คุณวิภา (ผจก.)</option>
+        </select>
+      </td>
     </tr>
     <tr>
-      <td colspan="4" style="height: 70px;">
+      <td colspan="4" style="height: 60px;">
         หมายเหตุ:<br>
-        <textarea class="footer-note" rows="2" placeholder="พิมพ์หมายเหตุเพิ่มเติมตรงนี้..."></textarea>
+        <textarea class="footer-note input-red" rows="2" placeholder="พิมพ์หมายเหตุเพิ่มเติมตรงนี้..."></textarea>
       </td>
     </tr>
   </table>
@@ -247,25 +303,96 @@
 </div>
 
 <script>
-  // ฟังก์ชันคำนวณยอดอัตโนมัติเวลามีการพิมพ์
+  // 1. ระบบคำนวณอัตโนมัติ
   function calculateTotals() {
+    // รวมยอดฝั่งหัตถการ (Program)
     let totalProc = 0;
-    document.querySelectorAll('.amt-proc').forEach(el => {
+    document.querySelectorAll('.calc-proc').forEach(el => {
       totalProc += Number(el.value) || 0;
     });
-    document.getElementById('total-proc').innerText = totalProc > 0 ? totalProc.toLocaleString() : '-';
+    document.getElementById('total-proc-disp').value = totalProc > 0 ? totalProc.toLocaleString('th-TH', {minimumFractionDigits:2}) : '0.00';
 
+    // รวมยอดบัตรเครดิต
     let totalCC = 0;
-    document.querySelectorAll('.amt-cc').forEach(el => {
+    document.querySelectorAll('.calc-cc').forEach(el => {
       totalCC += Number(el.value) || 0;
     });
-    document.getElementById('total-cc').innerText = totalCC > 0 ? totalCC.toLocaleString() : '-';
+    document.getElementById('total-cc-disp').value = totalCC > 0 ? totalCC.toLocaleString('th-TH', {minimumFractionDigits:2}) : '0.00';
+
+    // คำนวณยอดชำระรวม (เงินสด/โอน/แอป + บัตรเครดิต)
+    let totalGrand = totalCC;
+    document.querySelectorAll('.calc-grand').forEach(el => {
+      totalGrand += Number(el.value) || 0;
+    });
+    
+    // หยอดลงช่องยอดชำระรวม (ซึ่งผู้ใช้สามารถพิมพ์แก้ทับได้)
+    // เช็คว่าถ้าช่องไม่ได้ถูกโฟกัส (กำลังพิมพ์อยู่) ให้เปลี่ยนค่าออโต้
+    const grandInput = document.getElementById('grand-total-input');
+    if (document.activeElement !== grandInput) {
+      grandInput.value = totalGrand || "";
+    }
   }
 
-  // ผูก Event ให้ช่องกรอกเงินทุกช่อง
-  document.querySelectorAll('.cell-input').forEach(input => {
-    input.addEventListener('input', calculateTotals);
-  });
+  // ผูก Event ให้ช่องกรอกตัวเลขทุกช่องเมื่อมีการพิมพ์
+  function bindCalculations() {
+    document.querySelectorAll('input[type="number"]').forEach(input => {
+      input.removeEventListener('input', calculateTotals); // กันการ bind ซ้ำ
+      input.addEventListener('input', calculateTotals);
+    });
+  }
+  bindCalculations();
+
+  // 2. ระบบเพิ่มแถว หัตถการอื่นๆ (พิมพ์ได้ไม่จำกัด)
+  function addOtherRow(btnElement) {
+    const currentRow = btnElement.closest('tr');
+    const newRow = document.createElement('tr');
+    newRow.className = "other-proc-row";
+    newRow.innerHTML = `
+        <td>
+          <input type="text" class="input-text" placeholder="ระบุหัตถการอื่นๆ..." />
+          <button class="btn-add no-print" onclick="addOtherRow(this)">+ เพิ่มหัตถการ</button>
+          <button class="btn-add no-print" style="color:red; border-color:red;" onclick="this.closest('tr').remove(); calculateTotals();">ลบ</button>
+        </td>
+        <td><input type="number" class="cell-input calc-proc" placeholder="0"/></td>
+        <td><input type="number" class="cell-input" placeholder="0"/></td>
+        <td class="bg-gray"></td>
+    `;
+    // แทรกแถวใหม่ต่อจากแถวปัจจุบัน
+    currentRow.parentNode.insertBefore(newRow, currentRow.nextSibling);
+    // ผูก Event คำนวณใหม่ให้แถวที่เพิ่งสร้าง
+    bindCalculations();
+  }
+
+  // 3. ระบบเช็คเลขบิลซ้ำ (จำลอง Logic การเช็ค)
+  function checkBillDuplicate(inputElement) {
+    const val = inputElement.value.trim();
+    const warning = document.getElementById('bill-warning');
+    if(val === "") {
+      warning.style.display = 'none';
+      return;
+    }
+    // ตัวอย่าง: สมมติว่าเลขที่ขึ้นต้นด้วย 'A02' เคยบันทึกไปแล้ว
+    if(val.startsWith('A02')) {
+      warning.style.display = 'block';
+      inputElement.style.borderBottom = "2px solid red";
+    } else {
+      warning.style.display = 'none';
+      inputElement.style.borderBottom = "1px dotted #000";
+    }
+  }
+
+  // 4. ระบบดาวน์โหลดเป็นรูปภาพ PNG (ผ่าน html2canvas)
+  function exportPNG() {
+    const captureArea = document.getElementById('captureArea');
+    
+    // แปลงหน้าเว็บตรงส่วนนั้นเป็น Canvas แล้วโหลด
+    html2canvas(captureArea, { scale: 2 }).then(canvas => {
+      let link = document.createElement('a');
+      link.download = `สรุปยอด_${new Date().getTime()}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    });
+  }
 </script>
 
 </body>
