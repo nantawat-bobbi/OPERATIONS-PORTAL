@@ -3,117 +3,101 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>LALIZA Operations Portal</title>
+<title>LALIZA Operations Portal V9</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
+  /* ==========================================
+     1. GLOBAL STYLES & THEME (SaaS Enterprise)
+  ========================================== */
   :root {
-    --bg-body: #F8FAFC;
-    --bg-surface: #FFFFFF;
-    --bg-sidebar: #0F172A;
-    --text-main: #0F172A;
-    --text-muted: #64748B;
-    --text-light: #94A3B8;
-    --border-light: #E2E8F0;
-    --border-input: #CBD5E1;
-    --primary: #4F46E5; /* Indigo 600 */
-    --primary-hover: #4338CA;
-    --primary-focus: rgba(79, 70, 229, 0.15);
-    
-    --radius-sm: 6px;
-    --radius-md: 8px;
-    --radius-lg: 12px;
-    
-    --shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.05), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+    --bg-body: #F8FAFC; --bg-surface: #FFFFFF; --bg-sidebar: #0F172A;
+    --text-main: #0F172A; --text-muted: #64748B; --border-light: #E2E8F0;
+    --primary: #4F46E5; --primary-hover: #4338CA;
+    --radius-md: 8px; --radius-lg: 12px;
   }
-
   *{ margin:0; padding:0; box-sizing:border-box; }
-  body{ font-family:'Inter', sans-serif; background:var(--bg-body); color:var(--text-main); -webkit-font-smoothing: antialiased; }
-  .app{ min-height:100vh; display:grid; grid-template-columns:250px 1fr; }
+  body{ font-family:'Inter', sans-serif; background:var(--bg-body); color:var(--text-main); }
   
-  /* SIDEBAR */
-  .sidebar{ background:var(--bg-sidebar); color:#fff; padding:24px 16px; border-right:1px solid #1E293B; }
-  .logo{ font-size:20px; font-weight:800; margin: 8px 12px 32px 12px; letter-spacing: 1px; color:#fff; }
+  /* ซ่อนฟอร์มพรินต์เวลาใช้งานปกติบนหน้าจอ */
+  #printArea { display: none; }
+
+  /* ==========================================
+     2. LAYOUT: SIDEBAR & MAIN AREA
+  ========================================== */
+  .app{ min-height:100vh; display:grid; grid-template-columns:250px 1fr; }
+  .sidebar{ background:var(--bg-sidebar); color:#fff; padding:24px 16px; }
+  .logo{ font-size:20px; font-weight:800; margin: 8px 12px 32px 12px; letter-spacing: 1px; }
   .nav{ display:flex; flex-direction:column; gap:6px; }
   .nav-btn{ 
-    border:none; background:transparent; color:var(--text-light); height:40px; 
+    border:none; background:transparent; color:#94A3B8; height:40px; 
     border-radius:var(--radius-md); text-align:left; padding:0 12px; 
     font-size:14px; font-weight:500; cursor:pointer; transition:all 0.2s; 
-    display: flex; align-items: center; gap: 10px;
   }
-  .nav-btn:hover{ background:#1E293B; color:#F8FAFC; }
-  .nav-btn.active{ background:var(--primary); color:#fff; font-weight: 600; box-shadow: var(--shadow-sm); }
+  .nav-btn.active{ background:var(--primary); color:#fff; font-weight: 600; }
   
-  /* MAIN */
   .main{ padding:32px 40px; max-width: 1440px; margin: 0 auto; width: 100%; }
   
-  /* TOPBAR & CONTEXT BAR */
-  .topbar{ display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:32px; padding-bottom: 24px; border-bottom: 1px solid var(--border-light); }
-  .header-left small{ color:var(--text-muted); font-size:12px; font-weight:600; letter-spacing:0.5px; text-transform:uppercase; }
-  .header-left h1{ margin-top:8px; font-size:28px; font-weight:700; letter-spacing:-0.02em; }
-  
-  .context-bar { display:flex; gap:12px; align-items:center; }
-  .context-bar select, .context-bar input { 
-    height:40px; border:1px solid var(--border-input); border-radius:var(--radius-md); 
-    padding:0 12px; font-size:14px; background: var(--bg-surface); color:var(--text-main);
-    box-shadow: var(--shadow-sm); cursor: pointer; transition: all 0.2s;
+  /* ==========================================
+     3. TOP SECTION: BRANCH GRID & DATE
+  ========================================== */
+  .top-section { margin-bottom: 24px; }
+  .branch-grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+    margin-bottom: 24px;
   }
-  .context-bar select:focus, .context-bar input:focus { outline:none; border-color:var(--primary); box-shadow: 0 0 0 3px var(--primary-focus); }
-  
-  .save-btn{ 
-    height:40px; padding:0 20px; border:none; border-radius:var(--radius-md); 
-    background:var(--primary); color:#fff; font-size: 14px; font-weight:600; 
-    cursor:pointer; box-shadow: var(--shadow-sm); transition: 0.2s; 
+  .branch-btn {
+    background: var(--bg-surface); border: 1px solid var(--border-light);
+    border-radius: var(--radius-md); padding: 12px; font-size: 14px;
+    font-weight: 600; color: var(--text-muted); cursor: pointer;
+    transition: 0.2s; display: flex; align-items: center; gap: 8px;
   }
-  .save-btn:hover:not(:disabled) { background:var(--primary-hover); transform: translateY(-1px); box-shadow: var(--shadow-md); }
-  .save-btn:disabled { background: #94A3B8; cursor: not-allowed; opacity: 0.7; }
+  .branch-btn:hover { border-color: var(--primary); }
+  .branch-btn.selected { background: #EEF2FF; border-color: var(--primary); color: var(--primary); }
+  .branch-indicator { width: 10px; height: 10px; border-radius: 50%; background: #CBD5E1; }
+  .branch-btn.selected .branch-indicator { background: var(--primary); }
+
+  .context-bar { display:flex; justify-content: space-between; align-items:center; padding-bottom: 24px; border-bottom: 1px solid var(--border-light); margin-bottom: 24px; }
+  .context-bar input[type="date"] { height:40px; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0 12px; font-size:14px; }
   
-  /* CONTENT GRID */
+  .action-group { display: flex; gap: 12px; }
+  .btn { height:40px; padding:0 20px; border:none; border-radius:var(--radius-md); font-size: 14px; font-weight:600; cursor:pointer; transition: 0.2s; }
+  .btn-print { background: #fff; border: 1px solid var(--border-light); color: var(--text-main); }
+  .btn-print:hover { background: #F1F5F9; }
+  .btn-save { background:var(--primary); color:#fff; }
+  .btn-save:hover { background:var(--primary-hover); }
+
+  /* ==========================================
+     4. CONTENT: FORM & PREVIEW
+  ========================================== */
   .content-grid{ display:grid; grid-template-columns:minmax(0, 1.5fr) 380px; gap:24px; align-items: start; }
-  
-  /* CARDS */
-  .card{ 
-    background:var(--bg-surface); border-radius:var(--radius-lg); padding:32px; 
-    border:1px solid var(--border-light); box-shadow:var(--shadow-sm); 
-  }
-  .card-title{ font-size:16px; font-weight:600; margin-bottom:24px; color:var(--text-main); display: flex; align-items: center; justify-content: space-between;}
-  
-  /* FORMS */
-  .form-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:20px 16px; }
+  .card{ background:var(--bg-surface); border-radius:var(--radius-lg); padding:32px; border:1px solid var(--border-light); }
+  .form-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:20px 16px; margin-bottom: 24px;}
   .field{ display:flex; flex-direction:column; gap:6px; }
   .field label{ font-size:13px; color:var(--text-muted); font-weight:500; }
-  .field input{ 
-    height:42px; border:1px solid var(--border-input); border-radius:var(--radius-md); 
-    padding:0 12px; font-size:15px; color:var(--text-main); box-shadow: var(--shadow-sm);
-    transition: all 0.2s ease;
-  }
-  .field input:focus{ outline:none; border-color:var(--primary); box-shadow: 0 0 0 3px var(--primary-focus); }
+  .field input{ height:42px; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0 12px; font-size:15px; }
   .field input::placeholder { color: #CBD5E1; }
+  .section-title { font-size:14px; color:var(--primary); margin-bottom:12px; font-weight: 700; border-left: 3px solid var(--primary); padding-left: 8px; }
   
-  /* SUMMARY & KPIS */
-  .summary{ display:flex; flex-direction:column; gap:16px; position: sticky; top: 32px; }
-  .summary-card{ 
-    background:var(--bg-surface); border-radius:var(--radius-lg); padding:28px; 
-    border:1px solid var(--border-light); box-shadow: var(--shadow-sm); 
-  }
-  .summary-label{ font-size:13px; color:var(--text-muted); font-weight:600; text-transform: uppercase; letter-spacing: 0.5px; }
-  .summary-value{ margin-top:12px; font-size:40px; font-weight:700; letter-spacing: -0.02em; color:var(--text-main); }
-  .summary-sub{ margin-top:8px; color:var(--text-muted); font-size:13px; }
-  
+  .summary-card{ background:var(--bg-surface); border-radius:var(--radius-lg); padding:28px; border:1px solid var(--border-light); margin-bottom: 16px;}
+  .summary-value{ margin-top:12px; font-size:40px; font-weight:700; color:var(--text-main); }
   .kpi-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
-  .kpi{ background:var(--bg-surface); border-radius:var(--radius-lg); padding:20px; border:1px solid var(--border-light); box-shadow: var(--shadow-sm); }
-  .kpi small{ color:var(--text-muted); font-size:13px; font-weight: 500; }
-  .kpi h3{ margin-top:8px; font-size:22px; font-weight:700; color:var(--text-main); }
-  
-  @media(max-width:1100px){ .content-grid{ grid-template-columns:1fr; } .summary{ position: static; } }
-  @media(max-width:768px){ 
-    .app{ grid-template-columns:1fr; } 
-    .sidebar{ display:none; } 
-    .main{ padding: 20px; }
-    .topbar { flex-direction: column; align-items: flex-start; gap: 20px; }
-    .context-bar { width: 100%; flex-wrap: wrap; }
-    .context-bar select, .context-bar input, .save-btn { flex: 1; }
-    .form-grid{ grid-template-columns:1fr; } 
+  .kpi{ background:var(--bg-surface); border-radius:var(--radius-lg); padding:20px; border:1px solid var(--border-light); }
+
+  /* ==========================================
+     5. PRINT CSS (สำหรับตอนพิมพ์ลงกระดาษ A4)
+  ========================================== */
+  @media print {
+    body * { visibility: hidden; } 
+    #printArea, #printArea * { visibility: visible; } 
+    #printArea { position: absolute; left: 0; top: 0; width: 100%; padding: 20px; font-family: sans-serif; }
+    .print-header { text-align: center; font-size: 18px; font-weight: bold; margin-bottom: 20px; }
+    .print-info { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; }
+    .print-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+    .print-table th, .print-table td { border: 1px solid #000; padding: 6px; font-size: 12px; }
+    .print-table th { background: #f0f0f0; text-align: center; }
   }
 </style>
 </head>
@@ -131,73 +115,299 @@
   </aside>
 
   <main class="main">
-    <div class="topbar">
-      <div class="header-left">
-        <small>Operations Portal</small>
-        <h1 id="pageTitle">Daily Revenue</h1>
-      </div>
+    <div class="top-section">
+      <h1 id="pageTitle" style="font-size: 28px; margin-bottom: 8px;">Daily Revenue</h1>
+      <small style="color: #64748B;">เลือกสาขาและวันที่เพื่อบันทึกข้อมูล</small>
       
-      <div class="context-bar">
-        <select id="globalBranch">
-          <option value="BKK">BKK - กรุงเทพ</option>
-          <option value="CNX">CNX - เชียงใหม่</option>
-        </select>
-        <input type="date" id="globalDate" />
-        <button class="save-btn" id="btnSave">Save Report</button>
+      <div class="branch-grid-container" id="branchSelector">
+        <button class="branch-btn selected" data-val="RAMA9"><div class="branch-indicator"></div>เซ็นทรัลพระราม 9</button>
+        <button class="branch-btn" data-val="PINKLAO"><div class="branch-indicator"></div>เซ็นทรัลปิ่นเกล้า</button>
+        <button class="branch-btn" data-val="BANGKAE"><div class="branch-indicator"></div>ซีคอนบางแค</button>
+        <button class="branch-btn" data-val="FUTURE"><div class="branch-indicator"></div>ฟิวเจอร์พาร์ครังสิต</button>
+        <button class="branch-btn" data-val="PROMENADE"><div class="branch-indicator"></div>เดอะพรอมานาด</button>
+        <button class="branch-btn" data-val="NGAMWONGWAN"><div class="branch-indicator"></div>เดอะมอลล์งามวงศ์วาน</button>
+        <button class="branch-btn" data-val="SRINAKARIN"><div class="branch-indicator"></div>ซีคอนศรีนครินทร์</button>
+        <button class="branch-btn" data-val="WESTGATE"><div class="branch-indicator"></div>เซ็นทรัลเวสต์เกต</button>
+      </div>
+    </div>
+    
+    <div class="context-bar">
+      <input type="date" id="globalDate" />
+      <div class="action-group">
+        <button class="btn btn-print" onclick="printReport()" id="btnPrint">🖨️ Print Form</button>
+        <button class="btn btn-save" id="btnSave">Save Report</button>
       </div>
     </div>
 
     <div class="content-grid">
       <div class="card">
-        <div class="card-title" id="formTitle">Data Entry</div>
-        <div id="moduleForm"></div>
+        <div id="moduleForm"></div> 
       </div>
-      
       <div class="summary">
         <div class="summary-card">
-          <div class="summary-label">Live Preview</div>
+          <div style="font-size:13px; color:#64748B;">Live Preview</div>
           <div class="summary-value" id="previewMain">฿0.00</div>
-          <div class="summary-sub" id="previewSub">Real-time summary calculation</div>
         </div>
-        <div class="kpi-grid" id="kpiGrid"></div>
+        <div class="kpi-grid" id="kpiGrid"></div> 
       </div>
     </div>
   </main>
+</div>
+
+<div id="printArea">
+  <div class="print-header">ใบสรุปยอดแคชเชียร์และบัตรเครดิต</div>
+  
+  <div class="print-info">
+    <span>ประจำวันที่: <span id="printDate"></span></span>
+    <span>สาขา: <span id="printBranch"></span></span>
+  </div>
+  <div class="print-info" style="margin-bottom: 15px;">
+    <span>แพทย์คนที่ 1: <span id="pt-doctor1" style="font-weight: 600;">-</span></span>
+    <span>แพทย์คนที่ 2: <span id="pt-doctor2" style="font-weight: 600;">-</span></span>
+  </div>
+
+  <table class="print-table">
+    <thead>
+      <tr>
+        <th>ยอดหน้าร้าน</th>
+        <th>Program</th>
+        <th>จำนวนเงิน</th>
+        <th>ยอดหักบัตร</th>
+        <th>เครดิต</th>
+        <th>จำนวนเงิน</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td></td><td>Co2</td><td id="pt-co2" style="text-align: right;"></td> <td></td><td>KBANK</td><td id="pt-kbank" style="text-align: right;"></td></tr>
+      <tr><td></td><td>Pico / Yag</td><td id="pt-pico" style="text-align: right;"></td> <td></td><td>KTC</td><td id="pt-ktc" style="text-align: right;"></td></tr>
+      <tr><td></td><td>V-beam</td><td id="pt-vbeam" style="text-align: right;"></td> <td></td><td>SCB</td><td id="pt-scb" style="text-align: right;"></td></tr>
+      <tr><td></td><td>Q-switch</td><td id="pt-qswitch" style="text-align: right;"></td> <td></td><td>โอนเงิน</td><td id="pt-transfer" style="text-align: right;"></td></tr>
+      <tr><td></td><td>Exilis</td><td id="pt-exilis" style="text-align: right;"></td> <td colspan="3"></td></tr>
+      <tr><td></td><td>Ulthera</td><td id="pt-ulthera" style="text-align: right;"></td> <td colspan="3"></td></tr>
+      <tr><td></td><td>Botox</td><td id="pt-botox" style="text-align: right;"></td> <td colspan="3"></td></tr>
+      <tr><td></td><td>Filler</td><td id="pt-filler" style="text-align: right;"></td> <td colspan="3"></td></tr>
+      <tr><td></td><td>Meso / ฉีด</td><td id="pt-meso" style="text-align: right;"></td> <td colspan="3"></td></tr>
+      <tr><td></td><td>อื่นๆ (หัตถการ)</td><td id="pt-proc-other" style="text-align: right;"></td> <td colspan="3"></td></tr>
+      <tr><td></td><td>Treatment</td><td id="pt-treatment" style="text-align: right;"></td> <td colspan="3"></td></tr>
+      <tr><td></td><td>ขายยา</td><td id="pt-medicine" style="text-align: right;"></td> <td colspan="3"></td></tr>
+      <tr><td></td><td>สินค้า</td><td id="pt-product" style="text-align: right;"></td> <td colspan="3"></td></tr>
+      <tr>
+        <td colspan="2" style="text-align: right; font-weight: bold;">ยอดรวมสุทธิ</td>
+        <td id="pt-total" style="text-align: right; font-weight: bold;"></td>
+        <td colspan="3"></td>
+      </tr>
+    </tbody>
+  </table>
 </div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  // ⚠️ วาง Config จาก Firebase ตรงนี้ ⚠️
+  // ⚠️ เอา CONFIG ของคุณมาวางทับตรงนี้ ⚠️
   const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "YOUR_API_KEY", 
+    authDomain: "YOUR_PROJECT.firebaseapp.com", 
+    projectId: "YOUR_PROJECT_ID"
   };
-
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
   let currentModule = 'revenue';
+  let selectedBranch = 'RAMA9'; 
+  let selectedBranchName = 'เซ็นทรัลพระราม 9';
   document.getElementById('globalDate').valueAsDate = new Date();
 
-  const toNumber = (value) => (value === '' || value === null || isNaN(Number(value))) ? 0 : Number(value);
+  const toNumber = (value) => (value === '' || isNaN(Number(value))) ? 0 : Number(value);
   const money = (value) => value.toLocaleString('th-TH', { minimumFractionDigits:2, maximumFractionDigits:2 });
   const getVal = (id) => document.getElementById(id)?.value;
 
+  // จัดการปุ่มเลือกสาขา
+  const branchBtns = document.querySelectorAll('.branch-btn');
+  branchBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      branchBtns.forEach(b => b.classList.remove('selected'));
+      e.currentTarget.classList.add('selected');
+      selectedBranch = e.currentTarget.dataset.val;
+      selectedBranchName = e.currentTarget.innerText;
+      // รีเฟรชพรีวิวเผื่อต้องการให้อัปเดตชื่อสาขาทันที
+      if (currentModule === 'revenue') updateRevenuePreview();
+    });
+  });
+
+  // จัดการเมนู Sidebar
   const navBtns = document.querySelectorAll('.nav-btn');
   navBtns.forEach(btn => {
     btn.addEventListener('click', (e) => {
       navBtns.forEach(b => b.classList.remove('active'));
       e.currentTarget.classList.add('active');
       currentModule = e.currentTarget.dataset.module;
+      
+      document.getElementById('btnPrint').style.display = (currentModule === 'revenue') ? 'block' : 'none';
       loadModule(currentModule);
     });
   });
+
+  function bindInputs(callback) {
+    document.querySelectorAll('#moduleForm input').forEach(input => { input.addEventListener('input', callback); });
+  }
+
+  // ==========================================
+  // โมดูล 1: REVENUE (เพิ่มช่องกรอกแพทย์ 2 คน)
+  // ==========================================
+  function renderRevenue() {
+    document.getElementById('pageTitle').innerText = 'Daily Revenue';
+    document.getElementById('moduleForm').innerHTML = `
+      <div class="section-title">👨‍⚕️ แพทย์ผู้ปฏิบัติการ (DOCTORS ON DUTY)</div>
+      <div class="form-grid">
+        <div class="field"><label>แพทย์คนที่ 1</label><input id="rev-doc1" type="text" placeholder="ระบุชื่อแพทย์คนที่ 1" /></div>
+        <div class="field"><label>แพทย์คนที่ 2</label><input id="rev-doc2" type="text" placeholder="ระบุชื่อแพทย์คนที่ 2 (ถ้ามี)" /></div>
+      </div>
+
+      <div class="section-title">🔸 PROGRAM (หัตถการ & เลเซอร์)</div>
+      <div class="form-grid">
+        <div class="field"><label>Co2</label><input id="rev-co2" type="number" value="0" /></div>
+        <div class="field"><label>Pico / Yag</label><input id="rev-pico" type="number" value="0" /></div>
+        <div class="field"><label>V-beam</label><input id="rev-vbeam" type="number" value="0" /></div>
+        <div class="field"><label>Q-switch</label><input id="rev-qswitch" type="number" value="0" /></div>
+        <div class="field"><label>Exilis</label><input id="rev-exilis" type="number" value="0" /></div>
+        <div class="field"><label>Ulthera</label><input id="rev-ulthera" type="number" value="0" /></div>
+        <div class="field"><label>Botox</label><input id="rev-botox" type="number" value="0" /></div>
+        <div class="field"><label>Filler</label><input id="rev-filler" type="number" value="0" /></div>
+        <div class="field"><label>Meso / ฉีด</label><input id="rev-meso" type="number" value="0" /></div>
+        <div class="field"><label>อื่นๆ (หัตถการ)</label><input id="rev-proc-other" type="number" value="0" /></div>
+      </div>
+
+      <div class="section-title">🔸 OTHER REVENUE (รายได้ส่วนอื่น)</div>
+      <div class="form-grid">
+        <div class="field"><label>Treatment</label><input id="rev-treatment" type="number" value="0" /></div>
+        <div class="field"><label>ขายยา</label><input id="rev-medicine" type="number" value="0" /></div>
+        <div class="field"><label>สินค้า</label><input id="rev-product" type="number" value="0" /></div>
+      </div>
+
+      <div class="section-title" style="color:#E11D48;">🔻 PAYMENT TYPES (ยอดหักบัตร & โอน)</div>
+      <div class="form-grid">
+        <div class="field"><label>KBANK</label><input id="pay-kbank" type="number" value="0" /></div>
+        <div class="field"><label>KTC</label><input id="pay-ktc" type="number" value="0" /></div>
+        <div class="field"><label>SCB</label><input id="pay-scb" type="number" value="0" /></div>
+        <div class="field"><label>โอนเงิน</label><input id="pay-transfer" type="number" value="0" /></div>
+      </div>
+    `;
+    bindInputs(updateRevenuePreview);
+    updateRevenuePreview();
+  }
+
+  function updateRevenuePreview() {
+    const totalProc = toNumber(getVal('rev-co2')) + toNumber(getVal('rev-pico')) + toNumber(getVal('rev-vbeam')) +
+                      toNumber(getVal('rev-qswitch')) + toNumber(getVal('rev-exilis')) + toNumber(getVal('rev-ulthera')) +
+                      toNumber(getVal('rev-botox')) + toNumber(getVal('rev-filler')) + toNumber(getVal('rev-meso')) + toNumber(getVal('rev-proc-other'));
+    
+    const grandTotal = totalProc + toNumber(getVal('rev-treatment')) + toNumber(getVal('rev-medicine')) + toNumber(getVal('rev-product'));
+
+    // อัปเดตหน้าจอ Live Preview
+    document.getElementById('previewMain').innerText = `฿${money(grandTotal)}`;
+    document.getElementById('kpiGrid').innerHTML = `
+      <div class="kpi"><small>หัตถการรวม</small><h3>฿${money(totalProc)}</h3></div>
+      <div class="kpi"><small>Treatment</small><h3>฿${money(toNumber(getVal('rev-treatment')))}</h3></div>
+      <div class="kpi"><small>ยา & สินค้า</small><h3>฿${money(toNumber(getVal('rev-medicine')) + toNumber(getVal('rev-product')))}</h3></div>
+      <div class="kpi"><small>หักบัตร/โอน</small><h3 style="color:#E11D48;">฿${money(toNumber(getVal('pay-kbank')) + toNumber(getVal('pay-ktc')) + toNumber(getVal('pay-scb')) + toNumber(getVal('pay-transfer')))}</h3></div>
+    `;
+
+    // 🎯 AUTO-MAPPING ไปหยอดในตารางกระดาษพิมพ์รวมถึงรายชื่อแพทย์
+    document.getElementById('pt-doctor1').innerText = getVal('rev-doc1') || "-";
+    document.getElementById('pt-doctor2').innerText = getVal('rev-doc2') || "-";
+
+    document.getElementById('pt-co2').innerText = money(toNumber(getVal('rev-co2')));
+    document.getElementById('pt-pico').innerText = money(toNumber(getVal('rev-pico')));
+    document.getElementById('pt-vbeam').innerText = money(toNumber(getVal('rev-vbeam')));
+    document.getElementById('pt-qswitch').innerText = money(toNumber(getVal('rev-qswitch')));
+    document.getElementById('pt-exilis').innerText = money(toNumber(getVal('rev-exilis')));
+    document.getElementById('pt-ulthera').innerText = money(toNumber(getVal('rev-ulthera')));
+    document.getElementById('pt-botox').innerText = money(toNumber(getVal('rev-botox')));
+    document.getElementById('pt-filler').innerText = money(toNumber(getVal('rev-filler')));
+    document.getElementById('pt-meso').innerText = money(toNumber(getVal('rev-meso')));
+    document.getElementById('pt-proc-other').innerText = money(toNumber(getVal('rev-proc-other')));
+    document.getElementById('pt-treatment').innerText = money(toNumber(getVal('rev-treatment')));
+    document.getElementById('pt-medicine').innerText = money(toNumber(getVal('rev-medicine')));
+    document.getElementById('pt-product').innerText = money(toNumber(getVal('rev-product')));
+    
+    document.getElementById('pt-kbank').innerText = money(toNumber(getVal('pay-kbank')));
+    document.getElementById('pt-ktc').innerText = money(toNumber(getVal('pay-ktc')));
+    document.getElementById('pt-scb').innerText = money(toNumber(getVal('pay-scb')));
+    document.getElementById('pt-transfer').innerText = money(toNumber(getVal('pay-transfer')));
+    
+    document.getElementById('pt-total').innerText = money(grandTotal);
+  }
+
+  // ==========================================
+  // โมดูล 2: CONFIRM TRACKING
+  // ==========================================
+  function renderConfirm() {
+    document.getElementById('pageTitle').innerText = 'Confirm Tracking';
+    document.getElementById('moduleForm').innerHTML = `
+      <div class="form-grid">
+        <div class="field"><label>คอนเฟิร์มมา</label><input id="cf-confirm" type="number" value="0" /></div>
+        <div class="field"><label>ขอเลื่อน</label><input id="cf-reschedule" type="number" value="0" /></div>
+        <div class="field"><label>วอล์คอิน</label><input id="cf-walkin" type="number" value="0" /></div>
+        <div class="field"><label>ไม่รับสาย</label><input id="cf-noanswer" type="number" value="0" /></div>
+        <div class="field"><label>โทรทั้งหมด</label><input id="cf-total" type="number" value="0" /></div>
+      </div>
+    `;
+    bindInputs(updateConfirmPreview);
+    updateConfirmPreview();
+  }
+  function updateConfirmPreview() {
+    const confirmed = toNumber(getVal('cf-confirm'));
+    const totalcalls = toNumber(getVal('cf-total'));
+    const showRate = totalcalls > 0 ? (confirmed / totalcalls) * 100 : 0;
+    document.getElementById('previewMain').innerText = `${showRate.toFixed(1)}%`;
+    document.getElementById('kpiGrid').innerHTML = `
+      <div class="kpi"><small>Confirmed</small><h3>${confirmed}</h3></div>
+      <div class="kpi"><small>Walk-in</small><h3>${toNumber(getVal('cf-walkin'))}</h3></div>
+    `;
+  }
+
+  // ==========================================
+  // โมดูล 3: DOCTOR FINANCE
+  // ==========================================
+  function renderDoctor() {
+    document.getElementById('pageTitle').innerText = 'Doctor Finance';
+    document.getElementById('moduleForm').innerHTML = `
+      <div class="form-grid">
+        <div class="field"><label>รหัสแพทย์ (Doctor ID)</label><input id="doc-id" type="text" placeholder="e.g. DOC-001" /></div>
+        <div class="field"><label>ยอดขาย (Sales)</label><input id="doc-revenue" type="number" value="0" /></div>
+        <div class="field"><label>ค่าแพทย์ (DF)</label><input id="doc-df" type="number" value="0" /></div>
+        <div class="field"><label>หมายเหตุ</label><input id="doc-note" type="text" /></div>
+      </div>
+    `;
+    bindInputs(updateDoctorPreview);
+    updateDoctorPreview();
+  }
+  function updateDoctorPreview() {
+    document.getElementById('previewMain').innerText = `฿${money(toNumber(getVal('doc-df')))}`;
+    document.getElementById('kpiGrid').innerHTML = `
+      <div class="kpi"><small>Revenue Generated</small><h3>฿${money(toNumber(getVal('doc-revenue')))}</h3></div>
+    `;
+  }
+
+  // ==========================================
+  // โมดูล 4: BILLING KPI
+  // ==========================================
+  function renderBilling() {
+    document.getElementById('pageTitle').innerText = 'Billing KPI';
+    document.getElementById('moduleForm').innerHTML = `
+      <div class="form-grid">
+        <div class="field"><label>จำนวนบิลทั้งหมด (Bills)</label><input id="bill-count" type="number" value="0" /></div>
+        <div class="field"><label>หมายเหตุ</label><input id="bill-note" type="text" /></div>
+      </div>
+    `;
+    bindInputs(updateBillingPreview);
+    updateBillingPreview();
+  }
+  function updateBillingPreview() {
+    document.getElementById('previewMain').innerText = toNumber(getVal('bill-count'));
+    document.getElementById('kpiGrid').innerHTML = ``;
+  }
 
   function loadModule(module) {
     if (module === 'revenue') renderRevenue();
@@ -206,153 +416,52 @@
     else if (module === 'billing') renderBilling();
   }
 
-  function bindInputs(callback) {
-    document.querySelectorAll('#moduleForm input').forEach(input => {
-      input.addEventListener('input', callback);
-    });
+  // สั่งพิมพ์รายงาน
+  window.printReport = function() {
+    document.getElementById('printDate').innerText = document.getElementById('globalDate').value;
+    document.getElementById('printBranch').innerText = selectedBranchName;
+    window.print();
   }
 
-  function renderRevenue() {
-    document.getElementById('pageTitle').innerText = 'Daily Revenue';
-    document.getElementById('formTitle').innerText = 'Revenue Breakdown';
-    document.getElementById('moduleForm').innerHTML = `
-      <div class="form-grid">
-        <div class="field"><label>หัตถการ (Procedure)</label><input id="rev-procedure" type="number" value="0" /></div>
-        <div class="field"><label>ขายยา (Medicine)</label><input id="rev-medicine" type="number" value="0" /></div>
-        <div class="field"><label>ทรีทเมนท์ (Treatment)</label><input id="rev-treatment" type="number" value="0" /></div>
-        <div class="field"><label>สินค้า (Product)</label><input id="rev-product" type="number" value="0" /></div>
-        <div class="field"><label>ระบบสมาชิก (Member)</label><input id="rev-member" type="number" value="0" /></div>
-        <div class="field"><label>HD Mall</label><input id="rev-hdmall" type="number" value="0" /></div>
-        <div class="field"><label>Gowabi</label><input id="rev-gowabi" type="number" value="0" /></div>
-        <div class="field"><label>รายได้อื่นๆ (Other)</label><input id="rev-other" type="number" value="0" /></div>
-      </div>
-    `;
-    bindInputs(updateRevenuePreview);
-    updateRevenuePreview();
-  }
-
-  function updateRevenuePreview() {
-    const total = toNumber(getVal('rev-procedure')) + toNumber(getVal('rev-medicine')) + toNumber(getVal('rev-treatment')) +
-                  toNumber(getVal('rev-product')) + toNumber(getVal('rev-member')) + toNumber(getVal('rev-hdmall')) +
-                  toNumber(getVal('rev-gowabi')) + toNumber(getVal('rev-other'));
-    document.getElementById('previewMain').innerText = `฿${money(total)}`;
-    document.getElementById('previewSub').innerText = 'Total Revenue Today';
-    document.getElementById('kpiGrid').innerHTML = `
-      <div class="kpi"><small>Procedure</small><h3>฿${money(toNumber(getVal('rev-procedure')))}</h3></div>
-      <div class="kpi"><small>Medicine</small><h3>฿${money(toNumber(getVal('rev-medicine')))}</h3></div>
-      <div class="kpi"><small>Treatment</small><h3>฿${money(toNumber(getVal('rev-treatment')))}</h3></div>
-      <div class="kpi"><small>Online Partners</small><h3>฿${money(toNumber(getVal('rev-hdmall')) + toNumber(getVal('rev-gowabi')))}</h3></div>
-    `;
-  }
-
-  function renderConfirm() {
-    document.getElementById('pageTitle').innerText = 'Confirm Tracking';
-    document.getElementById('formTitle').innerText = 'Call Center Metrics';
-    document.getElementById('moduleForm').innerHTML = `
-      <div class="form-grid">
-        <div class="field"><label>คอนเฟิร์มมา (Confirmed)</label><input id="cf-confirm" type="number" value="0" /></div>
-        <div class="field"><label>ขอเลื่อน (Rescheduled)</label><input id="cf-reschedule" type="number" value="0" /></div>
-        <div class="field"><label>วอล์คอิน (Walk-in)</label><input id="cf-walkin" type="number" value="0" /></div>
-        <div class="field"><label>ไม่รับสาย (No Answer)</label><input id="cf-noanswer" type="number" value="0" /></div>
-        <div class="field"><label>โทรทั้งหมด (Total Calls)</label><input id="cf-total" type="number" value="0" /></div>
-      </div>
-    `;
-    bindInputs(updateConfirmPreview);
-    updateConfirmPreview();
-  }
-
-  function updateConfirmPreview() {
-    const confirmed = toNumber(getVal('cf-confirm'));
-    const totalcalls = toNumber(getVal('cf-total'));
-    const showRate = totalcalls > 0 ? (confirmed / totalcalls) * 100 : 0;
-    document.getElementById('previewMain').innerText = `${showRate.toFixed(1)}%`;
-    document.getElementById('previewSub').innerText = 'Show Rate Conversion';
-    document.getElementById('kpiGrid').innerHTML = `
-      <div class="kpi"><small>Confirmed</small><h3>${confirmed}</h3></div>
-      <div class="kpi"><small>Total Calls</small><h3>${totalcalls}</h3></div>
-      <div class="kpi"><small>Walk-in Total</small><h3>${toNumber(getVal('cf-walkin'))}</h3></div>
-      <div class="kpi"><small>Missed / No Answer</small><h3>${toNumber(getVal('cf-noanswer'))}</h3></div>
-    `;
-  }
-
-  function renderDoctor() {
-    document.getElementById('pageTitle').innerText = 'Doctor Finance';
-    document.getElementById('formTitle').innerText = 'DF Settlement Entry';
-    document.getElementById('moduleForm').innerHTML = `
-      <div class="form-grid">
-        <div class="field"><label>รหัสแพทย์ (Doctor ID)</label><input id="doc-id" type="text" placeholder="e.g. DOC-001" /></div>
-        <div class="field"><label>ยอดขาย (Sales Revenue)</label><input id="doc-revenue" type="number" value="0" /></div>
-        <div class="field"><label>ค่าแพทย์ (DF Amount)</label><input id="doc-df" type="number" value="0" /></div>
-        <div class="field"><label>เวลาเข้างาน (Check-in)</label><input id="doc-start" type="time" /></div>
-        <div class="field"><label>เวลาออกงาน (Check-out)</label><input id="doc-end" type="time" /></div>
-        <div class="field"><label>หมายเหตุ (Remarks)</label><input id="doc-note" type="text" placeholder="Optional notes..." /></div>
-      </div>
-    `;
-    bindInputs(updateDoctorPreview);
-    updateDoctorPreview();
-  }
-
-  function updateDoctorPreview() {
-    const df = toNumber(getVal('doc-df'));
-    document.getElementById('previewMain').innerText = `฿${money(df)}`;
-    document.getElementById('previewSub').innerText = 'Total DF Allocated';
-    document.getElementById('kpiGrid').innerHTML = `
-      <div class="kpi"><small>Generated Revenue</small><h3>฿${money(toNumber(getVal('doc-revenue')))}</h3></div>
-      <div class="kpi"><small>Doctor DF</small><h3>฿${money(df)}</h3></div>
-    `;
-  }
-
-  function renderBilling() {
-    document.getElementById('pageTitle').innerText = 'Billing KPI';
-    document.getElementById('formTitle').innerText = 'Operations Productivity';
-    document.getElementById('moduleForm').innerHTML = `
-      <div class="form-grid">
-        <div class="field"><label>จำนวนบิลที่เปิด (Total Bills)</label><input id="bill-count" type="number" value="0" /></div>
-        <div class="field"><label>หมายเหตุ (Remarks)</label><input id="bill-note" type="text" placeholder="Optional notes..." /></div>
-      </div>
-    `;
-    bindInputs(updateBillingPreview);
-    updateBillingPreview();
-  }
-
-  function updateBillingPreview() {
-    const bills = toNumber(getVal('bill-count'));
-    document.getElementById('previewMain').innerText = bills;
-    document.getElementById('previewSub').innerText = 'Total Invoices Today';
-    document.getElementById('kpiGrid').innerHTML = `
-      <div class="kpi"><small>Processed Bills</small><h3>${bills}</h3></div>
-    `;
-  }
-
+  // บันทึกข้อมูลลง Firebase
   document.getElementById('btnSave').addEventListener('click', async () => {
-    const branchId = getVal('globalBranch');
     const rawDate = getVal('globalDate');
-    
-    if(!rawDate) return alert('Please select a date before saving.');
+    if(!rawDate) return alert('กรุณาเลือกวันที่ก่อนบันทึกข้อมูล');
     
     const dateStr = rawDate.replace(/-/g, ''); 
     const saveBtn = document.getElementById('btnSave');
-    saveBtn.innerText = 'Saving...';
-    saveBtn.disabled = true;
+    saveBtn.innerText = 'Saving...'; saveBtn.disabled = true;
 
     try {
       if (currentModule === 'revenue') {
-        const docId = `${branchId}_${dateStr}`;
+        const docId = `${selectedBranch}_${dateStr}`;
         await setDoc(doc(db, "dailyOperations", docId), {
-          branchId, reportDate: rawDate,
+          branchId: selectedBranch, reportDate: rawDate,
+          // บันทึกรายชื่อแพทย์ทั้ง 2 คนเข้า database
+          onDutyDoctors: {
+            doctor1: getVal('rev-doc1') || "",
+            doctor2: getVal('rev-doc2') || ""
+          },
           revenue: {
-            procedure: toNumber(getVal('rev-procedure')), medicine: toNumber(getVal('rev-medicine')),
-            treatment: toNumber(getVal('rev-treatment')), product: toNumber(getVal('rev-product')),
-            member: toNumber(getVal('rev-member')), hdMall: toNumber(getVal('rev-hdmall')),
-            gowabi: toNumber(getVal('rev-gowabi')), other: toNumber(getVal('rev-other'))
+            co2: toNumber(getVal('rev-co2')), pico: toNumber(getVal('rev-pico')),
+            vbeam: toNumber(getVal('rev-vbeam')), qswitch: toNumber(getVal('rev-qswitch')),
+            exilis: toNumber(getVal('rev-exilis')), ulthera: toNumber(getVal('rev-ulthera')),
+            botox: toNumber(getVal('rev-botox')), filler: toNumber(getVal('rev-filler')),
+            meso: toNumber(getVal('rev-meso')), proc_other: toNumber(getVal('rev-proc-other')),
+            treatment: toNumber(getVal('rev-treatment')), medicine: toNumber(getVal('rev-medicine')),
+            product: toNumber(getVal('rev-product'))
+          },
+          payments: {
+            kbank: toNumber(getVal('pay-kbank')), ktc: toNumber(getVal('pay-ktc')),
+            scb: toNumber(getVal('pay-scb')), transfer: toNumber(getVal('pay-transfer'))
           },
           createdAt: serverTimestamp(), updatedAt: serverTimestamp()
         }, { merge: true });
 
       } else if (currentModule === 'confirm') {
-        const docId = `${branchId}_${dateStr}`;
+        const docId = `${selectedBranch}_${dateStr}`;
         await setDoc(doc(db, "confirmReports", docId), {
-          branchId, reportDate: rawDate,
+          branchId: selectedBranch, reportDate: rawDate,
           metrics: {
             confirmed: toNumber(getVal('cf-confirm')), rescheduled: toNumber(getVal('cf-reschedule')),
             walkIn: toNumber(getVal('cf-walkin')), noAnswer: toNumber(getVal('cf-noanswer')),
@@ -363,31 +472,29 @@
 
       } else if (currentModule === 'doctor') {
         const dId = getVal('doc-id').trim() || "UNKNOWN";
-        const docId = `${dId}_${branchId}_${dateStr}`;
+        const docId = `${dId}_${selectedBranch}_${dateStr}`;
         await setDoc(doc(db, "doctorFinance", docId), {
-          doctorId: dId, branchId, reportDate: rawDate,
-          shift: { checkIn: getVal('doc-start') || "", checkOut: getVal('doc-end') || "" },
+          doctorId: dId, branchId: selectedBranch, reportDate: rawDate,
           finance: { sales: toNumber(getVal('doc-revenue')), df: toNumber(getVal('doc-df')) },
           note: getVal('doc-note') || "",
           createdAt: serverTimestamp(), updatedAt: serverTimestamp()
         }, { merge: true });
 
       } else if (currentModule === 'billing') {
-        const docId = `${branchId}_${dateStr}`;
+        const docId = `${selectedBranch}_${dateStr}`;
         await setDoc(doc(db, "billingKPI", docId), {
-          branchId, reportDate: rawDate,
+          branchId: selectedBranch, reportDate: rawDate,
           totalBills: toNumber(getVal('bill-count')), note: getVal('bill-note') || "",
           createdAt: serverTimestamp(), updatedAt: serverTimestamp()
         }, { merge: true });
       }
       
-      alert(`✅ Data saved successfully for [${currentModule}]`);
+      alert(`✅ บันทึกข้อมูลสาขา [${selectedBranchName}] สำเร็จ!`);
     } catch (error) {
       console.error("Save Error: ", error);
-      alert("❌ Failed to save data. Please check connection and permissions.");
+      alert("❌ ไม่สามารถบันทึกได้ โปรดตรวจสอบการเชื่อมต่อ Firebase");
     } finally {
-      saveBtn.innerText = 'Save Report';
-      saveBtn.disabled = false;
+      saveBtn.innerText = 'Save Report'; saveBtn.disabled = false;
     }
   });
 
