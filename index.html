@@ -73,8 +73,9 @@
   /* --- โซนแอปพลิเคชัน (HDmall/Gowabi) --- */
   .app-zone { font-size: 12px; line-height: 1.6; text-align: left; }
   .app-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; }
-  .app-input { width: 45px; text-align: center; border: 1px solid #ccc; font-family: var(--font-data); font-size: 12px; color: var(--text-blue)!important;}
-  .app-amt { width: 65px; text-align: right; }
+  .app-input { width: 55px; text-align: right; border: 1px solid #ccc; font-family: var(--font-data); font-size: 12px; color: var(--text-blue)!important; padding: 0 2px;}
+  .app-input.text-center { text-align: center; width: 45px; }
+  .app-amt { width: 75px; text-align: right; }
 
   /* --- ตาราง Footer --- */
   .footer-table { width: 100%; border-collapse: collapse; }
@@ -119,7 +120,7 @@
     <div class="toolbar no-print">
       <div>
         <h2 style="font-size: 24px; font-weight: 800;">Daily Revenue</h2>
-        <p style="color: #64748B; font-size: 14px;">(ตัวหนังสือสีน้ำเงิน / หมายเหตุสีแดง / คำนวณแอปพลิเคชันอัตโนมัติ)</p>
+        <p style="color: #64748B; font-size: 14px;">(ตัวหนังสือสีน้ำเงิน / หมายเหตุสีแดง / คำนวณพร้อมใส่คอมมาอัตโนมัติ)</p>
       </div>
       <div class="btn-group">
         <button class="btn btn-export" onclick="exportPNG()">🖼️ Export PNG</button>
@@ -133,10 +134,15 @@
         <div class="paper-title">ใบสรุปยอดแคชเชียร์และบัตรเครดิต</div>
         <div>
           <span style="font-weight: 600;">สาขา</span> 
-          <select class="inline-input text-bold" style="width: 180px; font-size: 15px; cursor: pointer;">
-            <option>เซ็นทรัลพระราม 9</option>
-            <option>ซีคอนบางแค</option>
-            <option>เซ็นทรัลปิ่นเกล้า</option>
+          <select class="inline-input text-bold" style="width: 240px; font-size: 15px; cursor: pointer;">
+            <option>สาขา-เซ็นทรัลพระราม 9</option>
+            <option>สาขา-เซ็นทรัลปิ่นเกล้า</option>
+            <option>สาขา-ซีคอนบางแค</option>
+            <option>สาขา-ฟิวเจอร์พาร์ครังสิต</option>
+            <option>สาขา-เดอะพรอมานาด</option>
+            <option>สาขา-เดอะมอลล์งามวงศ์วาน</option>
+            <option>สาขา-ซีคอนศรีนครินทร์</option>
+            <option>สาขา-เซ็นทรัลเวสต์เกต</option>
           </select>
         </div>
       </div>
@@ -163,49 +169,49 @@
           <tr>
             <td rowspan="15" class="bg-gray"></td>
             <td>Co2</td>
-            <td><input type="number" class="cell-input calc-proc" placeholder="0"></td>
-            <td><input type="number" class="cell-input text-red" style="color:red!important;" placeholder="0"></td>
+            <td><input type="text" class="cell-input calc-proc comma-format" placeholder="0"></td>
+            <td><input type="text" class="cell-input text-red comma-format" style="color:red!important;" placeholder="0"></td>
             <td>1. KBANK (กสิกร)</td>
             <td class="bg-gray"></td>
             <td rowspan="3" style="vertical-align: top; padding-top: 5px;">
               <div class="text-center text-bold" style="font-size: 13px; border-bottom:1px solid #000; padding-bottom:3px; margin-bottom:5px;">เงินสด</div>
-              <input type="number" id="pay-cash" class="cell-input calc-grand text-center" style="font-size: 18px; margin-top: 5px; font-weight: 800;" placeholder="0">
+              <input type="text" id="pay-cash" class="cell-input calc-grand comma-format text-center" style="font-size: 18px; margin-top: 5px; font-weight: 800;" placeholder="0">
             </td>
           </tr>
           <tr>
             <td>Pico</td>
-            <td><input type="number" class="cell-input calc-proc" placeholder="0"></td>
-            <td><input type="number" class="cell-input text-red" style="color:red!important;" placeholder="0"></td>
+            <td><input type="text" class="cell-input calc-proc comma-format" placeholder="0"></td>
+            <td><input type="text" class="cell-input text-red comma-format" style="color:red!important;" placeholder="0"></td>
             <td>1.1 Credit (เครดิต)</td>
-            <td><input type="number" class="cell-input calc-cc" placeholder="0"></td>
+            <td><input type="text" class="cell-input calc-cc comma-format" placeholder="0"></td>
           </tr>
           <tr>
             <td>Vbeam</td>
-            <td><input type="number" class="cell-input calc-proc" placeholder="0"></td>
-            <td><input type="number" class="cell-input text-red" style="color:red!important;" placeholder="0"></td>
+            <td><input type="text" class="cell-input calc-proc comma-format" placeholder="0"></td>
+            <td><input type="text" class="cell-input text-red comma-format" style="color:red!important;" placeholder="0"></td>
             <td>1.2 กสิกร(สแกน/โอน)</td>
-            <td><input type="number" class="cell-input calc-cc" placeholder="0"></td>
+            <td><input type="text" class="cell-input calc-cc comma-format" placeholder="0"></td>
           </tr>
           <tr>
             <td>Elos</td>
-            <td><input type="number" class="cell-input calc-proc" placeholder="0"></td>
-            <td><input type="number" class="cell-input text-red" style="color:red!important;" placeholder="0"></td>
+            <td><input type="text" class="cell-input calc-proc comma-format" placeholder="0"></td>
+            <td><input type="text" class="cell-input text-red comma-format" style="color:red!important;" placeholder="0"></td>
             <td>2. KTC (กรุงไทย)</td>
-            <td><input type="number" class="cell-input calc-cc" placeholder="0"></td>
+            <td><input type="text" class="cell-input calc-cc comma-format" placeholder="0"></td>
             <td rowspan="5" style="vertical-align: top; padding: 5px;">
               <div class="text-center text-bold" style="font-size: 13px; border-bottom:1px solid #000; padding-bottom:3px; margin-bottom:5px;">แอปพลิเคชัน</div>
               <div class="app-zone">
                 <div class="text-bold text-blue">1. HDmall</div>
-                <div class="app-row"><span>1.1 คน</span> <input type="number" class="app-input" placeholder="0"></div>
-                <div class="app-row"><span>1.2 รวม</span> <input type="number" id="app-hd-amt" class="app-input app-amt calc-app" placeholder="0"></div>
+                <div class="app-row"><span>1.1 คน</span> <input type="number" class="app-input text-center" placeholder="0"></div>
+                <div class="app-row"><span>1.2 รวม</span> <input type="text" id="app-hd-amt" class="app-input app-amt calc-app comma-format" placeholder="0"></div>
                 
                 <div class="text-bold text-blue" style="margin-top: 4px;">2. Gowabi</div>
-                <div class="app-row"><span>2.1 คน</span> <input type="number" class="app-input" placeholder="0"></div>
-                <div class="app-row"><span>2.2 รวม</span> <input type="number" id="app-gw-amt" class="app-input app-amt calc-app" placeholder="0"></div>
+                <div class="app-row"><span>2.1 คน</span> <input type="number" class="app-input text-center" placeholder="0"></div>
+                <div class="app-row"><span>2.2 รวม</span> <input type="text" id="app-gw-amt" class="app-input app-amt calc-app comma-format" placeholder="0"></div>
                 
                 <div style="margin-top: 4px; border-top: 1px dashed #000; padding-top: 4px; display: flex; justify-content: space-between; font-weight: bold;">
                   <span>ยอดรวมแอป</span> 
-                  <input type="text" id="pay-app-disp" class="inline-input text-right text-bold" style="width: 70px; border:none; color:#000!important;" readonly value="0.00">
+                  <input type="text" id="pay-app-disp" class="inline-input text-right text-bold" style="width: 75px; border:none; color:#000!important;" readonly value="0.00">
                 </div>
               </div>
               <input type="hidden" id="pay-app-hidden" class="calc-grand" value="0">
@@ -213,71 +219,71 @@
           </tr>
           <tr>
             <td>Botox</td>
-            <td><input type="number" class="cell-input calc-proc" placeholder="0"></td>
-            <td><input type="number" class="cell-input text-red" style="color:red!important;" placeholder="0"></td>
+            <td><input type="text" class="cell-input calc-proc comma-format" placeholder="0"></td>
+            <td><input type="text" class="cell-input text-red comma-format" style="color:red!important;" placeholder="0"></td>
             <td>3. BAY (กรุงศรี)</td>
-            <td><input type="number" class="cell-input calc-cc" placeholder="0"></td>
+            <td><input type="text" class="cell-input calc-cc comma-format" placeholder="0"></td>
           </tr>
           <tr>
             <td>Filler</td>
-            <td><input type="number" class="cell-input calc-proc" placeholder="0"></td>
-            <td><input type="number" class="cell-input text-red" style="color:red!important;" placeholder="0"></td>
+            <td><input type="text" class="cell-input calc-proc comma-format" placeholder="0"></td>
+            <td><input type="text" class="cell-input text-red comma-format" style="color:red!important;" placeholder="0"></td>
             <td>4. SCB (ไทยพาณิชย์)</td>
-            <td><input type="number" class="cell-input calc-cc" placeholder="0"></td>
+            <td><input type="text" class="cell-input calc-cc comma-format" placeholder="0"></td>
           </tr>
           <tr>
             <td>Meso</td>
-            <td><input type="number" class="cell-input calc-proc" placeholder="0"></td>
-            <td><input type="number" class="cell-input text-red" style="color:red!important;" placeholder="0"></td>
+            <td><input type="text" class="cell-input calc-proc comma-format" placeholder="0"></td>
+            <td><input type="text" class="cell-input text-red comma-format" style="color:red!important;" placeholder="0"></td>
             <td>อื่นๆ ระบุ <input type="text" class="inline-input" style="width: 60px;"></td>
-            <td><input type="number" class="cell-input calc-cc" placeholder="0"></td>
+            <td><input type="text" class="cell-input calc-cc comma-format" placeholder="0"></td>
           </tr>
           <tr>
             <td>Thermage</td>
-            <td><input type="number" class="cell-input calc-proc" placeholder="0"></td>
-            <td><input type="number" class="cell-input text-red" style="color:red!important;" placeholder="0"></td>
+            <td><input type="text" class="cell-input calc-proc comma-format" placeholder="0"></td>
+            <td><input type="text" class="cell-input text-red comma-format" style="color:red!important;" placeholder="0"></td>
             <td colspan="2" class="bg-gray"></td>
           </tr>
           <tr>
             <td>Ulthera</td>
-            <td><input type="number" class="cell-input calc-proc" placeholder="0"></td>
-            <td><input type="number" class="cell-input text-red" style="color:red!important;" placeholder="0"></td>
+            <td><input type="text" class="cell-input calc-proc comma-format" placeholder="0"></td>
+            <td><input type="text" class="cell-input text-red comma-format" style="color:red!important;" placeholder="0"></td>
             <td class="text-right text-bold">ยอดรวมเครดิต</td>
             <td class="bg-gray"><input type="text" id="total-cc-disp" class="cell-input text-bold" style="color:#000!important;" readonly value="0.00"></td>
             <td rowspan="4" style="vertical-align: top; padding-top: 10px;">
               <div class="text-center text-bold" style="font-size: 13px; border-bottom:1px solid #000; padding-bottom:3px; margin-bottom:5px;">ยอดเงินโอน</div>
-              <input type="number" id="pay-transfer" class="cell-input calc-grand text-center" style="font-size: 18px; margin-top: 5px; font-weight: 800;" placeholder="0">
+              <input type="text" id="pay-transfer" class="cell-input calc-grand comma-format text-center" style="font-size: 18px; margin-top: 5px; font-weight: 800;" placeholder="0">
             </td>
           </tr>
           <tr>
             <td>Treatment</td>
-            <td><input type="number" class="cell-input calc-proc" placeholder="0"></td>
-            <td><input type="number" class="cell-input text-red" style="color:red!important;" placeholder="0"></td>
+            <td><input type="text" class="cell-input calc-proc comma-format" placeholder="0"></td>
+            <td><input type="text" class="cell-input text-red comma-format" style="color:red!important;" placeholder="0"></td>
             <td rowspan="4" colspan="2" style="vertical-align: middle; padding: 10px;">
               <div class="text-bold text-center" style="font-size: 16px; margin-bottom: 5px;">ยอดชำระรวม</div>
-              <input type="text" id="grand-total-disp" class="cell-input text-bold text-center" style="font-size: 26px; color: #000!important; background: transparent;" value="0">
+              <input type="text" id="grand-total-disp" class="cell-input text-bold text-center" style="font-size: 26px; color: #000!important; background: transparent;" readonly value="0.00">
             </td>
           </tr>
           <tr>
             <td>Drip Vitamin (Nures)</td>
-            <td><input type="number" class="cell-input calc-proc" placeholder="0"></td>
-            <td><input type="number" class="cell-input text-red" style="color:red!important;" placeholder="0"></td>
+            <td><input type="text" class="cell-input calc-proc comma-format" placeholder="0"></td>
+            <td><input type="text" class="cell-input text-red comma-format" style="color:red!important;" placeholder="0"></td>
           </tr>
           <tr>
             <td>ขายยา / สินค้า</td>
-            <td><input type="number" class="cell-input calc-proc" placeholder="0"></td>
-            <td><input type="number" class="cell-input text-red" style="color:red!important;" placeholder="0"></td>
+            <td><input type="text" class="cell-input calc-proc comma-format" placeholder="0"></td>
+            <td><input type="text" class="cell-input text-red comma-format" style="color:red!important;" placeholder="0"></td>
           </tr>
           <tr>
             <td>ชาร์จ 3%</td>
-            <td><input type="number" class="cell-input calc-proc" placeholder="0"></td>
-            <td><input type="number" class="cell-input text-red" style="color:red!important;" placeholder="0"></td>
+            <td><input type="text" class="cell-input calc-proc comma-format" placeholder="0"></td>
+            <td><input type="text" class="cell-input text-red comma-format" style="color:red!important;" placeholder="0"></td>
             <td class="bg-gray"></td>
           </tr>
           <tr>
             <td><input type="text" class="inline-input" placeholder="ระบุหัตถการอื่นๆ..." style="width:100%; border:none;"></td>
-            <td><input type="number" class="cell-input calc-proc" placeholder="0"></td>
-            <td><input type="number" class="cell-input text-red" style="color:red!important;" placeholder="0"></td>
+            <td><input type="text" class="cell-input calc-proc comma-format" placeholder="0"></td>
+            <td><input type="text" class="cell-input text-red comma-format" style="color:red!important;" placeholder="0"></td>
             <td colspan="3" class="bg-gray"></td>
           </tr>
           
@@ -287,7 +293,7 @@
             <td class="bg-gray"></td>
             <td colspan="3" class="bg-gray text-center text-bold" style="display: flex; justify-content: space-between; align-items: center; border:none; height: 100%;">
               <span>คะแนน (Point)</span>
-              <input type="number" class="cell-input" style="width: 120px; background: #fff; border: 1px solid #ccc; text-align: center; color: #000!important; font-size: 16px;" placeholder="0">
+              <input type="text" class="cell-input comma-format" style="width: 120px; background: #fff; border: 1px solid #ccc; text-align: center; color: #000!important; font-size: 16px;" placeholder="0">
             </td>
           </tr>
         </tbody>
@@ -315,8 +321,8 @@
           </td>
         </tr>
         <tr>
-          <td width="22.5%">ยอดเงินขาด<br><input type="number" class="cell-input" style="margin-top: 10px; text-align: left;"></td>
-          <td width="22.5%">ยอดเงินเกิน<br><input type="number" class="cell-input" style="margin-top: 10px; text-align: left;"></td>
+          <td width="22.5%">ยอดเงินขาด<br><input type="text" class="cell-input comma-format" style="margin-top: 10px; text-align: left;"></td>
+          <td width="22.5%">ยอดเงินเกิน<br><input type="text" class="cell-input comma-format" style="margin-top: 10px; text-align: left;"></td>
           <td width="20%">สาเหตุ<br><input type="text" class="inline-input input-reason text-bold" style="margin-top: 10px;"></td>
           <td>
             ผู้จัดการ 
@@ -340,46 +346,88 @@
 </div>
 
 <script>
+  // ฟังก์ชันแปลงเลขเป็นแบบมีคอมมาหลักพัน และทศนิยมสองตำแหน่ง
   function formatMoney(num) {
-    return num === 0 ? "0.00" : num.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return num.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  // ฟังก์ชันดึงค่าตัวเลขจาก Input ที่อาจจะมีคอมมาติดอยู่เพื่อนำไปคำนวณ
+  function getRawNumber(element) {
+    if (!element) return 0;
+    // ลบคอมมาออกทั้งหมดก่อนแปลงเป็นตัวเลข
+    let val = element.value.replace(/,/g, '');
+    return Number(val) || 0;
   }
 
   function calculateTotals() {
-    // 1. รวมหัตถการ
+    // 1. รวมหัตถการ (Program)
     let totalProc = 0;
-    document.querySelectorAll('.calc-proc').forEach(input => { totalProc += Number(input.value) || 0; });
+    document.querySelectorAll('.calc-proc').forEach(input => { totalProc += getRawNumber(input); });
     document.getElementById('total-proc-disp').value = formatMoney(totalProc);
 
     // 2. รวมเครดิต
     let totalCC = 0;
-    document.querySelectorAll('.calc-cc').forEach(input => { totalCC += Number(input.value) || 0; });
+    document.querySelectorAll('.calc-cc').forEach(input => { totalCC += getRawNumber(input); });
     document.getElementById('total-cc-disp').value = formatMoney(totalCC);
 
     // 3. รวมแอป (HDmall + Gowabi)
     let totalApp = 0;
-    document.querySelectorAll('.calc-app').forEach(input => { totalApp += Number(input.value) || 0; });
+    document.querySelectorAll('.calc-app').forEach(input => { totalApp += getRawNumber(input); });
     document.getElementById('pay-app-disp').value = formatMoney(totalApp);
-    document.getElementById('pay-app-hidden').value = totalApp; // ซ่อนไว้บวกแกรนด์โททอล
+    document.getElementById('pay-app-hidden').value = totalApp; // เก็บค่า raw ไว้ใช้รวมยอดใหญ่
 
-    // 4. Grand Total
-    let grandTotal = totalCC;
-    document.querySelectorAll('.calc-grand').forEach(input => { grandTotal += Number(input.value) || 0; });
+    // 4. Grand Total (เครดิต + เงินสด + เงินโอน + รวมแอป)
+    let grandTotal = totalCC + totalApp; 
+    // บวก เงินสด และ เงินโอน เข้าไปเพิ่ม
+    grandTotal += getRawNumber(document.getElementById('pay-cash'));
+    grandTotal += getRawNumber(document.getElementById('pay-transfer'));
     
-    const grandInput = document.getElementById('grand-total-disp');
-    if (document.activeElement !== grandInput) {
-      grandInput.value = grandTotal > 0 ? formatMoney(grandTotal) : "";
-    }
+    document.getElementById('grand-total-disp').value = formatMoney(grandTotal);
   }
 
-  document.querySelectorAll('input[type="number"]').forEach(input => {
-    input.addEventListener('input', calculateTotals);
+  // จัดการพิมพ์คอมมาเรียบลไทม์ขณะที่พนักงานพิมพ์ข้อมูลลงไป
+  document.querySelectorAll('.comma-format').forEach(input => {
+    // เมื่อกำลังพิมพ์: อนุญาตให้พิมพ์จุดทศนิยมได้สะดวกขึ้น และใส่คอมมาจัดรูปเลขจำนวนเต็ม
+    input.addEventListener('input', function(e) {
+      let cursorPosition = this.selectionStart;
+      let originalLength = this.value.length;
+      
+      // เก็บเฉพาะตัวเลขและจุดทศนิยมตัวแรก
+      let cleanValue = this.value.replace(/[^0-9.]/g, '');
+      let parts = cleanValue.split('.');
+      if (parts.length > 2) parts = [parts[0], parts.slice(1).join('')];
+      
+      // ใส่คอมมาให้ฝั่งเลขจำนวนเต็ม
+      if (parts[0]) {
+        parts[0] = Number(parts[0]).toLocaleString('en-US'); // ใช้ en-US เพื่อให้ได้ฟอร์แมตคอมมามาตรฐานก่อน
+      }
+      
+      this.value = parts.join('.');
+      
+      // ปรับตำแหน่งเคอร์เซอร์ไม่ให้เด้งไปมาเวลามีคอมมาเพิ่มขึ้นมา
+      let newLength = this.value.length;
+      cursorPosition = cursorPosition + (newLength - originalLength);
+      this.setSelectionRange(cursorPosition, cursorPosition);
+      
+      // เรียกฟังก์ชันคำนวณราคารวม
+      calculateTotals();
+    });
+
+    // เมื่อกดย้ายโฟกัสออกจากช่อง (Blur): ทำการฟอร์แมตให้กลายเป็น .00 ทันที
+    input.addEventListener('blur', function() {
+      let rawVal = getRawNumber(this);
+      if (this.value !== "") {
+        this.value = formatMoney(rawVal);
+      }
+      calculateTotals();
+    });
   });
 
   // Mockup จำลองการเช็คเลขบิล
   function checkDuplicate() {
     const val = document.getElementById('bill-start').value;
     const warning = document.getElementById('bill-warning');
-    if(val.includes('001')) { // สมมติถ้าเลขบิลมีคำว่า 001 ให้เตือนซ้ำ
+    if(val.includes('001')) { 
       warning.style.display = 'block';
     } else {
       warning.style.display = 'none';
