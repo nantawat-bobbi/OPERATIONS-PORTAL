@@ -15,15 +15,30 @@
     color: #000;
   }
   
-  .container {
-    width: 210mm; /* ขนาดความกว้าง A4 */
-    min-height: 297mm; /* ขนาดความสูง A4 */
-    margin: 0 auto;
-    background: #fff;
-    padding: 10mm;
-    box-sizing: border-box;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+.container {
+
+  width: 297mm;
+  min-height: 210mm;
+  margin: 0 auto;
+  background: #fff;
+  padding: 10mm;
+  box-sizing: border-box;
+  box-shadow:
+    0 4px 15px rgba(0,0,0,0.1);
+
+}
+  /* วางตรงนี้ */
+@page {
+  size: A4 landscape;
+  margin: 10mm;
+}
+@media print {
+  body{
+    zoom:80%;
   }
+}
+
+</style>
 
   /* --- แถบเครื่องมือด้านบน (ซ่อนตอนพรินต์) --- */
   .toolbar {
