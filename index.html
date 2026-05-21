@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laliza Clinic — Operations Portal</title>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f0f2f5;--sur:#ffffff;--sur2:#f8f9fa;--sur3:#e9ecef;
+  --bdr:#dee2e6;--bdr2:#ced4da;
+  --tx:#212529;--tx2:#495057;--tx3:#868e96;
+  --acc:#1971c2;--acc2:#1864ab;
+  --grn:#2f9e44;--grn2:#d3f9d8;
+  --amb:#f08c00;--amb2:#fff3bf;
+  --red:#c92a2a;--red2:#ffe3e3;
+  --blue2:#dbe4ff;--blue3:#4c6ef5;
+  --pink2:#fce4ec;--pink3:#e91e8c;
+  --teal2:#e6fcf5;--teal3:#0ca678;
+  --yellow2:#fff9db;
+  --r:6px;--rl:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;font-size:14px;}
+.app{display:flex;min-height:100vh;}
+
+/* SIDEBAR */
+.sidebar{width:200px;background:#1a1d23;border-right:1px solid #2d3139;display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh;}
+.slogo{padding:18px 16px 14px;border-bottom:1px solid #2d3139;}
+.slogo .brand{font-size:13px;font-weight:700;color:#ffffff;letter-spacing:.03em;}
+.slogo .sub{font-size:10px;color:#6c7280;margin-top:2px;letter-spacing:.04em;text-transform:uppercase;}
+.nav{flex:1;padding:8px 7px;overflow-y:auto;}
+.ni{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:6px;cursor:pointer;color:#9ca3af;font-size:13px;transition:all .15s;margin-bottom:2px;border:1px solid transparent;}
+.ni:hover{background:#252830;color:#fff;}
+.ni.active{background:#1971c2;color:#fff;border-color:#1864ab;}
+.ni .ico{font-size:14px;width:16px;text-align:center;}
+.nn{font-size:10px;background:#2d3139;border-radius:3px;padding:1px 5px;color:#6c7280;margin-left:auto;}
+.ni.active .nn{background:rgba(255,255,255,.2);color:#fff;}
+.sbar{padding:10px 14px;border-top:1px solid #2d3139;font-size:11px;color:#6c7280;}
+.sdot{display:inline-block;width:5px;height:5px;border-radius:50%;background:#51cf66;margin-right:5px;}
+.main{flex:1;overflow-y:auto;background:var(--bg);}
+.tp{display:none;padding:0;min-height:100vh;}
+.tp.active{display:block;}
+
+/* PAGE HEADER */
+.ph{background:#fff;border-bottom:1px solid var(--bdr);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+.ptitle{font-size:16px;font-weight:700;color:var(--tx);}
+.psub{font-size:12px;color:var(--tx3);margin-top:1px;}
+.ha{display:flex;gap:7px;align-items:center;}
+.pc{padding:20px 24px;}
+
+/* FORM CONTROLS */
+select,input[type=text],input[type=date],input[type=time],input[type=month],input[type=number]{
+  background:#fff;border:1px solid var(--bdr2);border-radius:var(--r);padding:6px 10px;
+  color:var(--tx);font-size:13px;font-family:inherit;outline:none;transition:border-color .15s;
+}
+select:focus,input:focus{border-color:var(--acc);}
+.flbl{font-size:12px;color:var(--tx2);margin-bottom:4px;font-weight:500;}
+.fg{display:grid;gap:10px;}
+.fg4{grid-template-columns:repeat(4,1fr);}
+.fg3{grid-template-columns:repeat(3,1fr);}
+.fg2{grid-template-columns:1fr 1fr;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:var(--r);border:1px solid transparent;cursor:pointer;font-size:13px;font-family:inherit;font-weight:500;transition:all .15s;}
+.bp{background:var(--acc);color:#fff;border-color:var(--acc2);}
+.bp:hover{background:var(--acc2);}
+.bs{background:var(--grn);color:#fff;border-color:#276b34;}
+.bs:hover{background:#276b34;}
+.bg2{background:#fff;color:var(--tx2);border:1px solid var(--bdr2);}
+.bg2:hover{background:var(--sur2);color:var(--tx);}
+.bam{background:var(--amb);color:#fff;}
+.bam:hover{background:#d97706;}
+.bred{background:var(--red);color:#fff;}
+.bfull{width:100%;justify-content:center;padding:10px;font-size:14px;font-weight:600;}
+
+/* KPI CARDS */
+.kgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px;}
+.kc{background:#fff;border:1px solid var(--bdr);border-radius:var(--rl);padding:14px 16px;}
+.klbl{font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;font-weight:600;}
+.kval{font-size:21px;font-weight:700;color:var(--tx);}
+.kval.g{color:var(--grn);}
+.kval.a{color:var(--acc);}
+.kval.am{color:var(--amb);}
+.kval.r{color:var(--red);}
+.ksub{font-size:11px;color:var(--tx3);margin-top:3px;}
+
+/* CHART CARDS */
+.crow{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:18px;}
+.cc{background:#fff;border:1px solid var(--bdr);border-radius:var(--rl);padding:16px;}
+.ct{font-size:13px;font-weight:600;color:var(--tx);margin-bottom:10px;}
+
+/* PANEL (white card) */
+.panel{background:#fff;border:1px solid var(--bdr);border-radius:var(--rl);padding:18px;margin-bottom:16px;}
+.panel-title{font-size:14px;font-weight:700;color:var(--tx);margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid var(--acc);display:flex;align-items:center;justify-content:space-between;}
+
+/* =========================================
+   TAB 1: ใบสรุปยอดแคชเชียร์ — ต้นฉบับ
+   ========================================= */
+.form-header-box{background:#fff;border:1px solid #333;padding:20px 24px;margin-bottom:0;}
+.form-title-main{font-size:18px;font-weight:700;text-align:center;margin-bottom:2px;}
+.form-meta{display:flex;justify-content:space-between;font-size:13px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #ccc;}
+.form-select-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px;padding:12px;background:#f8f9fa;border:1px solid var(--bdr);border-radius:var(--r);}
+/* Main cashier form table — exact layout from image */
+.cf-wrap{overflow-x:auto;}
+.cf-table{width:100%;border-collapse:collapse;font-size:13px;}
+.cf-table th{background:#e9ecef;padding:8px 10px;border:1px solid #adb5bd;text-align:center;font-weight:700;font-size:12px;white-space:nowrap;}
+.cf-table td{padding:7px 10px;border:1px solid #ced4da;vertical-align:middle;}
+.cf-table .section-header{background:#dee2e6;font-weight:700;font-size:11px;text-align:center;letter-spacing:.04em;color:var(--tx2);}
+.cf-table .prog-name{font-weight:500;}
+.cf-table .total-row{background:#fff3bf;font-weight:700;}
+.cf-table .payment-total-row{background:#d3f9d8;font-weight:700;}
+.num-in{border:1px solid #ced4da;border-radius:4px;padding:5px 8px;text-align:right;width:110px;font-size:13px;background:#fff;}
+.num-in:focus{border-color:var(--acc);outline:none;}
+.num-display{font-weight:600;color:#1971c2;font-size:14px;}
+.num-display.green{color:#2f9e44;}
+.num-display.amber{color:#f08c00;}
+/* Column color bands like the original */
+.col-prog{background:#fff;}
+.col-amount{background:#f8fff8;}
+.col-credit-name{background:#fff8f0;}
+.col-credit-amt{background:#fff8f0;}
+.col-app-name{background:#f0f8ff;}
+.col-app-amt{background:#f0f8ff;}
+.col-cash{background:#f0fff4;}
+.bottom-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;}
+.sign-box{border:1px solid var(--bdr2);border-radius:var(--r);padding:12px 14px;background:#fafafa;}
+.sign-label{font-size:11px;color:var(--tx3);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;}
+
+/* =========================================
+   TAB 2: Revenue Sheet — Google Sheet style
+   ========================================= */
+.rev-sheet{background:#fff;border:1px solid var(--bdr);border-radius:var(--rl);overflow:hidden;}
+.rev-sheet-header{background:#4a86c8;color:#fff;text-align:center;padding:12px;font-size:15px;font-weight:700;}
+.rev-tbl{width:100%;border-collapse:collapse;font-size:12px;}
+.rev-tbl th{padding:7px 8px;border:1px solid #b7c2d0;text-align:center;font-weight:700;font-size:11px;white-space:nowrap;}
+.rev-tbl td{padding:6px 8px;border:1px solid #d0d7e0;text-align:right;font-size:12px;}
+.rev-tbl td:first-child{text-align:left;white-space:nowrap;}
+.rev-tbl .th-date{background:#e8f0fe;color:#1a237e;}
+.rev-tbl .th-revenue{background:#e8f5e9;color:#1b5e20;}
+.rev-tbl .th-deduct{background:#fff3e0;color:#e65100;}
+.rev-tbl .th-hdmall{background:#fce4ec;color:#880e4f;}
+.rev-tbl .th-gowabi{background:#ede7f6;color:#4a148c;}
+.rev-tbl .th-charge{background:#e3f2fd;color:#0d47a1;}
+.rev-tbl .th-member{background:#f3e5f5;color:#4a148c;}
+.rev-tbl .th-staff{background:#e0f7fa;color:#006064;}
+.rev-tbl .th-deposit{background:#fbe9e7;color:#bf360c;}
+.rev-tbl .th-net{background:#1a237e;color:#fff;}
+.rev-tbl .td-today{background:#fff9c4;}
+.rev-tbl .td-has{color:#2f9e44;font-weight:600;}
+.rev-tbl .td-zero{color:#adb5bd;}
+.rev-tbl .td-total{background:#e8f5e9;font-weight:700;color:#1b5e20;}
+.rev-tbl .td-total:first-child{color:#212529;}
+.rev-summary{background:#f8f9fa;border-top:2px solid var(--bdr2);padding:12px 16px;display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
+.rev-sum-item label{font-size:10px;color:var(--tx3);font-weight:600;text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:3px;}
+.rev-sum-item span{font-size:14px;font-weight:700;color:var(--tx);}
+.rev-sum-item span.fire{color:var(--amb);}
+
+/* =========================================
+   TAB 3: Confirm Tracking — ตามต้นฉบับ
+   ========================================= */
+.trk-header-box{background:#fff;border:1px solid var(--bdr);border-radius:var(--rl);padding:16px;margin-bottom:16px;}
+.trk-main-table{width:100%;border-collapse:collapse;font-size:13px;}
+.trk-main-table th{padding:8px 10px;border:1px solid #adb5bd;text-align:center;font-weight:700;font-size:12px;background:#e9ecef;white-space:nowrap;}
+.trk-main-table .th-group{background:#bbdefb;color:#0d47a1;border:1px solid #90caf9;}
+.trk-main-table .th-confirm{background:#c8e6c9;color:#1b5e20;border:1px solid #a5d6a7;}
+.trk-main-table .th-real{background:#ffe0b2;color:#e65100;border:1px solid #ffcc80;}
+.trk-main-table td{padding:7px 10px;border:1px solid #dee2e6;text-align:center;vertical-align:middle;}
+.trk-main-table td:first-child{text-align:left;font-weight:600;}
+.trk-main-table .td-branch{background:#f8f9fa;}
+.trk-main-table .td-total-row{background:#e3f2fd;font-weight:700;}
+.trk-input{border:1px solid #ced4da;border-radius:4px;padding:4px;text-align:center;width:52px;font-size:12px;}
+.trk-input:focus{border-color:var(--acc);outline:none;}
+.branch-done-dot{width:8px;height:8px;border-radius:50%;background:#dee2e6;display:inline-block;margin-left:6px;}
+.branch-done-dot.done{background:#51cf66;}
+
+/* =========================================
+   TAB 4: Doctor Finance — ตามต้นฉบับ
+   ========================================= */
+.doc-main-table{width:100%;border-collapse:collapse;font-size:13px;}
+.doc-main-table th{padding:8px 10px;border:1px solid #adb5bd;text-align:center;font-weight:700;font-size:12px;background:#ffcdd2;color:#b71c1c;white-space:nowrap;}
+.doc-main-table th.th-normal{background:#e9ecef;color:#212529;}
+.doc-main-table td{padding:7px 10px;border:1px solid #dee2e6;text-align:center;vertical-align:middle;}
+.doc-main-table td:first-child{text-align:center;}
+.doc-main-table .td-today{background:#fff9c4;}
+.doc-main-table .td-sales{color:#1971c2;font-weight:600;}
+.doc-main-table .td-df{color:#f08c00;font-weight:600;}
+.doc-main-table tr.has-data:hover td{background:#f8f9fa;}
+.doc-total-row{background:#ffcdd2;font-weight:700;}
+.doc-total-row td{color:#b71c1c;}
+.df-num-in{border:1px solid #ced4da;border-radius:4px;padding:4px 7px;text-align:right;width:100px;font-size:12px;}
+.df-num-in:focus{border-color:var(--acc);outline:none;background:#fff9c4;}
+
+/* =========================================
+   TAB 5: Settings
+   ========================================= */
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.ss{background:#fff;border:1px solid var(--bdr);border-radius:var(--rl);padding:16px;}
+.sti{font-size:13px;font-weight:700;color:var(--tx);margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--acc);display:flex;align-items:center;justify-content:space-between;}
+.li{display:flex;align-items:center;justify-content:space-between;padding:7px 9px;border-radius:var(--r);background:#f8f9fa;border:1px solid var(--bdr);margin-bottom:5px;font-size:13px;}
+.lid{background:none;border:none;cursor:pointer;color:#adb5bd;font-size:16px;padding:1px 4px;border-radius:3px;}
+.lid:hover{color:var(--red);background:var(--red2);}
+.ar{display:flex;gap:7px;margin-top:9px;}
+.ar input{flex:1;}
+.pill{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;}
+.pg{background:var(--grn2);color:#276b34;}
+.pa{background:var(--amb2);color:#865500;}
+.pb{background:var(--blue2);color:#1971c2;}
+
+/* POPUP */
+.pov{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center;}
+.pbox{background:#fff;border-radius:var(--rl);padding:24px;max-width:400px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.18);}
+.ptitle2{font-size:15px;font-weight:700;margin-bottom:8px;color:var(--tx);}
+.psub2{font-size:13px;color:var(--tx2);margin-bottom:16px;line-height:1.6;}
+.pacts{display:flex;gap:8px;}
+.toast{position:fixed;bottom:20px;right:20px;background:#212529;border-radius:var(--r);padding:10px 16px;font-size:13px;color:#fff;z-index:9998;animation:su .25s ease;max-width:300px;}
+.toast.success{border-left:3px solid #51cf66;}
+.toast.error{border-left:3px solid #f03e3e;}
+@keyframes su{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.msel{display:flex;align-items:center;gap:8px;}
+.mnav{background:#fff;border:1px solid var(--bdr2);border-radius:var(--r);padding:5px 12px;cursor:pointer;color:var(--tx2);font-size:15px;}
+.mnav:hover{background:var(--sur2);}
+.mlbl{font-size:15px;font-weight:700;min-width:150px;text-align:center;color:var(--tx);}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="sidebar">
+  <div class="slogo"><div class="brand">LALIZA CLINIC</div><div class="sub">Operations Portal</div></div>
+  <nav class="nav">
+    <div class="ni active" onclick="sw('t1',this)"><span class="ico">📋</span>Daily Ops Core<span class="nn">1</span></div>
+    <div class="ni" onclick="sw('t2',this)"><span class="ico">📊</span>Revenue Sheet<span class="nn">2</span></div>
+    <div class="ni" onclick="sw('t3',this)"><span class="ico">☎️</span>Confirm Tracking<span class="nn">3</span></div>
+    <div class="ni" onclick="sw('t4',this)"><span class="ico">👨‍⚕️</span>Doctor Finance<span class="nn">4</span></div>
+    <div class="ni" onclick="sw('t5',this)"><span class="ico">⚙️</span>Custom Settings<span class="nn">5</span></div>
+  </nav>
+  <div class="sbar"><span class="sdot"></span>Firebase Connected</div>
+</div>
+<div class="main">
+
+<!-- ===== TAB 1: DAILY OPS CORE ===== -->
+<div id="t1" class="tp active">
+  <div class="ph">
+    <div><div class="ptitle">📋 Daily Ops Core — ใบสรุปยอดแคชเชียร์และบัตรเครดิต</div><div class="psub" id="t1dl"></div><div class="psub" style="color:#1971c2;font-weight:600;margin-top:2px;" id="t1-sync-note">ข้อมูลซิงค์มาจาก Revenue Sheet อัตโนมัติ</div></div>
+    <div class="ha"><button class="btn bg2" onclick="exportFormPNG()">📷 PNG</button><button class="btn bg2" onclick="exportFormPDF()">📄 PDF</button><span id="t1conn" style="font-size:12px;color:#2f9e44;font-weight:600;">● Connected</span></div>
+  </div>
+  <div class="pc">
+    <!-- KPI Dashboard -->
+    <div class="kgrid">
+      <div class="kc"><div class="klbl">ยอดรวมวันนี้ (ทุกสาขา)</div><div class="kval g" id="ki-tot">฿0.00</div><div class="ksub" id="ki-bc">0 สาขาบันทึกแล้ว</div></div>
+      <div class="kc"><div class="klbl">สาขายอดสูงสุด</div><div class="kval a" id="ki-tb">—</div><div class="ksub" id="ki-tv"></div></div>
+      <div class="kc"><div class="klbl">ยอดโอน/สแกน KBANK</div><div class="kval" id="ki-tr">฿0.00</div></div>
+      <div class="kc"><div class="klbl">สัดส่วนบัตรเครดิต</div><div class="kval am" id="ki-cr">0%</div><div class="ksub">จากยอดรวม</div></div>
+    </div>
+    <div class="crow">
+      <div class="cc"><div class="ct">กราฟเปรียบเทียบรายรับ — ทุกสาขา</div><div style="position:relative;height:180px;"><canvas id="barC" role="img" aria-label="กราฟรายรับ"></canvas></div></div>
+      <div class="cc"><div class="ct">ช่องทางชำระเงิน</div><div id="pieLeg" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:7px;font-size:11px;color:var(--tx2);"></div><div style="position:relative;height:140px;"><canvas id="pieC" role="img" aria-label="ช่องทางชำระ"></canvas></div></div>
+    </div>
+
+    <!-- ฟอร์มเลือกสาขา/วันที่/แพทย์ -->
+    <div class="panel">
+      <div class="panel-title">ใบสรุปยอดแคชเชียร์และบัตรเครดิต
+        <span style="font-size:12px;color:var(--tx3);font-weight:400;">Update 25-06-2024</span>
+      </div>
+      <div class="fg fg4" style="margin-bottom:14px;">
+        <div><div class="flbl">สาขา</div>
+          <select id="fb" style="width:100%;" onchange="odc()">
+            <option value="central_rama9">เซ็นทรัลพระราม 9</option><option value="pinklao">ปิ่นเกล้า</option>
+            <option value="bangkae">บางแค</option><option value="rangsit">รังสิต</option>
+            <option value="promanat">พรมานาต</option><option value="ngamwongwan">งามวงศ์วาน</option>
+            <option value="srinakarin">ศรีนคริทนร์</option><option value="westgate">เวสต์เกต</option>
+          </select></div>
+        <div><div class="flbl">ประจำวันที่</div><input type="date" id="fd" style="width:100%;" onchange="odc()"></div>
+        <div><div class="flbl">แพทย์คนที่ 1</div><select id="fd1" style="width:100%;"><option value="">— เลือก —</option></select></div>
+        <div><div class="flbl">แพทย์คนที่ 2</div><select id="fd2" style="width:100%;"><option value="">— ถ้ามี —</option></select></div>
+      </div>
+
+      <!-- ตารางหลัก — layout ตามใบสรุปต้นฉบับ -->
+      <div class="cf-wrap">
+      <table class="cf-table">
+        <thead>
+          <tr>
+            <th rowspan="2" style="width:20px;">ยอดหน้าร้าน</th>
+            <th rowspan="2" style="width:110px;">Program</th>
+            <th rowspan="2" style="width:120px;">จำนวนเงิน (บาท)</th>
+            <th rowspan="2" style="width:120px;">ยอดหักบัตร<br>(VIP+VOUCHER)</th>
+            <th colspan="2" style="background:#fff3e0;color:#e65100;">เครดิต</th>
+            <th colspan="2" style="background:#e3f2fd;color:#0d47a1;">เงินสด / โอน / แอป</th>
+          </tr>
+          <tr>
+            <th style="background:#fff8f0;">ช่องทาง</th>
+            <th style="background:#fff8f0;width:120px;">จำนวนเงิน (บาท)</th>
+            <th style="background:#f0f8ff;">แอป/ช่องทาง</th>
+            <th style="background:#f0f8ff;width:120px;">จำนวนเงิน (บาท)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="section-header" colspan="8">◆ Programs หน้าร้าน</td></tr>
+          <tr>
+            <td></td><td class="prog-name col-prog">Co2</td>
+            <td class="col-amount"><input type="number" class="num-in" id="p-co2" value="0" oninput="rc()"></td>
+            <td class="col-amount"><input type="number" class="num-in" id="v-co2" value="0" oninput="rc()"></td>
+            <td class="col-credit-name">1. KBANK (กสิกร)</td>
+            <td class="col-credit-amt"><input type="number" class="num-in" id="c-kbank" value="0" oninput="rc()"></td>
+            <td class="col-app-name" style="background:#f0fff4;font-weight:600;color:#2f9e44;">เงินสด / โอน</td>
+            <td class="col-cash"><span class="num-display green" id="t-cash">0.00</span></td>
+          </tr>
+          <tr>
+            <td></td><td class="prog-name col-prog">Pico</td>
+            <td class="col-amount"><input type="number" class="num-in" id="p-pico" value="0" oninput="rc()"></td>
+            <td class="col-amount"><input type="number" class="num-in" id="v-pico" value="0" oninput="rc()"></td>
+            <td class="col-credit-name">1.1 Credit (เครดิต)</td>
+            <td class="col-credit-amt"><input type="number" class="num-in" id="c-credit" value="0" oninput="rc()"></td>
+            <td class="col-app-name" style="background:#fff8f0;">แอปพลิเคชัน</td>
+            <td class="col-app-amt" style="background:#fff8f0;"></td>
+          </tr>
+          <tr>
+            <td></td><td class="prog-name col-prog">Vbeam</td>
+            <td class="col-amount"><input type="number" class="num-in" id="p-vbeam" value="0" oninput="rc()"></td>
+            <td class="col-amount"><input type="number" class="num-in" id="v-vbeam" value="0" oninput="rc()"></td>
+            <td class="col-credit-name">1.2 กสิกร (สแกน/โอน)</td>
+            <td class="col-credit-amt"><input type="number" class="num-in" id="c-kbsc" value="0" oninput="rc()"></td>
+            <td class="col-app-name">HDMall สรุปรวม</td>
+            <td class="col-app-amt"><input type="number" class="num-in" id="a-hdmall" value="0" oninput="rc()"></td>
+          </tr>
+          <tr>
+            <td></td><td class="prog-name col-prog">Elos</td>
+            <td class="col-amount"><input type="number" class="num-in" id="p-elos" value="0" oninput="rc()"></td>
+            <td class="col-amount"><input type="number" class="num-in" id="v-elos" value="0" oninput="rc()"></td>
+            <td class="col-credit-name">2. KTC (กรุงไทย)</td>
+            <td class="col-credit-amt"><input type="number" class="num-in" id="c-ktc" value="0" oninput="rc()"></td>
+            <td class="col-app-name">Gowabi สรุปรวม</td>
+            <td class="col-app-amt"><input type="number" class="num-in" id="a-gowabi" value="0" oninput="rc()"></td>
+          </tr>
+          <tr>
+            <td></td><td class="prog-name col-prog">Botox</td>
+            <td class="col-amount"><input type="number" class="num-in" id="p-botox" value="0" oninput="rc()"></td>
+            <td class="col-amount"><input type="number" class="num-in" id="v-botox" value="0" oninput="rc()"></td>
+            <td class="col-credit-name">3. BAY (กรุงศรี)</td>
+            <td class="col-credit-amt"><input type="number" class="num-in" id="c-bay" value="0" oninput="rc()"></td>
+            <td class="col-app-name">แอปอื่นๆ</td>
+            <td class="col-app-amt"><input type="number" class="num-in" id="a-other" value="0" oninput="rc()"></td>
+          </tr>
+          <tr>
+            <td></td><td class="prog-name col-prog">Filler</td>
+            <td class="col-amount"><input type="number" class="num-in" id="p-filler" value="0" oninput="rc()"></td>
+            <td class="col-amount"><input type="number" class="num-in" id="v-filler" value="0" oninput="rc()"></td>
+            <td class="col-credit-name">4. SCB (ไทยพาณิชย์)</td>
+            <td class="col-credit-amt"><input type="number" class="num-in" id="c-scb" value="0" oninput="rc()"></td>
+            <td></td><td></td>
+          </tr>
+          <tr>
+            <td></td><td class="prog-name col-prog">Meso</td>
+            <td class="col-amount"><input type="number" class="num-in" id="p-meso" value="0" oninput="rc()"></td>
+            <td class="col-amount"><input type="number" class="num-in" id="v-meso" value="0" oninput="rc()"></td>
+            <td class="col-credit-name">อื่นๆ ระบุ</td>
+            <td class="col-credit-amt"><input type="number" class="num-in" id="c-other" value="0" oninput="rc()"></td>
+            <td></td><td></td>
+          </tr>
+          <tr><td></td><td class="prog-name col-prog">Thermage</td><td class="col-amount"><input type="number" class="num-in" id="p-thermage" value="0" oninput="rc()"></td><td class="col-amount"><input type="number" class="num-in" id="v-thermage" value="0" oninput="rc()"></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td class="prog-name col-prog">Ulthera</td><td class="col-amount"><input type="number" class="num-in" id="p-ulthera" value="0" oninput="rc()"></td><td class="col-amount"><input type="number" class="num-in" id="v-ulthera" value="0" oninput="rc()"></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td class="prog-name col-prog">Treatment</td><td class="col-amount"><input type="number" class="num-in" id="p-treatment" value="0" oninput="rc()"></td><td class="col-amount"><input type="number" class="num-in" id="v-treatment" value="0" oninput="rc()"></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td class="prog-name col-prog">Drip Vitamin (Nures)</td><td class="col-amount"><input type="number" class="num-in" id="p-drip" value="0" oninput="rc()"></td><td class="col-amount"><input type="number" class="num-in" id="v-drip" value="0" oninput="rc()"></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td class="prog-name col-prog">Product</td><td class="col-amount"><input type="number" class="num-in" id="p-product" value="0" oninput="rc()"></td><td class="col-amount"><input type="number" class="num-in" id="v-product" value="0" oninput="rc()"></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td class="prog-name col-prog">หัตถการอื่นๆ</td><td class="col-amount"><input type="number" class="num-in" id="p-misc" value="0" oninput="rc()"></td><td class="col-amount"><input type="number" class="num-in" id="v-misc" value="0" oninput="rc()"></td><td></td><td></td><td style="font-size:12px;color:var(--tx3);">ยอดเงินโอน</td><td><span class="num-display" id="t-transfer">0.00</span></td></tr>
+          <tr class="total-row">
+            <td colspan="2" style="text-align:center;">ยอดรวม</td>
+            <td style="text-align:right;"><span class="num-display" id="t-prog">0.00</span></td>
+            <td style="text-align:right;"><span class="num-display amber" id="t-vip">0.00</span></td>
+            <td style="text-align:center;font-weight:700;">คะแนน (Point)</td>
+            <td></td>
+            <td style="text-align:center;font-size:12px;color:var(--tx3);">ยอดรวมเครดิต</td>
+            <td style="text-align:right;"><span class="num-display" id="t-crd">0.00</span></td>
+          </tr>
+          <tr class="payment-total-row">
+            <td colspan="6" style="text-align:right;padding-right:16px;">ยอดชำระรวม (เงินสด+บัตร+แอป)</td>
+            <td colspan="2" style="text-align:right;font-size:16px;color:#2f9e44;"><span id="t-total">0.00</span> บาท</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+
+      <!-- Bottom: bill range + cashier + manager -->
+      <div style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div style="border:1px solid var(--bdr2);border-radius:var(--r);padding:12px;">
+          <div style="font-size:12px;font-weight:700;margin-bottom:8px;">ข้อมูลบิล</div>
+          <div class="fg fg2" style="gap:8px;">
+            <div><div class="flbl">เลขบิลเริ่มต้น</div><input type="text" id="fbs" style="width:100%;" placeholder="B0001"></div>
+            <div><div class="flbl">เลขบิลสิ้นสุด / รวม</div><input type="text" id="fbe" style="width:100%;" placeholder="B0050"></div>
+          </div>
+          <div style="margin-top:8px;"><div class="flbl">ยอดเงินขาด / เงินเกิน / สาเหตุ</div><input type="text" id="fshort" style="width:100%;" placeholder="ระบุถ้ามี..."></div>
+          <div style="margin-top:8px;"><div class="flbl">หมายเหตุ</div><input type="text" id="fn" style="width:100%;" placeholder="หมายเหตุเพิ่มเติม..."></div>
+        </div>
+        <div style="border:1px solid var(--bdr2);border-radius:var(--r);padding:12px;">
+          <div style="font-size:12px;font-weight:700;margin-bottom:8px;">ลายเซ็นรับรอง</div>
+          <div style="margin-bottom:10px;"><div class="flbl">แคชเชียร์ผู้ส่งยอด</div><select id="fc" style="width:100%;"><option value="">— เลือก —</option></select></div>
+          <div><div class="flbl">ผู้จัดการเซ็นรับรอง</div><select id="fm" style="width:100%;"><option value="">— เลือก —</option></select></div>
+        </div>
+      </div>
+      <button class="btn bs bfull" style="margin-top:14px;" onclick="sv1()">💾 บันทึกยอดลงคลาวด์ — กระจายทุกหน้าอัตโนมัติ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TAB 2: REVENUE SHEET ===== -->
+<div id="t2" class="tp">
+  <div class="ph">
+    <div><div class="ptitle">📊 Revenue Sheet — ตารางสรุปรายรับประจำเดือน</div><div class="psub">กรอกข้อมูลที่นี่ก่อน — ข้อมูลจะไหลไปยัง Daily Ops Core อัตโนมัติ</div></div>
+    <div class="ha">
+      <div class="msel"><button class="mnav" onclick="cm(-1)">‹</button><div class="mlbl" id="rml">—</div><button class="mnav" onclick="cm(1)">›</button></div>
+      <select id="rbs" style="width:155px;" onchange="lr()">
+        <option value="central_rama9">เซ็นทรัลพระราม 9</option><option value="pinklao">ปิ่นเกล้า</option>
+        <option value="bangkae">บางแค</option><option value="rangsit">รังสิต</option>
+        <option value="promanat">พรมานาต</option><option value="ngamwongwan">งามวงศ์วาน</option>
+        <option value="srinakarin">ศรีนคริทนร์</option><option value="westgate">เวสต์เกต</option>
+      </select>
+      <button class="btn bg2" onclick="xPNG()">📷 PNG</button>
+      <button class="btn bg2" onclick="xPDF()">📄 PDF</button>
+    </div>
+  </div>
+  <div class="pc">
+    <div class="kgrid">
+      <div class="kc"><div class="klbl">ยอดปัจจุบัน</div><div class="kval g" id="rkt">฿0.00</div></div>
+      <div class="kc"><div class="klbl">% ความสำเร็จ</div><div class="kval a" id="rkp">0.00%</div><div class="ksub" id="rktg"></div></div>
+      <div class="kc"><div class="klbl">คงเหลือ (วัน)</div><div class="kval am" id="rkd">—</div></div>
+      <div class="kc"><div class="klbl">เป้าที่ต้องทำต่อวัน</div><div class="kval" id="rkdt">฿0.00</div></div>
+    </div>
+    <div class="rev-sheet" id="revPanel">
+      <div class="rev-sheet-header" id="rsh">ลาลิซ่าคลินิก สาขา...</div>
+      <div style="overflow-x:auto;">
+      <table class="rev-tbl">
+        <thead>
+          <tr>
+            <th class="th-date">วันที่</th>
+            <th class="th-revenue">รายได้รวม</th>
+            <th class="th-revenue">หัตถการ</th>
+            <th class="th-deduct">ชำระยา</th>
+            <th class="th-deduct">Treatment</th>
+            <th class="th-hdmall">HD Mall</th>
+            <th class="th-gowabi">Gowabi</th>
+            <th class="th-charge">ชาร์จ 3%</th>
+            <th class="th-member">Member</th>
+            <th class="th-staff">หัตถการ พนง.</th>
+            <th class="th-deposit">มัดจำเงิน</th>
+            <th class="th-net">รวมรายได้สุทธิ</th>
+          </tr>
+        </thead>
+        <tbody id="rtb"></tbody>
+        <tfoot id="rtf"></tfoot>
+      </table>
+      </div>
+      <div class="rev-summary">
+        <div class="rev-sum-item"><label>ยอดปัจจุบัน 🔥</label><span class="fire" id="rs1">0.00</span></div>
+        <div class="rev-sum-item"><label>% ความสำเร็จ 🔥</label><span class="fire" id="rs2">0.00%</span></div>
+        <div class="rev-sum-item"><label>คงเหลือ 🔥</label><span id="rs3">0.00</span></div>
+        <div class="rev-sum-item"><label>เหลืออีก (วัน) 🔥</label><span id="rs4">—</span></div>
+        <div class="rev-sum-item"><label>เป้าที่ต้องทำต่อวัน 🔥</label><span id="rs5">0.00</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TAB 3: CONFIRM TRACKING ===== -->
+<div id="t3" class="tp">
+  <div class="ph">
+    <div><div class="ptitle">☎️ Confirm Tracking — รวมสถิติติดตามเคสทุกสาขา</div><div class="psub">กรอกข้อมูล CF ประจำวัน — เมื่อทุกสาขากรอกครบ ระบบจะแจ้งเตือน Export</div></div>
+    <div class="ha">
+      <input type="date" id="t3d" style="width:150px;" onchange="lt()">
+      <button class="btn bam" onclick="cet()">📤 Export ส่ง ผจก.</button>
+    </div>
+  </div>
+  <div class="pc">
+    <div class="kgrid">
+      <div class="kc"><div class="klbl">CF-มา รวมทุกสาขา</div><div class="kval g" id="t3cf">0</div><div class="ksub">คนเก่า + ใหม่</div></div>
+      <div class="kc"><div class="klbl">CF-ขอเลื่อน</div><div class="kval am" id="t3pp">0</div></div>
+      <div class="kc"><div class="klbl">ไม่รับสาย</div><div class="kval r" id="t3na">0</div></div>
+      <div class="kc"><div class="klbl">สาขากรอกแล้ว</div><div class="kval a" id="t3dc">0 / 8</div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">ตารางสรุปรวม Confirm Tracking ประจำวัน</div>
+      <div style="overflow-x:auto;">
+      <table class="trk-main-table" id="trkTable">
+        <thead>
+          <tr>
+            <th rowspan="2" style="width:130px;">สาขา</th>
+            <th colspan="2" class="th-group">คนใช้ (คอนเฟิร์ม)</th>
+            <th class="th-group">(CF-ขอเลื่อน)</th>
+            <th class="th-group">(CF-ขอ walk-in)</th>
+            <th class="th-group">ไม่รับสาย/<br>ปิดเครื่อง</th>
+            <th class="th-group">โทร CF<br>ทั้งหมด</th>
+            <th colspan="3" class="th-real">มาจริง</th>
+          </tr>
+          <tr>
+            <th class="th-confirm">(CF-มา)<br>คนใช้เก่า (คน)</th>
+            <th class="th-confirm">(CF-มา)<br>คนใช้ใหม่ (คน)</th>
+            <th class="th-group">CF-ขอเลื่อน</th>
+            <th class="th-group">CF walk-in</th>
+            <th class="th-group">ไม่รับสาย</th>
+            <th class="th-group">โทรทั้งหมด</th>
+            <th class="th-real">คนใช้เก่า</th>
+            <th class="th-real">คนใช้ใหม่</th>
+            <th class="th-real">คนใช้รวม</th>
+          </tr>
+        </thead>
+        <tbody id="t3sb"></tbody>
+        <tfoot id="t3tf"></tfoot>
+      </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TAB 4: DOCTOR FINANCE ===== -->
+<div id="t4" class="tp">
+  <div class="ph">
+    <div><div class="ptitle">👨‍⚕️ Doctor Finance — รายได้แพทย์รายวัน</div><div class="psub">ดึงรายชื่อแพทย์จาก Firestore — บันทึกยอดขายและค่า DF</div></div>
+    <div class="ha">
+      <select id="t4b" style="width:155px;" onchange="ldf()">
+        <option value="central_rama9">เซ็นทรัลพระราม 9</option><option value="pinklao">ปิ่นเกล้า</option>
+        <option value="bangkae">บางแค</option><option value="rangsit">รังสิต</option>
+        <option value="promanat">พรมานาต</option><option value="ngamwongwan">งามวงศ์วาน</option>
+        <option value="srinakarin">ศรีนคริทนร์</option><option value="westgate">เวสต์เกต</option>
+      </select>
+      <input type="month" id="t4m" style="width:145px;" onchange="ldf()">
+    </div>
+  </div>
+  <div class="pc">
+    <div class="kgrid">
+      <div class="kc"><div class="klbl">ยอดรวมแพทย์ทั้งหมด</div><div class="kval g" id="t4kt">฿0.00</div></div>
+      <div class="kc"><div class="klbl">ค่า DF รวม</div><div class="kval am" id="t4kd">฿0.00</div></div>
+      <div class="kc"><div class="klbl">จำนวนวันทำงาน</div><div class="kval a" id="t4kw">0 วัน</div></div>
+      <div class="kc"><div class="klbl">แพทย์ในระบบ</div><div class="kval" id="t4kn">0 คน</div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">ตารางรายได้แพทย์ประจำเดือน — รูปแบบตามต้นฉบับ
+        <button class="btn bp" onclick="openAdd()">+ เพิ่มรายการ</button>
+      </div>
+      <div style="overflow-x:auto;">
+      <table class="doc-main-table">
+        <thead>
+          <tr>
+            <th class="th-normal" style="width:40px;">ลำดับ</th>
+            <th class="th-normal" style="width:80px;">วันที่</th>
+            <th class="th-normal">เวลาเข้างาน</th>
+            <th class="th-normal">เวลาออกงาน</th>
+            <th class="th-normal">ลายเซ็นต์</th>
+            <th>ยอดขาย</th>
+            <th>ค่า DF</th>
+            <th class="th-normal">ลายเซ็นต์</th>
+          </tr>
+        </thead>
+        <tbody id="t4body"><tr><td colspan="8" style="text-align:center;color:var(--tx3);padding:24px;">โหลดข้อมูล...</td></tr></tbody>
+        <tfoot id="t4foot"></tfoot>
+      </table>
+      </div>
+    </div>
+    <!-- Add form -->
+    <div class="panel" id="t4ap" style="display:none;">
+      <div class="panel-title">เพิ่มรายการวันทำงาน</div>
+      <div class="fg fg4" style="margin-bottom:10px;">
+        <div><div class="flbl">แพทย์</div><select id="t4ds" style="width:100%;"></select></div>
+        <div><div class="flbl">วันที่ทำงาน</div><input type="date" id="t4wd" style="width:100%;"></div>
+        <div><div class="flbl">เวลาเข้างาน</div><input type="time" id="t4ti" style="width:100%;"></div>
+        <div><div class="flbl">เวลาออกงาน</div><input type="time" id="t4to" style="width:100%;"></div>
+      </div>
+      <div class="fg fg4">
+        <div><div class="flbl">ยอดขาย (บาท)</div><input type="number" id="t4sl" style="width:100%;" placeholder="0"></div>
+        <div><div class="flbl">ค่า DF (บาท)</div><input type="number" id="t4df2" style="width:100%;" placeholder="0"></div>
+        <div><div class="flbl">หมายเหตุ</div><input type="text" id="t4nt" style="width:100%;" placeholder="ระบุ..."></div>
+        <div style="display:flex;align-items:flex-end;gap:7px;"><button class="btn bg2" onclick="g('t4ap').style.display='none'">ยกเลิก</button><button class="btn bs" onclick="saveDR()">บันทึก</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TAB 5: SETTINGS ===== -->
+<div id="t5" class="tp">
+  <div class="ph"><div><div class="ptitle">⚙️ Custom Settings — จัดการข้อมูลหลักของระบบ</div></div></div>
+  <div class="pc">
+  <div class="sgrid">
+    <div class="ss">
+      <div class="sti">รายชื่อแพทย์ <span class="pill pb" id="dcb">0 คน</span><button class="btn bg2" style="font-size:12px;padding:5px 9px;" onclick="syncFB()">💾 บันทึก</button></div>
+      <div id="dl"></div>
+      <div class="ar"><input type="text" id="nd" placeholder="ชื่อ-นามสกุล แพทย์..."><button class="btn bp" style="padding:6px 12px;" onclick="addDoc()">+ เพิ่ม</button></div>
+    </div>
+    <div class="ss">
+      <div class="sti">รายชื่อแคชเชียร์ <span class="pill pg" id="ccb">0 คน</span><button class="btn bg2" style="font-size:12px;padding:5px 9px;" onclick="syncFB()">💾 บันทึก</button></div>
+      <div id="cl"></div>
+      <div class="ar"><input type="text" id="nc" placeholder="ชื่อแคชเชียร์..."><button class="btn bp" style="padding:6px 12px;" onclick="addCa()">+ เพิ่ม</button></div>
+    </div>
+    <div class="ss">
+      <div class="sti">รายชื่อผู้จัดการ <span class="pill pa" id="mcb">0 คน</span><button class="btn bg2" style="font-size:12px;padding:5px 9px;" onclick="syncFB()">💾 บันทึก</button></div>
+      <div id="ml2"></div>
+      <div class="ar"><input type="text" id="nm" placeholder="ชื่อผู้จัดการ..."><button class="btn bp" style="padding:6px 12px;" onclick="addMg()">+ เพิ่ม</button></div>
+    </div>
+    <div class="ss">
+      <div class="sti">เป้าหมายรายเดือน (บาท) <button class="btn bg2" style="font-size:12px;padding:5px 9px;" onclick="syncFB()">💾 บันทึก</button></div>
+      <div id="tgl"></div>
+    </div>
+    <div class="ss" style="grid-column:1/-1;">
+      <div class="sti">Google Sheet Webhooks<button class="btn bg2" style="font-size:12px;padding:5px 9px;" onclick="saveWH()">💾 บันทึก</button></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;">
+        <div><div class="flbl">Revenue Manager</div><input type="text" id="wh1" style="width:100%;" placeholder="https://script.google.com/..."></div>
+        <div><div class="flbl">Doctor Finance</div><input type="text" id="wh2" style="width:100%;" placeholder="https://script.google.com/..."></div>
+        <div><div class="flbl">Branch Manager</div><input type="text" id="wh3" style="width:100%;" placeholder="https://script.google.com/..."></div>
+        <div><div class="flbl">Tracking</div><input type="text" id="wh4" style="width:100%;" placeholder="https://script.google.com/..."></div>
+      </div>
+      <div style="margin-top:10px;padding:10px 14px;background:#e7f5ff;border-radius:var(--r);font-size:12px;color:#1864ab;line-height:1.7;border:1px solid #74c0fc;">
+        💡 Google Sheet → Extensions → Apps Script → Deploy → New Deployment → Web App → Anyone → Copy URL → วางด้านบน
+      </div>
+    </div>
+  </div>
+  </div>
+</div>
+
+</div></div>
+<!-- EXPORT POPUP -->
+<div id="epop" class="pov" style="display:none;">
+  <div class="pbox">
+    <div class="ptitle2">📤 ทุกสาขากรอกข้อมูลครบแล้ว!</div>
+    <div class="psub2">ระบบพร้อม Export ไฟล์สรุป Confirm Tracking ประจำวันนี้เพื่อส่งให้ผู้จัดการ</div>
+    <div class="pacts">
+      <button class="btn bg2" onclick="g('epop').style.display='none'">ยกเลิก</button>
+      <button class="btn bam" onclick="xTrPNG()">📷 Export PNG</button>
+      <button class="btn bp" onclick="xTrPDF()">📄 Export PDF</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const FBC={apiKey:"AIzaSyDetHuoARpuhqRp-o9mVzECi1nzWAEo-O4",authDomain:"operations-portal-d60a5.firebaseapp.com",databaseURL:"https://operations-portal-d60a5-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"operations-portal-d60a5",storageBucket:"operations-portal-d60a5.firebasestorage.app",messagingSenderId:"821300876730",appId:"1:821300876730:web:608260e1871c7260463983"};
+if(!firebase.apps.length)firebase.initializeApp(FBC);
+const DB=firebase.database();const FS=firebase.firestore();
+let bC=null,pC=null,rY=new Date().getFullYear(),rM=new Date().getMonth();
+let docL=[],caL=[],mgL=[],tgM={central_rama9:0,pinklao:0,bangkae:0,rangsit:0,promanat:0,ngamwongwan:0,srinakarin:0,westgate:0},whs={},trkD={};
+const BK={central_rama9:"เซ็นทรัลพระราม 9",pinklao:"ปิ่นเกล้า",bangkae:"บางแค",rangsit:"รังสิต",promanat:"พรมานาต",ngamwongwan:"งามวงศ์วาน",srinakarin:"ศรีนคริทนร์",westgate:"เวสต์เกต"};
+const BKS=Object.keys(BK);
+const ThM=["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+const TF=[{k:"cf_old",l:"CF-มา (เก่า)"},{k:"cf_new",l:"CF-มา (ใหม่)"},{k:"cf_postpone",l:"CF-ขอเลื่อน"},{k:"cf_walkin",l:"CF walk-in"},{k:"no_answer",l:"ไม่รับสาย/ปิดเครื่อง"},{k:"total_call",l:"โทร CF ทั้งหมด"},{k:"came_old",l:"มาจริง (เก่า)"},{k:"came_new",l:"มาจริง (ใหม่)"}];
+const PI=["co2","pico","vbeam","elos","botox","filler","meso","thermage","ulthera","treatment","drip","product","misc"];
+const CI=["kbank","credit","kbsc","ktc","bay","scb","other"];
+function g(id){return document.getElementById(id);}
+function fm(n){return(parseFloat(n)||0).toLocaleString("th-TH",{minimumFractionDigits:2,maximumFractionDigits:2});}
+function fmI(n){return Math.round(parseFloat(n)||0).toLocaleString("th-TH");}
+function vv(id){return parseFloat(g(id)?.value)||0;}
+function toast(m,t="success"){const el=document.createElement("div");el.className="toast "+t;el.textContent=m;document.body.appendChild(el);setTimeout(()=>el.remove(),3500);}
+function sw(id,item){document.querySelectorAll(".tp").forEach(p=>p.classList.remove("active"));document.querySelectorAll(".ni").forEach(n=>n.classList.remove("active"));g(id).classList.add("active");item.classList.add("active");if(id==="t2")lr();if(id==="t3"){lt();bldTG();}if(id==="t4")ldf();if(id==="t5")rnd5();}
+function rc(){
+  let tp=0,tv=0;PI.forEach(k=>{tp+=vv("p-"+k);tv+=vv("v-"+k);});g("t-prog").textContent=fm(tp);g("t-vip").textContent=fm(tv);
+  let tc=0;CI.forEach(k=>tc+=vv("c-"+k));g("t-crd").textContent=fm(tc);
+  const ta=vv("a-hdmall")+vv("a-gowabi")+vv("a-other");
+  const kbsc=vv("c-kbsc");g("t-transfer").textContent=fm(kbsc);
+  const cash=Math.max(0,tp-tv-tc-ta);
+  g("t-cash").textContent=fm(cash);
+  g("t-total").textContent=fm(tc+ta+cash);
+}
+function odc(){
+  const date=g("fd").value,branch=g("fb").value;if(!date||!branch)return;
+  DB.ref("daily_records/"+date+"/"+branch).once("value",snap=>{
+    if(snap.exists()){
+      const d=snap.val();
+      PI.forEach(k=>{if(g("p-"+k))g("p-"+k).value=d["p_"+k]||0;if(g("v-"+k))g("v-"+k).value=d["v_"+k]||0;});
+      CI.forEach(k=>{if(g("c-"+k))g("c-"+k).value=d["c_"+k]||0;});
+      ["hdmall","gowabi","other"].forEach(k=>{if(g("a-"+k))g("a-"+k).value=d["a_"+k]||0;});
+      ["fc","fm","fd1","fd2"].forEach(f=>{const m={fc:"cashier",fm:"manager",fd1:"doc1",fd2:"doc2"};if(g(f)&&d[m[f]])g(f).value=d[m[f]];});
+      if(g("fbs"))g("fbs").value=d.bill_start||"";if(g("fbe"))g("fbe").value=d.bill_end||"";if(g("fn"))g("fn").value=d.note||"";
+      // sync fields ที่มาจาก Revenue Sheet
+      if(d.a_hdmall!==undefined&&g("a-hdmall"))g("a-hdmall").value=d.a_hdmall;
+      if(d.a_gowabi!==undefined&&g("a-gowabi"))g("a-gowabi").value=d.a_gowabi;
+      if(d.p_treatment!==undefined&&g("p-treatment"))g("p-treatment").value=d.p_treatment;
+      rc();
+      // แสดง note ว่าข้อมูลมาจาก Revenue Sheet
+      if(d.last_rev_update){const n=g("t1-sync-note");if(n)n.textContent="✓ ซิงค์จาก Revenue Sheet ล่าสุด: "+new Date(d.last_rev_update).toLocaleString("th-TH");}
+    }
+  });
+  ldash(date);
+}
+function ldash(date){
+  DB.ref("daily_records/"+date).on("value",snap=>{
+    let tot=0,tr=0,cr=0,bd={};BKS.forEach(b=>bd[b]=0);
+    if(snap.exists()){const dy=snap.val();for(let b in dy){const d=dy[b];const s=d.total_prog||0;if(bd.hasOwnProperty(b))bd[b]=s;tot+=s;tr+=d.c_kbsc||0;cr+=d.total_crd||0;}}
+    g("ki-tot").textContent="฿"+fm(tot);g("ki-tr").textContent="฿"+fm(tr);
+    g("ki-cr").textContent=tot>0?Math.round(cr/tot*100)+"%":"0%";
+    let top="—",topV=0,bc=0;for(let b in bd){if(bd[b]>0)bc++;if(bd[b]>topV){topV=bd[b];top=BK[b];}}
+    g("ki-tb").textContent=top;g("ki-tv").textContent=topV>0?"฿"+fm(topV):"";g("ki-bc").textContent=bc+" สาขาบันทึกแล้ว";
+    rCharts(bd,tr,cr,tot);
+  });
+}
+function rCharts(bd,tr,cr,tot){
+  const bCtx=g("barC").getContext("2d");const pCtx=g("pieC").getContext("2d");
+  if(bC)bC.destroy();if(pC)pC.destroy();
+  bC=new Chart(bCtx,{type:"bar",data:{labels:BKS.map(k=>BK[k]),datasets:[{label:"รายได้",data:BKS.map(k=>bd[k]||0),backgroundColor:"#1971c2",borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:"#495057",font:{size:10},maxRotation:30},grid:{display:false}},y:{ticks:{color:"#495057",font:{size:10},callback:v=>"฿"+fmI(v)},grid:{color:"#e9ecef"}}}}});
+  const cash=Math.max(0,tot-tr-cr);
+  g("pieLeg").innerHTML=[["#1971c2","บัตรเครดิต",cr],["#2f9e44","โอน/สแกน",tr],["#f08c00","เงินสด",cash]].map(([c,l,v])=>"<span style='display:flex;align-items:center;gap:4px;'><span style='width:9px;height:9px;border-radius:2px;background:"+c+";'></span>"+l+": ฿"+fm(v)+"</span>").join("");
+  pC=new Chart(pCtx,{type:"doughnut",data:{labels:["บัตรเครดิต","โอน/สแกน","เงินสด"],datasets:[{data:[cr,tr,cash],backgroundColor:["#1971c2","#2f9e44","#f08c00"],borderWidth:2,borderColor:"#fff"}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},cutout:"60%"}});
+}
+async function sv1(){
+  const branch=g("fb").value,date=g("fd").value;if(!date){toast("กรุณาระบุวันที่","error");return;}
+  let tp=0,tv=0;PI.forEach(k=>{tp+=vv("p-"+k);tv+=vv("v-"+k);});
+  let tc=0;CI.forEach(k=>tc+=vv("c-"+k));
+  const payload={branch,date,doc1:g("fd1").value,doc2:g("fd2").value,cashier:g("fc").value,manager:g("fm").value,bill_start:g("fbs").value,bill_end:g("fbe").value,note:g("fn").value,total_prog:tp,total_vip:tv,total_crd:tc,a_hdmall:vv("a-hdmall"),a_gowabi:vv("a-gowabi"),a_other:vv("a-other"),c_kbsc:vv("c-kbsc"),timestamp:new Date().toISOString()};
+  PI.forEach(k=>{payload["p_"+k]=vv("p-"+k);payload["v_"+k]=vv("v-"+k);});
+  CI.forEach(k=>{payload["c_"+k]=vv("c-"+k);});
+  try{await DB.ref("daily_records/"+date+"/"+branch).set(payload);const sends=Object.values(whs).filter(Boolean).map(url=>fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload),mode:"no-cors"}).catch(()=>{}));await Promise.all(sends);toast("🎉 บันทึกสำเร็จ!");}catch(e){toast("❌ "+e.message,"error");}
+}
+function cm(d){rM+=d;if(rM<0){rM=11;rY--;}if(rM>11){rM=0;rY++;}lr();}
+function lr(){
+  const branch=g("rbs").value;
+  g("rml").textContent=ThM[rM]+" "+(rY+543);
+  g("rsh").textContent="ลาลิซ่าคลินิก สาขา"+BK[branch];
+  const dim=new Date(rY,rM+1,0).getDate();
+  const today=new Date();const td=rY+"-"+String(rM+1).padStart(2,"0")+"-"+String(today.getDate()).padStart(2,"0");
+  // Map: rev column key -> firebase key (for sync to Daily Ops Core)
+  const REV_COLS=[
+    {k:"rev_total",    lbl:"รายได้รวม",    fb:"total_prog"},
+    {k:"rev_hathakon", lbl:"หัตถการ",       fb:"p_misc"},
+    {k:"rev_drug",     lbl:"ชำระยา",        fb:null},
+    {k:"rev_treatment",lbl:"Treatment",     fb:"p_treatment"},
+    {k:"rev_hdmall",   lbl:"HD Mall",       fb:"a_hdmall"},
+    {k:"rev_gowabi",   lbl:"Gowabi",        fb:"a_gowabi"},
+    {k:"rev_charge",   lbl:"ชาร์จ 3%",      fb:null},
+    {k:"rev_member",   lbl:"Member",        fb:null},
+    {k:"rev_staff",    lbl:"หัตถการ พนง.", fb:null},
+    {k:"rev_deposit",  lbl:"มัดจำเงิน",    fb:null},
+  ];
+  DB.ref("daily_records").once("value",snap=>{
+    const all=snap.val()||{};const tb=g("rtb");tb.innerHTML="";let gt=0,mt=tgM[branch]||0;
+    for(let day=1;day<=dim;day++){
+      const ds=rY+"-"+String(rM+1).padStart(2,"0")+"-"+String(day).padStart(2,"0");
+      const thD=day+" "+["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."][rM]+" "+(rY+543);
+      const d=all[ds]?.[branch]||{};
+      // get saved rev_ values if exist, else derive from daily_records
+      const rv={};
+      REV_COLS.forEach(c=>{
+        rv[c.k]=d["rev_"+c.k]!==undefined ? d["rev_"+c.k] : (c.fb&&d[c.fb]?d[c.fb]:0);
+      });
+      const t=rv.rev_total||d.total_prog||0;
+      // net = total - drug - charge - member - staff + deposit (simplified)
+      const net=t;
+      gt+=t;
+      const hd=t>0,isTd=ds===td,rc2=isTd?" td-today":"",nc=hd?" td-has":" td-zero";
+      const inp=(key,val)=>`<input type="number" class="rev-cell-input" data-date="${ds}" data-branch="${branch}" data-key="${key}" value="${val||0}" oninput="onRevInput(this)">`;
+      tb.innerHTML+=`<tr><td class="td-branch${rc2}">${thD}</td>${REV_COLS.map(c=>`<td class="${hd?"td-has":""}">${inp(c.k, rv[c.k]||0)}</td>`).join("")}<td class="${nc.trim()}" id="net-${ds}">${hd?fm(net):"—"}</td></tr>`;
+    }
+    g("rtf").innerHTML=`<tr class="td-total"><td>Total</td><td colspan="${REV_COLS.length}"></td><td id="rev-grand-total">${fm(gt)}</td></tr>`;
+    recalcRevTotals();
+    const pct=mt>0?(gt/mt*100):0;const dl=dim-today.getDate();const need=mt-gt;
+    g("rkt").textContent="฿"+fm(gt);g("rkp").textContent=pct.toFixed(2)+"%";g("rktg").textContent=mt>0?"เป้า ฿"+fm(mt):"ยังไม่ได้ตั้งเป้า";g("rkd").textContent=dl+" วัน";g("rkdt").textContent=dl>0&&need>0?"฿"+fm(need/dl):"—";
+    g("rs1").textContent=fm(gt);g("rs2").textContent=pct.toFixed(2)+"%";g("rs3").textContent=need>0?fm(need):fm(0);g("rs4").textContent=dl+" วัน";g("rs5").textContent=dl>0&&need>0?fm(need/dl):"—";
+  });
+}
+
+// เมื่อพนักงานกรอกใน Revenue Sheet — save + sync ไป Daily Ops Core
+let revTimer={};
+function onRevInput(el){
+  const date=el.dataset.date,branch=el.dataset.branch,key=el.dataset.key,val=parseFloat(el.value)||0;
+  // recalc net for this row
+  const row=el.closest("tr");
+  if(row){
+    const inputs=row.querySelectorAll(".rev-cell-input");
+    let rowTotal=0;inputs.forEach(i=>{if(i.dataset.key==="rev_total")rowTotal=parseFloat(i.value)||0;});
+    const netCell=g("net-"+date);if(netCell)netCell.textContent=rowTotal>0?fm(rowTotal):"—";
+  }
+  recalcRevTotals();
+  // debounce save
+  clearTimeout(revTimer[date]);
+  revTimer[date]=setTimeout(()=>saveRevRow(date,branch,row),800);
+}
+
+function recalcRevTotals(){
+  let grand=0;
+  document.querySelectorAll(".rev-cell-input[data-key='rev_total']").forEach(i=>{grand+=parseFloat(i.value)||0;});
+  const gtEl=g("rev-grand-total");if(gtEl)gtEl.textContent=fm(grand);
+  // update KPI
+  const branch=g("rbs").value,mt=tgM[branch]||0;
+  g("rkt").textContent="฿"+fm(grand);
+  if(mt>0){g("rkp").textContent=(grand/mt*100).toFixed(2)+"%";}
+  g("rs1").textContent=fm(grand);if(mt>0)g("rs2").textContent=(grand/mt*100).toFixed(2)+"%";
+}
+
+async function saveRevRow(date,branch,row){
+  if(!date||!branch)return;
+  const payload={};
+  if(row){
+    row.querySelectorAll(".rev-cell-input").forEach(i=>{payload["rev_"+i.dataset.key]=parseFloat(i.value)||0;});
+  }
+  // Map ที่ match กัน → ไหลไป Daily Ops Core fields
+  const MAP={
+    rev_rev_total:"total_prog",
+    rev_rev_hdmall:"a_hdmall",
+    rev_rev_gowabi:"a_gowabi",
+    rev_rev_treatment:"p_treatment",
+  };
+  const syncPayload={};
+  Object.keys(MAP).forEach(rk=>{if(payload[rk]!==undefined)syncPayload[MAP[rk]]=payload[rk];});
+  try{
+    // บันทึก rev_ fields ลง Firebase (merge กับ daily_records)
+    await DB.ref("daily_records/"+date+"/"+branch).update({...payload,...syncPayload,last_rev_update:new Date().toISOString()});
+    // ถ้า tab1 เปิดอยู่และวันที่/สาขาตรงกัน → อัปเดต form
+    const t1date=g("fd")?.value,t1branch=g("fb")?.value;
+    if(t1date===date&&t1branch===branch){
+      if(syncPayload.total_prog&&g("p-co2")){}// reload form
+      syncDailyFormFromRev(date,branch,syncPayload);
+    }
+    // toast เบาๆ
+    showRevSaved(date);
+  }catch(e){console.error(e);}
+}
+
+function showRevSaved(date){
+  const el=document.createElement("div");
+  el.style.cssText="position:fixed;bottom:16px;right:16px;background:#2f9e44;color:#fff;padding:8px 14px;border-radius:6px;font-size:12px;z-index:9999;";
+  el.textContent="✓ บันทึก "+date+" แล้ว — ไหลไป Daily Ops Core";
+  document.body.appendChild(el);setTimeout(()=>el.remove(),2500);
+}
+
+function syncDailyFormFromRev(date,branch,data){
+  // sync fields ที่ match
+  if(data.a_hdmall!==undefined&&g("a-hdmall"))g("a-hdmall").value=data.a_hdmall;
+  if(data.a_gowabi!==undefined&&g("a-gowabi"))g("a-gowabi").value=data.a_gowabi;
+  if(data.p_treatment!==undefined&&g("p-treatment"))g("p-treatment").value=data.p_treatment;
+  if(data.total_prog!==undefined){
+    // กระจายไป total display
+  }
+  rc();
+}
+
+// export ฟอร์มใบสรุปยอด (tab1)
+function exportFormPNG(){
+  const panel=document.querySelector("#t1 .panel");
+  if(!panel){toast("ไม่พบฟอร์ม","error");return;}
+  html2canvas(panel,{backgroundColor:"#ffffff",scale:2,useCORS:true}).then(c=>{
+    const a=document.createElement("a");
+    const branch=g("fb").value,date=g("fd").value;
+    a.download="cashier_form_"+branch+"_"+date+".png";
+    a.href=c.toDataURL();a.click();
+  });
+}
+function exportFormPDF(){
+  const panel=document.querySelector("#t1 .panel");
+  if(!panel){toast("ไม่พบฟอร์ม","error");return;}
+  html2canvas(panel,{backgroundColor:"#ffffff",scale:2,useCORS:true}).then(c=>{
+    const {jsPDF}=window.jspdf;
+    const pdf=new jsPDF("p","mm","a4");
+    const iw=pdf.internal.pageSize.getWidth()-20;
+    const ih=(c.height/c.width)*iw;
+    pdf.addImage(c.toDataURL("image/jpeg",0.95),"JPEG",10,10,iw,ih);
+    const branch=g("fb").value,date=g("fd").value;
+    pdf.save("cashier_form_"+branch+"_"+date+".pdf");
+  });
+}
+function xPNG(){html2canvas(g("revPanel"),{backgroundColor:"#ffffff",scale:2}).then(c=>{const a=document.createElement("a");a.download="revenue_"+rY+"_"+(rM+1)+".png";a.href=c.toDataURL();a.click();});}
+function xPDF(){html2canvas(g("revPanel"),{backgroundColor:"#ffffff",scale:2}).then(c=>{const {jsPDF}=window.jspdf;const pdf=new jsPDF("l","mm","a4");const iw=pdf.internal.pageSize.getWidth();const ih=pdf.internal.pageSize.getHeight();pdf.addImage(c.toDataURL(),"PNG",0,0,iw,ih);pdf.save("revenue_"+rY+"_"+(rM+1)+".pdf");});}
+// TAB 3
+function bldTG(){
+  const tb=g("t3sb");if(!tb)return;tb.innerHTML="";
+  const tf=g("t3tf");if(tf)tf.innerHTML="";
+  BKS.forEach(bk=>{
+    const d=trkD[bk]||{};
+    const co=d.cf_old||0,cn=d.cf_new||0,cpo=d.cf_postpone||0,cw=d.cf_walkin||0,no=d.no_answer||0,tc=d.total_call||0,go=d.came_old||0,gn=d.came_new||0;
+    tb.innerHTML+=`<tr><td class="td-branch">${BK[bk]}<span class="branch-done-dot${(co+cn+cpo+cw+no+tc+go+gn)>0?" done":""}"></span></td><td><input type="number" class="trk-input" value="${co}" id="tf-${bk}-cf_old" oninput="onTI('${bk}')"></td><td><input type="number" class="trk-input" value="${cn}" id="tf-${bk}-cf_new" oninput="onTI('${bk}')"></td><td><input type="number" class="trk-input" value="${cpo}" id="tf-${bk}-cf_postpone" oninput="onTI('${bk}')"></td><td><input type="number" class="trk-input" value="${cw}" id="tf-${bk}-cf_walkin" oninput="onTI('${bk}')"></td><td><input type="number" class="trk-input" value="${no}" id="tf-${bk}-no_answer" oninput="onTI('${bk}')"></td><td><input type="number" class="trk-input" value="${tc}" id="tf-${bk}-total_call" oninput="onTI('${bk}')"></td><td><input type="number" class="trk-input" value="${go}" id="tf-${bk}-came_old" oninput="onTI('${bk}')"></td><td><input type="number" class="trk-input" value="${gn}" id="tf-${bk}-came_new" oninput="onTI('${bk}')"></td><td>${go+gn}</td></tr>`;
+  });
+  updTS();
+}
+function onTI(bk){
+  const d={};TF.forEach(f=>d[f.k]=parseInt(g("tf-"+bk+"-"+f.k)?.value)||0);
+  trkD[bk]=d;updTS();
+  const date=g("t3d").value;if(date)DB.ref("tracking_records/"+date+"/"+bk).set({...d,timestamp:new Date().toISOString()}).catch(()=>{});
+}
+function updTS(){
+  let cf=0,pp=0,na=0,dc=0;
+  let totals={cf_old:0,cf_new:0,cf_postpone:0,cf_walkin:0,no_answer:0,total_call:0,came_old:0,came_new:0};
+  BKS.forEach(bk=>{
+    const d=trkD[bk]||{};
+    const co=d.cf_old||0,cn=d.cf_new||0,cpo=d.cf_postpone||0,cw=d.cf_walkin||0,no=d.no_answer||0,tc=d.total_call||0,go=d.came_old||0,gn=d.came_new||0;
+    TF.forEach(f=>totals[f.k]=(totals[f.k]||0)+(d[f.k]||0));
+    const hd=TF.some(f=>(d[f.k]||0)>0);if(hd)dc++;cf+=co+cn;pp+=cpo;na+=no;
+    // update row
+    const row=g("tf-"+bk+"-cf_old")?.closest("tr");
+    if(row){const last=row.cells[9];if(last)last.textContent=go+gn;}
+    const dot=row?.querySelector(".branch-done-dot");if(dot)dot.classList.toggle("done",hd);
+  });
+  g("t3cf").textContent=cf;g("t3pp").textContent=pp;g("t3na").textContent=na;g("t3dc").textContent=dc+" / 8";
+  const tf=g("t3tf");if(tf)tf.innerHTML=`<tr class="td-total-row"><td>รวม</td><td>${totals.cf_old}</td><td>${totals.cf_new}</td><td>${totals.cf_postpone}</td><td>${totals.cf_walkin}</td><td>${totals.no_answer}</td><td>${totals.total_call}</td><td>${totals.came_old}</td><td>${totals.came_new}</td><td>${totals.came_old+totals.came_new}</td></tr>`;
+}
+function lt(){
+  const date=g("t3d").value;if(!date)return;
+  DB.ref("tracking_records/"+date).once("value",snap=>{
+    trkD={};
+    if(snap.exists()){const d=snap.val();BKS.forEach(bk=>{trkD[bk]=d[bk]||{};});}
+    bldTG();
+  });
+}
+function cet(){
+  const dc=BKS.filter(bk=>trkD[bk]&&TF.some(f=>(trkD[bk][f.k]||0)>0)).length;
+  if(dc<BKS.length){if(!confirm("ยังมี "+(BKS.length-dc)+" สาขาที่ยังไม่กรอก ต้องการ Export เลยไหม?"))return;}
+  g("epop").style.display="flex";
+}
+function xTrPNG(){g("epop").style.display="none";html2canvas(g("t3"),{backgroundColor:"#f0f2f5",scale:2}).then(c=>{const a=document.createElement("a");a.download="tracking_"+(g("t3d").value||"today")+".png";a.href=c.toDataURL();a.click();});}
+function xTrPDF(){g("epop").style.display="none";html2canvas(g("t3"),{backgroundColor:"#f0f2f5",scale:2}).then(c=>{const {jsPDF}=window.jspdf;const pdf=new jsPDF("l","mm","a4");const iw=pdf.internal.pageSize.getWidth();pdf.addImage(c.toDataURL(),"PNG",0,0,iw,iw*c.height/c.width);pdf.save("tracking_"+(g("t3d").value||"today")+".pdf");});}
+// TAB 4
+function ldf(){
+  const branch=g("t4b").value,month=g("t4m").value;if(!month)return;
+  const [yr,mo]=month.split("-"),prefix=yr+"-"+mo;
+  DB.ref("doctor_records").orderByChild("branch").equalTo(branch).once("value",snap=>{
+    const tb=g("t4body");tb.innerHTML="";const tf=g("t4foot");tf.innerHTML="";let ts=0,td=0;const days=new Set();const rows=[];
+    if(snap.exists()){snap.forEach(child=>{const d=child.val();if(d.work_date&&d.work_date.startsWith(prefix)){rows.push({key:child.key,...d});ts+=d.sales||0;td+=d.df||0;days.add(d.work_date);}});}
+    if(rows.length===0){tb.innerHTML="<tr><td colspan='8' style='text-align:center;color:var(--tx3);padding:24px;'>ยังไม่มีข้อมูลในเดือนนี้</td></tr>";}
+    else{rows.sort((a,b)=>a.work_date.localeCompare(b.work_date));rows.forEach((d,i)=>{const isTd=d.work_date===new Date().toISOString().split("T")[0];tb.innerHTML+=`<tr class="has-data${isTd?" td-today":""}"><td>${i+1}</td><td>${d.work_date||"—"}</td><td>${d.time_in||"—"}</td><td>${d.time_out||"—"}</td><td style="color:var(--tx3);">—</td><td class="td-sales">฿${fm(d.sales||0)}</td><td class="td-df">฿${fm(d.df||0)}</td><td style="color:var(--tx3);font-size:12px;">${d.note||"—"}</td></tr>`;});}
+    tf.innerHTML=`<tr class="doc-total-row"><td colspan="5">รวมทั้งหมด</td><td>฿${fm(ts)}</td><td>฿${fm(td)}</td><td>—</td></tr>`;
+    g("t4kt").textContent="฿"+fm(ts);g("t4kd").textContent="฿"+fm(td);g("t4kw").textContent=days.size+" วัน";g("t4kn").textContent=docL.length+" คน";
+  });
+}
+function openAdd(){const p=g("t4ap");p.style.display=p.style.display==="none"?"block":"none";const sel=g("t4ds");sel.innerHTML="<option value=''>— เลือกแพทย์ —</option>";docL.forEach(d=>sel.innerHTML+=`<option value="${d}">${d}</option>`);g("t4wd").value=new Date().toISOString().split("T")[0];}
+async function saveDR(){
+  const doc=g("t4ds").value,date=g("t4wd").value,branch=g("t4b").value;
+  if(!doc||!date){toast("กรุณาเลือกแพทย์และวันที่","error");return;}
+  const p={doctor:doc,work_date:date,branch,time_in:g("t4ti").value,time_out:g("t4to").value,sales:parseFloat(g("t4sl").value)||0,df:parseFloat(g("t4df2").value)||0,note:g("t4nt").value,timestamp:new Date().toISOString()};
+  try{await DB.ref("doctor_records").push(p);toast("บันทึกข้อมูลแพทย์สำเร็จ");g("t4ap").style.display="none";ldf();}catch(e){toast("Error: "+e.message,"error");}
+}
+// TAB 5
+function rndList(cid,bid,arr,delFn){const c=g(cid);if(!c)return;c.innerHTML=arr.map((x,i)=>`<div class="li">${x}<button class="lid" onclick="${delFn}(${i})">×</button></div>`).join("");g(bid).textContent=arr.length+" คน";}
+function rnd5(){
+  rndList("dl","dcb",docL,"delDoc");rndList("cl","ccb",caL,"delCa");rndList("ml2","mcb",mgL,"delMg");
+  const tg=g("tgl");if(!tg)return;
+  tg.innerHTML=BKS.map(bk=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--bdr);"><label style="font-size:13px;color:var(--tx2);">${BK[bk]}</label><input type="number" style="width:130px;" value="${tgM[bk]||0}" onchange="tgM['${bk}']=parseFloat(this.value)||0"></div>`).join("");
+  ["wh1","wh2","wh3","wh4"].forEach((id,i)=>{const keys=["revenue","doctor","branch","tracking"];if(g(id)&&whs[keys[i]])g(id).value=whs[keys[i]];});
+}
+function addDoc(){const v=g("nd").value.trim();if(v){docL.push(v);g("nd").value="";rndList("dl","dcb",docL,"delDoc");rDS();}}
+function delDoc(i){docL.splice(i,1);rndList("dl","dcb",docL,"delDoc");rDS();}
+function addCa(){const v=g("nc").value.trim();if(v){caL.push(v);g("nc").value="";rndList("cl","ccb",caL,"delCa");rSS();}}
+function delCa(i){caL.splice(i,1);rndList("cl","ccb",caL,"delCa");rSS();}
+function addMg(){const v=g("nm").value.trim();if(v){mgL.push(v);g("nm").value="";rndList("ml2","mcb",mgL,"delMg");rSS();}}
+function delMg(i){mgL.splice(i,1);rndList("ml2","mcb",mgL,"delMg");rSS();}
+function rDS(){["fd1","fd2","t4ds"].forEach(id=>{const sel=g(id);if(!sel)return;const cur=sel.value;sel.innerHTML="<option value=''>— เลือก —</option>";docL.forEach(d=>sel.innerHTML+=`<option value="${d}">${d}</option>`);sel.value=cur;});}
+function rSS(){const cs=g("fc"),ms=g("fm");if(cs){const cur=cs.value;cs.innerHTML="<option value=''>— เลือก —</option>";caL.forEach(c=>cs.innerHTML+=`<option value="${c}">${c}</option>`);cs.value=cur;}if(ms){const cur=ms.value;ms.innerHTML="<option value=''>— เลือก —</option>";mgL.forEach(m=>ms.innerHTML+=`<option value="${m}">${m}</option>`);ms.value=cur;}}
+async function syncFB(){
+  try{await DB.ref("system_settings").set({doctors:docL,cashiers:caL,managers:mgL,targets:tgM,updated:new Date().toISOString()});await Promise.all(docL.map(name=>FS.collection("doctors").doc(name.replace(/\s+/g,"_")).set({name,updated:new Date().toISOString()},{merge:true})));toast("บันทึกการตั้งค่าสำเร็จ");}catch(e){toast("Error: "+e.message,"error");}
+}
+function saveWH(){const keys=["revenue","doctor","branch","tracking"];["wh1","wh2","wh3","wh4"].forEach((id,i)=>{whs[keys[i]]=g(id)?.value.trim()||"";});localStorage.setItem("laliza_wh",JSON.stringify(whs));toast("บันทึก Webhooks แล้ว");}
+function init(){
+  const today=new Date().toISOString().split("T")[0];
+  g("fd").value=today;g("t3d").value=today;g("t4m").value=today.slice(0,7);
+  g("t1dl").textContent=new Date().toLocaleDateString("th-TH",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
+  try{whs=JSON.parse(localStorage.getItem("laliza_wh"))||{};}catch(e){whs={};}
+  DB.ref("system_settings").on("value",snap=>{if(snap.exists()){const d=snap.val();docL=d.doctors||[];caL=d.cashiers||[];mgL=d.managers||[];tgM=d.targets||tgM;rDS();rSS();}});
+  FS.collection("doctors").get().then(snapshot=>{const fd=[];snapshot.forEach(doc=>{if(doc.data().name)fd.push(doc.data().name);});if(fd.length>0){docL=[...new Set([...docL,...fd])];rDS();}}).catch(()=>{});
+  bldTG();ldash(today);g("rml").textContent=ThM[rM]+" "+(rY+543);
+  // Live listener: Revenue Sheet → Daily Ops Core realtime sync
+  DB.ref("daily_records/"+today).on("value",snap=>{
+    if(!snap.exists())return;
+    const branch=g("fb")?.value;
+    if(!branch)return;
+    const d=snap.child(branch).val();
+    if(!d||!d.last_rev_update)return;
+    // ถ้า user ไม่ได้กำลังพิมพ์อยู่ ให้ sync
+    if(d.a_hdmall!==undefined&&g("a-hdmall")&&document.activeElement!==g("a-hdmall"))g("a-hdmall").value=d.a_hdmall;
+    if(d.a_gowabi!==undefined&&g("a-gowabi")&&document.activeElement!==g("a-gowabi"))g("a-gowabi").value=d.a_gowabi;
+    if(d.p_treatment!==undefined&&g("p-treatment")&&document.activeElement!==g("p-treatment"))g("p-treatment").value=d.p_treatment;
+    rc();
+  });
+}
+document.addEventListener("DOMContentLoaded",init);
+</script>
+</body>
+</html>
