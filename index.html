@@ -3,12 +3,14 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>LALIZA Operations Portal - Merged Edition</title>
+<title>LALIZA Enterprise Operations Portal</title>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
 </style>
 
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <style>
@@ -17,8 +19,7 @@
   ========================================== */
   :root {
     --bg-main: #e2e8f0; --sidebar-bg: #0F172A; --primary: #4F46E5;
-    --text-blue: #1D4ED8; 
-    --text-red: #DC2626;  
+    --text-blue: #1D4ED8; --text-red: #DC2626;  
     --font-ui: 'Sarabun', sans-serif; --font-data: 'IBM Plex Mono', monospace;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -36,11 +37,9 @@
 
   .tab-content { display: none; width: 100%; max-width: 1122px; }
   .tab-content.active { display: block; }
-  
-  .placeholder-card { background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); width: 100%; text-align: center; margin-top: 20px;}
 
   /* ==========================================
-     2. PAPER UI (กระดาษ A4 แนวนอน)
+     2. PAPER UI & GLOBAL MODULES
   ========================================== */
   .toolbar { width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
   .btn-group { display: flex; gap: 10px; }
@@ -50,20 +49,18 @@
   .btn-save { background: #0F172A; color: white; }
   .btn:hover { filter: brightness(1.1); }
 
-  .paper { background: #fff; width: 1122px; padding: 30px 40px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-radius: 4px; position: relative; }
-
+  .paper { background: #fff; width: 1122px; padding: 30px 40px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-radius: 4px; position: relative; margin-bottom: 30px; }
   .paper-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; }
   .paper-title { font-size: 24px; font-weight: 800; }
   
   .inline-input { border: none; border-bottom: 1px dotted #ccc; background: transparent; font-family: var(--font-ui); font-size: 14px; color: var(--text-blue) !important; outline: none; padding: 2px 4px; }
   .inline-input:focus { border-bottom: 1px solid var(--primary); background: #F8FAFC;}
 
-  /* --- ตารางหลัก --- */
   .main-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
   .main-table th, .main-table td { border: 1px solid #000; padding: 4px 6px; vertical-align: middle; }
   .main-table th { background: #f0f0f0; text-align: center; font-weight: 700; font-size: 13px; }
   
-  .bg-gray { background-color: #E5E7EB !important; -webkit-print-color-adjust: exact; }
+  .bg-gray { background-color: #E5E7EB !important; }
   .text-center { text-align: center; }
   .text-right { text-align: right; }
   .text-bold { font-weight: 700; }
@@ -72,33 +69,33 @@
   .cell-input { width: 100%; border: none; background: transparent; font-family: var(--font-data); font-size: 14px; font-weight: 600; text-align: right; color: var(--text-blue) !important; outline: none; padding: 2px 4px; border-radius: 4px; }
   .cell-input:hover { background: #FEF08A; cursor: text; }
   .cell-input:focus { background: #EEF2FF; }
-  
-  input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 
-  /* --- โซนแอปพลิเคชัน --- */
   .app-zone { font-size: 12px; line-height: 1.6; text-align: left; }
   .app-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; gap: 4px; }
   .app-input { width: 50px; text-align: center; border: none; border-bottom: 1px dotted #ccc; background: transparent; font-family: var(--font-data); font-size: 12px; color: var(--text-blue)!important; padding: 2px 0; outline: none; }
   .app-input:focus { border-bottom: 1px solid var(--primary); background: #F8FAFC; }
   .app-amt { width: 90px; text-align: right; } 
 
-  /* --- ตาราง Footer --- */
   .footer-table { width: 100%; border-collapse: collapse; }
   .footer-table td { border: 1px solid #000; padding: 8px; vertical-align: top; height: 50px;}
   textarea.inline-input { width: 100%; resize: none; border: none; color: var(--text-red) !important; }
-  .input-reason { color: var(--text-red) !important; width: 100%; }
+
+  /* ==========================================
+     3. POPUP MODAL COMPONENT
+  ========================================== */
+  .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; place-items: center; z-index: 9999; }
+  .modal-box { background: white; padding: 30px; border-radius: 12px; width: 450px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2); }
+  .modal-icon { font-size: 48px; margin-bottom: 15px; }
+  .modal-title { font-size: 20px; font-weight: 800; margin-bottom: 10px; color: #0F172A; }
+  .modal-desc { font-size: 14px; color: #475569; margin-bottom: 24px; line-height: 1.5; }
 
   @media print {
     @page { size: A4 landscape; margin: 8mm; }
     body { background: #fff; }
-    .sidebar, .toolbar, .no-print { display: none !important; }
+    .sidebar, .toolbar, .no-print, .modal-overlay { display: none !important; }
     .main { padding: 0; }
-    .paper { width: 100%; padding: 0; box-shadow: none; border-radius: 0; min-height: auto; }
+    .paper { width: 100%; padding: 0; box-shadow: none; border-radius: 0; }
     * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-    .cell-input:hover, .cell-input:focus { background: transparent; }
-    .inline-input { border-bottom: 1px dotted #ccc; }
-    .app-input { border-bottom: 1px dotted #ccc; }
-    input::placeholder, textarea::placeholder { color: transparent !important; }
   }
 </style>
 </head>
@@ -106,16 +103,13 @@
 
 <div class="app">
   <aside class="sidebar no-print">
-    <div class="logo-box">
-      <div class="logo-icon">L</div>
-      <span>LALIZA</span>
-    </div>
+    <div class="logo-box"><div class="logo-icon">L</div><span>LALIZA</span></div>
     <nav>
-      <button class="nav-btn active" data-tab="revenue-tab">📊 ระบบกรอกข้อมูล (Table UI)</button>
-      <button class="nav-btn" data-tab="tracking-tab">☎️ Confirm Tracking</button>
-      <button class="nav-btn" data-tab="doctor-tab">👨‍⚕️ Doctor Finance</button>
+      <button class="nav-btn active" data-tab="revenue-tab">📊 ระบบรายรับประจำวัน (Revenue)</button>
+      <button class="nav-btn" data-tab="tracking-tab">☎️ Confirm Tracking (รวมทุกสาขา)</button>
+      <button class="nav-btn" data-tab="doctor-tab">👨‍⚕️ รายได้แพทย์ (Doctor Finance)</button>
     </nav>
-    <div style="margin-top: auto; font-size: 12px; color: #475569;">LALIZA Portal v13<br>Landscape Edition</div>
+    <div style="margin-top: auto; font-size: 12px; color: #475569;">LALIZA Portal v15<br>Firebase Ecosystem</div>
   </aside>
 
   <main class="main">
@@ -123,38 +117,37 @@
     <div id="revenue-tab" class="tab-content active">
       <div class="toolbar no-print">
         <div>
-          <h2 style="font-size: 24px; font-weight: 800;">Daily Revenue</h2>
-          <p style="color: #64748B; font-size: 14px;">(รวมช่องยอดหน้าร้านให้กรอกยอดเดียว / แก้ไขตัวหนังสือแอปไม่ขาดแล้ว)</p>
+          <h2 style="font-size: 22px; font-weight: 800;">ระบบกรอกใบสรุปยอดแคชเชียร์และบัตรเครดิต</h2>
+          <p style="color: #64748B; font-size: 13px;">กรอกข้อมูลของแต่ละสาขา ระบบจะจัดเก็บลงคลาวด์แยกตามวันและสาขาอัตโนมัติ</p>
         </div>
         <div class="btn-group">
-          <button class="btn btn-export" onclick="exportPNG()">🖼️ Export PNG</button>
-          <button class="btn btn-print" onclick="window.print()">🖨️ พิมพ์ / Save PDF</button>
-          <button class="btn btn-save" onclick="alert('ระบบ Save พร้อมเชื่อมต่อฐานข้อมูลในขั้นตอนต่อไปครับ')">💾 บันทึก (Save)</button>
+          <button class="btn btn-print" onclick="window.print()">🖨️ พิมพ์ / PDF</button>
+          <button class="btn btn-save" onclick="saveRevenueData()">💾 บันทึกข้อมูลลงฐานข้อมูล</button>
         </div>
       </div>
 
-      <div class="paper" id="captureArea">
+      <div class="paper" id="revenueCaptureArea">
         <div class="paper-header">
           <div class="paper-title">ใบสรุปยอดแคชเชียร์และบัตรเครดิต</div>
           <div>
-            <span style="font-weight: 600;">สาขา</span> 
-            <select class="inline-input text-bold" style="width: 240px; font-size: 15px; cursor: pointer;">
-              <option>สาขา-เซ็นทรัลพระราม 9</option>
-              <option>สาขา-เซ็นทรัลปิ่นเกล้า</option>
-              <option>สาขา-ซีคอนบางแค</option>
-              <option>สาขา-ฟิวเจอร์พาร์ครังสิต</option>
-              <option>สาขา-เดอะพรอมานาด</option>
-              <option>สาขา-เดอะมอลล์งามวงศ์วาน</option>
-              <option>สาขา-ซีคอนศรีนครินทร์</option>
-              <option>สาขา-เซ็นทรัลเวสต์เกต</option>
+            <span style="font-weight: 600;">สาขาที่กรอก:</span> 
+            <select id="rev-branch-select" class="inline-input text-bold" style="width: 220px; font-size: 15px;" onchange="loadRevenueData()">
+              <option value="พระราม9">สาขา-เซ็นทรัลพระราม 9</option>
+              <option value="ปิ่นเกล้า">สาขา-เซ็นทรัลปิ่นเกล้า</option>
+              <option value="บางแค">สาขา-ซีคอนบางแค</option>
+              <option value="รังสิต">สาขา-ฟิวเจอร์พาร์ครังสิต</option>
+              <option value="พรอมานาด">สาขา-เดอะพรอมานาด</option>
+              <option value="งามวงศ์วาน">สาขา-เดอะมอลล์งามวงศ์วาน</option>
+              <option value="ศรีนครินทร์">สาขา-ซีคอนศรีนครินทร์</option>
+              <option value="เวสต์เกต">สาขา-เซ็นทรัลเวสต์เกต</option>
             </select>
           </div>
         </div>
         
         <div style="display: flex; gap: 30px; margin-bottom: 10px; font-weight: 600; font-size: 14px;">
-          <div>ประจำวันที่ <input type="date" class="inline-input" style="width: 130px;"></div>
-          <div>แพทย์คนที่ 1 <input type="text" class="inline-input" style="width: 180px;" placeholder="ระบุชื่อแพทย์..."></div>
-          <div>แพทย์คนที่ 2 <input type="text" class="inline-input" style="width: 180px;" placeholder="ระบุชื่อแพทย์ (ถ้ามี)..."></div>
+          <div>ประจำวันที่: <input type="date" id="rev-date-input" class="inline-input" style="width: 130px;" onchange="loadRevenueData()"></div>
+          <div>แพทย์คนที่ 1: <input type="text" id="rev-doc1" class="inline-input" style="width: 180px;" placeholder="ระบุชื่อแพทย์..."></div>
+          <div>แพทย์คนที่ 2: <input type="text" id="rev-doc2" class="inline-input" style="width: 180px;" placeholder="ระบุชื่อแพทย์ (ถ้ามี)..."></div>
         </div>
 
         <table class="main-table">
@@ -172,8 +165,8 @@
           <tbody>
             <tr>
               <td rowspan="13" style="vertical-align: middle; text-align: center; background: #fff; padding: 15px;">
-                <div style="font-size: 12px; font-weight: bold; margin-bottom: 8px; color: #64748B;">ยอดรวมหน้าร้าน</div>
-                <input type="text" class="cell-input comma-format text-center" style="font-size: 20px; font-weight: 800; border-bottom: 2px solid var(--primary); border-radius: 0; padding: 4px;" placeholder="0.00">
+                <div style="font-size: 11px; font-weight: bold; margin-bottom: 8px; color: #64748B;">ยอดรวมหน้าร้าน</div>
+                <input type="text" id="store-front-total" class="cell-input comma-format text-center" style="font-size: 18px; font-weight: 800; border-bottom: 2px solid var(--primary); border-radius: 0; padding: 4px;" placeholder="0.00">
               </td>
               <td>Co2</td>
               <td><input type="text" class="cell-input calc-proc comma-format" placeholder="0"></td>
@@ -209,11 +202,11 @@
                 <div class="text-center text-bold" style="font-size: 13px; border-bottom:1px solid #000; padding-bottom:3px; margin-bottom:5px;">แอปพลิเคชัน</div>
                 <div class="app-zone">
                   <div class="text-bold text-blue">1. HDmall</div>
-                  <div class="app-row"><span>1.1 คน</span> <input type="number" class="app-input" placeholder="0"></div>
+                  <div class="app-row"><span>1.1 คน</span> <input type="number" id="app-hd-pax" class="app-input" placeholder="0"></div>
                   <div class="app-row"><span>1.2 รวม</span> <input type="text" id="app-hd-amt" class="app-input app-amt calc-app comma-format" placeholder="0"></div>
                   
                   <div class="text-bold text-blue" style="margin-top: 6px;">2. Gowabi</div>
-                  <div class="app-row"><span>2.1 คน</span> <input type="number" class="app-input" placeholder="0"></div>
+                  <div class="app-row"><span>2.1 คน</span> <input type="number" id="app-gw-pax" class="app-input" placeholder="0"></div>
                   <div class="app-row"><span>2.2 รวม</span> <input type="text" id="app-gw-amt" class="app-input app-amt calc-app comma-format" placeholder="0"></div>
                   
                   <div style="margin-top: 6px; border-top: 1px dashed #000; padding-top: 4px; display: flex; justify-content: space-between; font-weight: bold;">
@@ -242,7 +235,7 @@
               <td>Meso</td>
               <td><input type="text" class="cell-input calc-proc comma-format" placeholder="0"></td>
               <td><input type="text" class="cell-input text-red comma-format" style="color:red!important;" placeholder="0"></td>
-              <td>อื่นๆ ระบุ <input type="text" class="inline-input" style="width: 60px;"></td>
+              <td>อื่นๆ ระบุ <input type="text" id="rev-cc-other-label" class="inline-input" style="width: 60px;"></td>
               <td><input type="text" class="cell-input calc-cc comma-format" placeholder="0"></td>
             </tr>
             <tr>
@@ -266,9 +259,9 @@
               <td>Treatment</td>
               <td><input type="text" class="cell-input calc-proc comma-format" placeholder="0"></td>
               <td><input type="text" class="cell-input text-red comma-format" style="color:red!important;" placeholder="0"></td>
-              <td rowspan="4" colspan="2" style="vertical-align: middle; padding: 10px;">
-                <div class="text-bold text-center" style="font-size: 16px; margin-bottom: 5px;">ยอดชำระรวม</div>
-                <input type="text" id="grand-total-disp" class="cell-input text-bold text-center" style="font-size: 26px; color: #000!important; background: transparent;" readonly value="0.00">
+              <td rowspan="4" colspan="2" style="vertical-align: middle; padding: 10px; background-color: #f8fafc;">
+                <div class="text-bold text-center" style="font-size: 15px; margin-bottom: 5px; color: #475569;">ยอดชำระรวม</div>
+                <input type="text" id="grand-total-disp" class="cell-input text-bold text-center" style="font-size: 26px; color: #0F172A!important;" readonly value="0.00">
               </td>
             </tr>
             <tr>
@@ -288,7 +281,7 @@
             </tr>
             <tr>
               <td class="bg-gray"></td>
-              <td><input type="text" class="inline-input" placeholder="ระบุหัตถการอื่นๆ..." style="width:100%; border:none;"></td>
+              <td><input type="text" id="rev-proc-other-label" class="inline-input" placeholder="ระบุหัตถการอื่นๆ..." style="width:100%; border:none;"></td>
               <td><input type="text" class="cell-input calc-proc comma-format" placeholder="0"></td>
               <td><input type="text" class="cell-input text-red comma-format" style="color:red!important;" placeholder="0"></td>
               <td colspan="3" class="bg-gray"></td>
@@ -300,7 +293,7 @@
               <td class="bg-gray"></td>
               <td colspan="3" class="bg-gray text-center text-bold" style="display: flex; justify-content: space-between; align-items: center; border:none; height: 100%;">
                 <span>คะแนน (Point)</span>
-                <input type="text" class="cell-input comma-format" style="width: 120px; background: #fff; border: 1px solid #ccc; text-align: center; color: #000!important; font-size: 16px;" placeholder="0">
+                <input type="text" id="rev-point" class="cell-input comma-format" style="width: 120px; background: #fff; border: 1px solid #ccc; text-align: center; color: #000!important; font-size: 16px;" placeholder="0">
               </td>
             </tr>
           </tbody>
@@ -310,40 +303,30 @@
           <tr>
             <td colspan="2" width="45%">
               <div style="margin-bottom: 10px;">
-                เลขที่บิลเริ่ม <input type="text" id="bill-start" class="inline-input text-bold" style="width: 90px;" onblur="checkDuplicate()"> 
-                ถึง <input type="text" class="inline-input text-bold" style="width: 90px;">
+                เลขที่บิลเริ่ม <input type="text" id="bill-start" class="inline-input text-bold" style="width: 90px;"> 
+                ถึง <input type="text" id="bill-end" class="inline-input text-bold" style="width: 90px;">
               </div>
-              <div id="bill-warning" class="text-red" style="font-size:12px; display:none;">⚠️ พบเลขบิลซ้ำในระบบ</div>
             </td>
             <td width="20%">
-              รวมบิลที่ใช้ <input type="number" class="inline-input text-center text-bold" style="width: 40px;"> บิล
+              รวมบิลที่ใช้ <input type="number" id="bill-qty" class="inline-input text-center text-bold" style="width: 40px;"> บิล
             </td>
             <td width="35%">
               แคชเชียร์ 
-              <select class="inline-input" style="width: 70%; margin-left: 5px;">
-                <option>-- เลือกลายเซ็น --</option>
-                <option>สมศรี รักงาน</option>
-                <option>มาลี ดีใจ</option>
-              </select>
+              <input type="text" id="cashier-name" class="inline-input" style="width: 70%;" placeholder="ลงชื่อแคชเชียร์...">
             </td>
           </tr>
           <tr>
-            <td width="22.5%">ยอดเงินขาด<br><input type="text" class="cell-input comma-format" style="margin-top: 10px; text-align: left;"></td>
-            <td width="22.5%">ยอดเงินเกิน<br><input type="text" class="cell-input comma-format" style="margin-top: 10px; text-align: left;"></td>
-            <td width="20%">สาเหตุ<br><input type="text" class="inline-input input-reason text-bold" style="margin-top: 10px;"></td>
+            <td width="22.5%">ยอดเงินขาด<br><input type="text" id="rev-short-amt" class="cell-input comma-format" style="margin-top: 10px; text-align: left;"></td>
+            <td width="22.5%">ยอดเงินเกิน<br><input type="text" id="rev-over-amt" class="cell-input comma-format" style="margin-top: 10px; text-align: left;"></td>
+            <td width="20%">สาเหตุ<br><input type="text" id="rev-reason" class="inline-input text-bold" style="margin-top: 10px; width:100%;"></td>
             <td>
-              ผู้จัดการ 
-              <select class="inline-input" style="width: 70%; margin-left: 5px;">
-                <option>-- เลือกลายเซ็น --</option>
-                <option>คุณสมชาย</option>
-                <option>คุณวิภา</option>
-              </select>
+              ผู้จัดการ <input type="text" id="manager-name" class="inline-input" style="width: 70%;" placeholder="ลงชื่อผู้จัดการ...">
             </td>
           </tr>
           <tr>
-            <td colspan="4" style="height: 70px;">
+            <td colspan="4" style="height: 60px;">
               หมายเหตุ:<br>
-              <textarea class="inline-input input-reason text-bold" rows="2" placeholder="พิมพ์หมายเหตุเพิ่มเติมตรงนี้..."></textarea>
+              <textarea id="rev-note" class="inline-input text-bold" rows="2" placeholder="พิมพ์หมายเหตุเพิ่มเติมตรงนี้..." style="width:100%; color:var(--text-red)!important;"></textarea>
             </td>
           </tr>
         </table>
@@ -351,125 +334,591 @@
     </div>
 
     <div id="tracking-tab" class="tab-content">
-      <div class="toolbar">
-        <h2 style="font-size: 24px; font-weight: 800;">☎️ Confirm Tracking System</h2>
+      <div class="toolbar no-print">
+        <div>
+          <h2 style="font-size: 22px; font-weight: 800;">☎️ Confirm Tracking Dashboard</h2>
+          <p style="color: #64748B; font-size: 13px;">แต่ละสาขากรอกข้อมูลของตนเอง ข้อมูลจะอัพเดทข้ามสาขาทันที เมื่อครบทุกสาขาจะเปิดปุ่มรายงาน ผจก.</p>
+        </div>
+        <div style="display:flex; gap:15px; align-items:center;">
+          <div>เลือกวันที่: <input type="date" id="track-date-input" class="inline-input text-bold" style="width:140px; font-size:15px;" onchange="loadTrackingData()"></div>
+          <button class="btn btn-save" onclick="saveTrackingData()">💾 บันทึกข้อมูลคิว</button>
+        </div>
       </div>
-      <div class="placeholder-card">
-        <h3 style="font-size: 20px; color: #1E293B; margin-bottom: 10px;">ระบบติดตามคนไข้และคอนเฟิร์มบุ๊กกิ้ง</h3>
-        <p style="color: #64748B;">ส่วนงานนี้กำลังเตรียมเชื่อมต่อฐานข้อมูลประวัติและคิวของคนไข้ในเฟสถัดไปครับ</p>
+
+      <div class="paper" id="trackingCaptureArea">
+        <div class="paper-header">
+          <div class="paper-title" id="tracking-table-title">ตารางสถานะคนไข้และคอนเฟิร์มบุ๊กกิ้งประจำวัน</div>
+          <div style="font-size:14px; font-weight:bold; color:var(--text-red)" id="completion-status">สถานะ: รอทุกสาขากรอกข้อมูล...</div>
+        </div>
+
+        <table class="main-table" id="tracking-main-table">
+          <thead>
+            <tr>
+              <th rowspan="3" width="12%">สาขา</th>
+              <th colspan="6">คนไข้ (คอนเฟิร์ม)</th>
+              <th colspan="3">มาจริง</th>
+            </tr>
+            <tr>
+              <th colspan="2">(CF-มา)</th>
+              <th rowspan="2" width="10%">(CF-ขอเลื่อน)</th>
+              <th rowspan="2" width="10%">(CF-ขอ walk-in)</th>
+              <th rowspan="2" width="11%">ไม่รับสาย/ปิดเครื่อง</th>
+              <th rowspan="2" width="10%">โทร CF-ทั้งหมด</th>
+              <th rowspan="2" width="10%">คนไข้เก่า</th>
+              <th rowspan="2" width="10%">คนไข้ใหม่</th>
+              <th rowspan="2" width="10%">คนไข้ทั้งหมด</th>
+            </tr>
+            <tr>
+              <th width="8%">คนไข้เก่า (คน)</th>
+              <th width="8%">คนไข้ใหม่ (คน)</th>
+            </tr>
+          </thead>
+          <tbody id="tracking-tbody">
+            </tbody>
+        </table>
       </div>
     </div>
 
     <div id="doctor-tab" class="tab-content">
-      <div class="toolbar">
-        <h2 style="font-size: 24px; font-weight: 800;">👨‍⚕️ Doctor Finance / DF</h2>
+      <div class="toolbar no-print">
+        <div>
+          <h2 style="font-size: 22px; font-weight: 800;">👨‍⚕️ Doctor Finance System</h2>
+          <p style="color: #64748B; font-size: 13px;">ระบบบริหารจัดการรายได้แพทย์ แยกตามสาขา วัน และสรุปยอดเฉลี่ยคงเหลือสะสม</p>
+        </div>
+        <div style="display:flex; gap:15px; align-items:center;">
+          <div>เลือกวันที่: <input type="date" id="doc-date-input" class="inline-input text-bold" style="width:140px; font-size:15px;" onchange="loadDoctorData()"></div>
+          <button class="btn btn-save" onclick="saveDoctorData()">💾 บันทึกยอดแพทย์</button>
+        </div>
       </div>
-      <div class="placeholder-card">
-        <h3 style="font-size: 20px; color: #1E293B; margin-bottom: 10px;">ระบบคำนวณค่ามือแพทย์ (Doctor Fee)</h3>
-        <p style="color: #64748B;">ระบบสรุปยอดแชร์รายได้และค่าหัตถการของแพทย์แต่ละท่านอัตโนมัติ</p>
+
+      <div class="paper" id="doctorCaptureArea">
+        <div class="paper-header">
+          <div class="paper-title">ตารางสรุปรายได้และค่าหัตถการแพทย์ (Doctor Fee)</div>
+          <div>
+            <span style="font-weight: 600;">เลือกสาขาดูข้อมูล:</span>
+            <select id="doc-branch-select" class="inline-input text-bold" style="width: 180px;" onchange="loadDoctorData()">
+              <option value="พระราม9">พระราม 9</option>
+              <option value="ปิ่นเกล้า">ปิ่นเกล้า</option>
+              <option value="บางแค">บางแค</option>
+              <option value="รังสิต">รังสิต</option>
+              <option value="พรอมานาด">พรอมานาด</option>
+              <option value="งามวงศ์วาน">งามวงศ์วาน</option>
+              <option value="ศรีนครินทร์">ศรีนครินทร์</option>
+              <option value="เวสต์เกต">เวสต์เกต</option>
+            </select>
+          </div>
+        </div>
+
+        <table class="main-table">
+          <thead>
+            <tr>
+              <th width="6%">วันที่</th>
+              <th width="15%">พญ.หทัยทิพย์<br>(หมอแนท)</th>
+              <th width="15%">พญ.ศิริกาญจน์<br>(หมอหวาน)</th>
+              <th width="15%">นพ.ภัทรพล<br>(หมอนิค)</th>
+              <th width="15%">นพ.ยุทธรัตน์<br>(หมอนัท)</th>
+              <th width="15%">พญ.ปัณรส<br>(หมอเปียโน)</th>
+              <th width="19%">Grand Total</th>
+            </tr>
+          </thead>
+          <tbody id="doctor-tbody">
+            </tbody>
+        </table>
       </div>
     </div>
 
   </main>
 </div>
 
+<div class="modal-overlay" id="reportModal">
+  <div class="modal-box">
+    <div class="modal-icon">🎉</div>
+    <div class="modal-title">กรอกข้อมูลครบทุกสาขาแล้ว!</div>
+    <div class="modal-desc">
+      ขณะนี้ทุกสาขาได้ทำการส่งบันทึกยอด Confirm Tracking ครบถ้วนแล้ว ระบบได้ประมวลผลรายงานภาพรวมรอบวันส่งต่อผู้จัดการเรียบร้อยครับ
+    </div>
+    <button class="btn btn-export" style="width: 100%; justify-content: center; font-size:16px; padding:12px;" onclick="exportTrackingReport()">
+      🖼️ดาวน์โหลดไฟล์รายงาน ผจก. (.PNG)
+    </button>
+    <button class="btn" style="width: 100%; justify-content: center; margin-top:10px; background:#e2e8f0; color:#000;" onclick="closeModal()">
+      ปิดหน้าต่างนี้
+    </button>
+  </div>
+</div>
+
 <script>
-  document.querySelectorAll('.nav-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-      const targetTabId = this.getAttribute('data-tab');
-      if(!targetTabId) return;
+  // --------------------------------------------------
+  // 5.1 INITIALIZE FIREBASE CONFIGURATION
+  // --------------------------------------------------
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com", // คอนฟิก URL ของโครงการคุณแทนช่องนี้
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
 
-      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-      this.classList.add('active');
-
-      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-      document.getElementById(targetTabId).classList.add('active');
-    });
-  });
-
-  function formatMoney(num) {
-    return num.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  // ตรวจสอบความถูกต้องก่อนเริ่มรันระบบอินสแตนซ์
+  if(firebaseConfig.apiKey !== "YOUR_API_KEY") {
+    firebase.initializeApp(firebaseConfig);
+  } else {
+    console.warn("Firebase config is missing! Running in mockup mode.");
+    window.dbMock = {};
   }
 
-  function getRawNumber(element) {
-    if (!element) return 0;
-    let val = element.value.replace(/,/g, '');
-    return Number(val) || 0;
-  }
+  const branches = ["พระราม9", "ปิ่นเกล้า", "บางแค", "รังสิต", "พรอมานาด", "งามวงศ์วาน", "ศรีนครินทร์", "เวสต์เกต"];
+  const doctors = ["doc_nat", "doc_wan", "doc_nick", "doc_nut", "doc_piano"];
 
-  function calculateTotals() {
-    let totalProc = 0;
-    document.querySelectorAll('.calc-proc').forEach(input => { totalProc += getRawNumber(input); });
-    document.getElementById('total-proc-disp').value = formatMoney(totalProc);
+  // --------------------------------------------------
+  // 5.2 APPLICATION INITIAL RUN & APP EVENTS
+  // --------------------------------------------------
+  document.addEventListener("DOMContentLoaded", () => {
+    // กำหนดวันที่ค่าเริ่มต้นเป็นวันปัจจุบันทั้งหมด
+    const todayStr = new Date().toISOString().split('T')[0];
+    document.getElementById('rev-date-input').value = todayStr;
+    document.getElementById('track-date-input').value = todayStr;
+    document.getElementById('doc-date-input').value = todayStr;
 
-    let totalCC = 0;
-    document.querySelectorAll('.calc-cc').forEach(input => { totalCC += getRawNumber(input); });
-    document.getElementById('total-cc-disp').value = formatMoney(totalCC);
-
-    let totalApp = 0;
-    document.querySelectorAll('.calc-app').forEach(input => { totalApp += getRawNumber(input); });
-    document.getElementById('pay-app-disp').value = formatMoney(totalApp);
-    document.getElementById('pay-app-hidden').value = totalApp;
-
-    let grandTotal = totalCC + totalApp; 
-    grandTotal += getRawNumber(document.getElementById('pay-cash'));
-    grandTotal += getRawNumber(document.getElementById('pay-transfer'));
+    initTabSystem();
+    initTrackingTableLayout();
     
-    document.getElementById('grand-total-disp').value = formatMoney(grandTotal);
-  }
-
-  document.querySelectorAll('.comma-format').forEach(input => {
-    input.addEventListener('input', function(e) {
-      let cursorPosition = this.selectionStart;
-      let originalLength = this.value.length;
-      
-      let cleanValue = this.value.replace(/[^0-9.]/g, '');
-      let parts = cleanValue.split('.');
-      if (parts.length > 2) parts = [parts[0], parts.slice(1).join('')];
-      
-      if (parts[0]) {
-        parts[0] = Number(parts[0]).toLocaleString('en-US');
-      }
-      
-      this.value = parts.join('.');
-      
-      let newLength = this.value.length;
-      cursorPosition = cursorPosition + (newLength - originalLength);
-      this.setSelectionRange(cursorPosition, cursorPosition);
-      
-      calculateTotals();
-    });
-
-    input.addEventListener('blur', function() {
-      let rawVal = getRawNumber(this);
-      if (this.value !== "") {
-        this.value = formatMoney(rawVal);
-      }
-      calculateTotals();
-    });
+    // โหลดข้อมูลรอบแรกสุด
+    loadRevenueData();
+    loadTrackingData();
+    loadDoctorData();
+    setupFormattingAndCalculations();
   });
 
-  function checkDuplicate() {
-    const val = document.getElementById('bill-start').value;
-    const warning = document.getElementById('bill-warning');
-    if(val.includes('001')) { 
-      warning.style.display = 'block';
+  function initTabSystem() {
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const target = this.getAttribute('data-tab');
+        if(!target) return;
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        this.classList.add('active');
+        document.getElementById(target).classList.add('active');
+      });
+    });
+  }
+
+  // --------------------------------------------------
+  // 5.3 MODULE 1: REVENUE CALCULATIONS & STORAGE
+  // --------------------------------------------------
+  function saveRevenueData() {
+    const date = document.getElementById('rev-date-input').value;
+    const branch = document.getElementById('rev-branch-select').value;
+    if(!date) return alert("กรุณาระบุวันที่รับข้อมูล!");
+
+    // ดึงค่า Input ทั้งหมดภายในฟอร์มเพื่อเก็บลงแบบโครงสร้างอาเรย์ออปเจกต์ไม่ทับข้อมูลเก่า
+    const payload = {
+      doc1: document.getElementById('rev-doc1').value,
+      doc2: document.getElementById('rev-doc2').value,
+      storeFrontTotal: document.getElementById('store-front-total').value,
+      point: document.getElementById('rev-point').value,
+      billStart: document.getElementById('bill-start').value,
+      billEnd: document.getElementById('bill-end').value,
+      billQty: document.getElementById('bill-qty').value,
+      cashier: document.getElementById('cashier-name').value,
+      manager: document.getElementById('manager-name').value,
+      shortAmt: document.getElementById('rev-short-amt').value,
+      overAmt: document.getElementById('rev-over-amt').value,
+      reason: document.getElementById('rev-reason').value,
+      note: document.getElementById('rev-note').value,
+      procedures: [],
+      credits: []
+    };
+
+    document.querySelectorAll('#revenue-tab .calc-proc').forEach(el => payload.procedures.push(el.value));
+    document.querySelectorAll('#revenue-tab .calc-cc').forEach(el => payload.credits.push(el.value));
+    payload.payCash = document.getElementById('pay-cash').value;
+    payload.payTransfer = document.getElementById('pay-transfer').value;
+    payload.appHdPax = document.getElementById('app-hd-pax').value;
+    payload.appHdAmt = document.getElementById('app-hd-amt').value;
+    payload.appGwPax = document.getElementById('app-gw-pax').value;
+    payload.appGwAmt = document.getElementById('app-gw-amt').value;
+
+    if(window.firebase && firebase.apps.length) {
+      firebase.database().ref(`revenue/${date}/${branch}`).set(payload)
+        .then(() => alert(`บันทึกข้อมูลสรุปยอดของสาขา ${branch} เรียบร้อยแล้วค่ะ`))
+        .catch(err => alert("เกิดข้อผิดพลาดในการบันทึกบน Firebase: " + err.message));
     } else {
-      warning.style.display = 'none';
+      if(!window.dbMock) window.dbMock = {};
+      if(!window.dbMock.revenue) window.dbMock.revenue = {};
+      if(!window.dbMock.revenue[date]) window.dbMock.revenue[date] = {};
+      window.dbMock.revenue[date][branch] = payload;
+      alert(`[Mock Mode] จำลองการเซฟข้อมูลสาขา ${branch} ลงหน่วยความจำแล้ว`);
     }
   }
 
-  window.exportPNG = function() {
-    const area = document.getElementById('captureArea');
-    html2canvas(area, { scale: 2 }).then(canvas => {
-      const link = document.createElement('a');
-      link.download = `LALIZA_Report_${new Date().getTime()}.png`;
-      link.href = canvas.toDataURL("image/png");
-      link.click();
+  function loadRevenueData() {
+    const date = document.getElementById('rev-date-input').value;
+    const branch = document.getElementById('rev-branch-select').value;
+    
+    if(window.firebase && firebase.apps.length) {
+      firebase.database().ref(`revenue/${date}/${branch}`).once('value', snapshot => {
+        const data = snapshot.val();
+        renderRevenueForm(data);
+      });
+    } else {
+      const data = window.dbMock?.revenue?.[date]?.[branch] || null;
+      renderRevenueForm(data);
+    }
+  }
+
+  function renderRevenueForm(data) {
+    if(!data) {
+      // รีเซ็ตฟอร์มให้ว่างถ้าไม่พบข้อมูลเดิมในวันนั้นๆ
+      document.querySelectorAll('#revenue-tab input[type="text"]').forEach(i => i.value = "");
+      document.getElementById('rev-doc1').value = ""; document.getElementById('rev-doc2').value = "";
+      document.getElementById('rev-note').value = ""; document.getElementById('bill-qty').value = "";
+      calculateRevenueTotals();
+      return;
+    }
+    document.getElementById('rev-doc1').value = data.doc1 || "";
+    document.getElementById('rev-doc2').value = data.doc2 || "";
+    document.getElementById('store-front-total').value = data.storeFrontTotal || "";
+    document.getElementById('rev-point').value = data.point || "";
+    document.getElementById('bill-start').value = data.billStart || "";
+    document.getElementById('bill-end').value = data.billEnd || "";
+    document.getElementById('bill-qty').value = data.billQty || "";
+    document.getElementById('cashier-name').value = data.cashier || "";
+    document.getElementById('manager-name').value = data.manager || "";
+    document.getElementById('rev-short-amt').value = data.shortAmt || "";
+    document.getElementById('rev-over-amt').value = data.overAmt || "";
+    document.getElementById('rev-reason').value = data.reason || "";
+    document.getElementById('rev-note').value = data.note || "";
+    document.getElementById('pay-cash').value = data.payCash || "";
+    document.getElementById('pay-transfer').value = data.payTransfer || "";
+    document.getElementById('app-hd-pax').value = data.appHdPax || "0";
+    document.getElementById('app-hd-amt').value = data.appHdAmt || "0";
+    document.getElementById('app-gw-pax').value = data.appGwPax || "0";
+    document.getElementById('app-gw-amt').value = data.appGwAmt || "0";
+
+    const procInputs = document.querySelectorAll('#revenue-tab .calc-proc');
+    if(data.procedures) data.procedures.forEach((val, index) => { if(procInputs[index]) procInputs[index].value = val; });
+
+    const ccInputs = document.querySelectorAll('#revenue-tab .calc-cc');
+    if(data.credits) data.credits.forEach((val, index) => { if(ccInputs[index]) ccInputs[index].value = val; });
+
+    calculateRevenueTotals();
+  }
+
+  // --------------------------------------------------
+  // 5.4 MODULE 2: CONFIRM TRACKING SYSTEM (8 BRANCHES)
+  // --------------------------------------------------
+  function initTrackingTableLayout() {
+    const tbody = document.getElementById('tracking-tbody');
+    tbody.innerHTML = "";
+    
+    branches.forEach(bName => {
+      const tr = document.createElement('tr');
+      tr.setAttribute('data-branch', bName);
+      tr.innerHTML = `
+        <td class="text-bold text-center" style="background:#f1f5f9;">${bName}</td>
+        <td><input type="number" class="cell-input track-cell text-center" data-field="old_cf" value="0"></td>
+        <td><input type="number" class="cell-input track-cell text-center" data-field="new_cf" value="0"></td>
+        <td><input type="number" class="cell-input track-cell text-center" data-field="postpone" value="0"></td>
+        <td><input type="number" class="cell-input track-cell text-center" data-field="walkin" value="0"></td>
+        <td><input type="number" class="cell-input track-cell text-center" data-field="no_answer" value="0"></td>
+        <td class="bg-gray text-bold text-center data-total-cf" style="font-family:var(--font-data)">0</td>
+        <td><input type="number" class="cell-input track-cell text-center" data-field="old_actual" value="0"></td>
+        <td><input type="number" class="cell-input track-cell text-center" data-field="new_actual" value="0"></td>
+        <td class="bg-gray text-bold text-center data-total-actual" style="font-family:var(--font-data)">0</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    // แนบ Event Listener สำหรับการคำนวณสรุปแถวแบบ Dynamic
+    tbody.addEventListener('input', (e) => {
+      if(e.target.classList.contains('track-cell')) {
+        calculateTrackingRowTotals(e.target.closest('tr'));
+        checkAllBranchesCompletion();
+      }
     });
   }
 
-  document.querySelector('input[type="date"]').valueAsDate = new Date();
+  function calculateTrackingRowTotals(tr) {
+    const oldCf = Number(tr.querySelector('[data-field="old_cf"]').value) || 0;
+    const newCf = Number(tr.querySelector('[data-field="new_cf"]').value) || 0;
+    const postpone = Number(tr.querySelector('[data-field="postpone"]').value) || 0;
+    const walkin = Number(tr.querySelector('[data-field="walkin"]').value) || 0;
+    const noAnswer = Number(tr.querySelector('[data-field="no_answer"]').value) || 0;
+    
+    const totalCf = oldCf + newCf + postpone + walkin + noAnswer;
+    tr.querySelector('.data-total-cf').innerText = totalCf;
+
+    const oldAct = Number(tr.querySelector('[data-field="old_actual"]').value) || 0;
+    const newAct = Number(tr.querySelector('[data-field="new_actual"]').value) || 0;
+    tr.querySelector('.data-total-actual').innerText = oldAct + newAct;
+  }
+
+  function saveTrackingData() {
+    const date = document.getElementById('track-date-input').value;
+    if(!date) return alert("กรุณาเลือกวันที่ก่อนบันทึกข้อมูลครับ");
+
+    const trackingPayload = {};
+    document.querySelectorAll('#tracking-tbody tr').forEach(tr => {
+      const bName = tr.getAttribute('data-branch');
+      trackingPayload[bName] = {
+        old_cf: tr.querySelector('[data-field="old_cf"]').value,
+        new_cf: tr.querySelector('[data-field="new_cf"]').value,
+        postpone: tr.querySelector('[data-field="postpone"]').value,
+        walkin: tr.querySelector('[data-field="walkin"]').value,
+        no_answer: tr.querySelector('[data-field="no_answer"]').value,
+        old_actual: tr.querySelector('[data-field="old_actual"]').value,
+        new_actual: tr.querySelector('[data-field="new_actual"]').value
+      };
+    });
+
+    if(window.firebase && firebase.apps.length) {
+      firebase.database().ref(`tracking/${date}`).update(trackingPayload)
+        .then(() => {
+          alert("บันทึกข้อมูลผังคนไข้ Real-time ครบทุกสาขาขึ้นระบบคลาวด์แล้ว!");
+          checkAllBranchesCompletion();
+        });
+    } else {
+      if(!window.dbMock) window.dbMock = {};
+      if(!window.dbMock.tracking) window.dbMock.tracking = {};
+      window.dbMock.tracking[date] = trackingPayload;
+      alert("[Mock Mode] อัพเดทผังข้อมูลคิวคนไข้ครบทุกสาขาในระบบจำลองเรียบร้อย");
+      checkAllBranchesCompletion();
+    }
+  }
+
+  function loadTrackingData() {
+    const date = document.getElementById('track-date-input').value;
+    document.getElementById('tracking-table-title').innerText = `ตารางสถานะคนไข้และคอนเฟิร์มบุ๊กกิ้งประจำวันที่ ${date}`;
+    
+    if(window.firebase && firebase.apps.length) {
+      firebase.database().ref(`tracking/${date}`).once('value', snapshot => {
+        renderTrackingTable(snapshot.val());
+      });
+    } else {
+      renderTrackingTable(window.dbMock?.tracking?.[date] || null);
+    }
+  }
+
+  function renderTrackingTable(data) {
+    branches.forEach(bName => {
+      const tr = document.querySelector(`#tracking-tbody tr[data-branch="${bName}"]`);
+      if(!tr) return;
+      const bData = data?.[bName];
+      
+      tr.querySelector('[data-field="old_cf"]').value = bData?.old_cf || "0";
+      tr.querySelector('[data-field="new_cf"]').value = bData?.new_cf || "0";
+      tr.querySelector('[data-field="postpone"]').value = bData?.postpone || "0";
+      tr.querySelector('[data-field="walkin"]').value = bData?.walkin || "0";
+      tr.querySelector('[data-field="no_answer"]').value = bData?.no_answer || "0";
+      tr.querySelector('[data-field="old_actual"]').value = bData?.old_actual || "0";
+      tr.querySelector('[data-field="new_actual"]').value = bData?.new_actual || "0";
+      
+      calculateTrackingRowTotals(tr);
+    });
+    checkAllBranchesCompletion();
+  }
+
+  function checkAllBranchesCompletion() {
+    let completedCount = 0;
+    document.querySelectorAll('#tracking-tbody tr').forEach(tr => {
+      const totalCf = Number(tr.querySelector('.data-total-cf').innerText) || 0;
+      if(totalCf > 0) completedCount++;
+    });
+
+    const statusText = document.getElementById('completion-status');
+    if(completedCount === branches.length) {
+      statusText.innerText = "● ทุกสาขากรอกครบถ้วนแล้ว";
+      statusText.style.color = "green";
+      document.getElementById('reportModal').style.display = 'grid'; // เปิด Popup ทันทีตามเงื่อนไข
+    } else {
+      statusText.innerText = `สถานะ: รอสาขากรอกข้อมูล (ส่งแล้ว ${completedCount}/${branches.length} สาขา)`;
+      statusText.style.color = "var(--text-red)";
+    }
+  }
+
+  function closeModal() { document.getElementById('reportModal').style.display = 'none'; }
+
+  function exportTrackingReport() {
+    const area = document.getElementById('trackingCaptureArea');
+    html2canvas(area, { scale: 2 }).then(canvas => {
+      const link = document.createElement('a');
+      link.download = `LALIZA_Tracking_Report_${document.getElementById('track-date-input').value}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+      closeModal();
+    });
+  }
+
+  // --------------------------------------------------
+  // 5.5 MODULE 3: DOCTOR FINANCE IMPLEMENTATION
+  // --------------------------------------------------
+  function loadDoctorData() {
+    const date = document.getElementById('doc-date-input').value;
+    const branch = document.getElementById('doc-branch-select').value;
+    const tbody = document.getElementById('doctor-tbody');
+    tbody.innerHTML = "";
+
+    if(window.firebase && firebase.apps.length) {
+      firebase.database().ref(`doctor_finance/${date}/${branch}`).once('value', snapshot => {
+        renderDoctorRow(snapshot.val(), date);
+      });
+    } else {
+      renderDoctorRow(window.dbMock?.doctor_finance?.[date]?.[branch] || null, date);
+    }
+  }
+
+  function renderDoctorRow(data, dateDisplay) {
+    const tbody = document.getElementById('doctor-tbody');
+    
+    // แปลง Format วันที่โชว์ให้กระชับสั้นลง
+    const shortDate = dateDisplay.split('-').slice(1).reverse().join('/') + '/' + (parseInt(dateDisplay.split('-')[0]) + 543).toString().slice(-2);
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="text-center text-bold bg-gray" style="font-size:12px;">${shortDate}</td>
+      <td><input type="text" class="cell-input df-val comma-format" data-doc="doc_nat" value="${data?.doc_nat || '0.00'}"></td>
+      <td><input type="text" class="cell-input df-val comma-format" data-doc="doc_wan" value="${data?.doc_wan || '0.00'}"></td>
+      <td><input type="text" class="cell-input df-val comma-format" data-doc="doc_nick" value="${data?.doc_nick || '0.00'}"></td>
+      <td><input type="text" class="cell-input df-val comma-format" data-doc="doc_nut" value="${data?.doc_nut || '0.00'}"></td>
+      <td><input type="text" class="cell-input df-val comma-format" data-doc="doc_piano" value="${data?.doc_piano || '0.00'}"></td>
+      <td class="bg-gray text-bold text-right" id="df-row-grand" style="font-family:var(--font-data); padding-right:10px;">0.00</td>
+    `;
+    tbody.appendChild(tr);
+
+    // แถวสรุปข้อมูลสะสม/ค่าเฉลี่ยด้านล่างตาราง (คำนวณอิงแบบ Excel)
+    const trSum = document.createElement('tr');
+    trSum.className = "bg-gray text-bold";
+    trSum.innerHTML = `
+      <td class="text-center">Grand Total</td>
+      <td class="text-right" id="sum-doc_nat">0.00</td><td class="text-right" id="sum-doc_wan">0.00</td>
+      <td class="text-right" id="sum-doc_nick">0.00</td><td class="text-right" id="sum-doc_nut">0.00</td>
+      <td class="text-right" id="sum-doc_piano">0.00</td>
+      <td class="text-right" id="total-all-df" style="padding-right:10px; color:var(--text-blue);">0.00</td>
+    `;
+    tbody.appendChild(trSum);
+
+    const trAvg = document.createElement('tr');
+    trAvg.className = "bg-gray text-bold";
+    trAvg.innerHTML = `
+      <td class="text-center">AVG/Per Day</td>
+      <td class="text-right" id="avg-doc_nat">0.00</td><td class="text-right" id="avg-doc_wan">0.00</td>
+      <td class="text-right" id="avg-doc_nick">0.00</td><td class="text-right" id="avg-doc_nut">0.00</td>
+      <td class="text-right" id="avg-doc_piano">0.00</td>
+      <td class="text-right" id="avg-all-df" style="padding-right:10px;">0.00</td>
+    `;
+    tbody.appendChild(trAvg);
+
+    // เรียกผูกระบบคำนวณและฟอร์แมตยอดเงินทันทีที่วาดตารางเสร็จ
+    attachLiveCalculationToDF();
+    calculateDFTotals();
+  }
+
+  function attachLiveCalculationToDF() {
+    document.querySelectorAll('.df-val').forEach(input => {
+      input.addEventListener('input', function() {
+        // จัดการคอมมาขณะพิมพ์ข้อความตัวเลข
+        let pos = this.selectionStart;
+        let oldLen = this.value.length;
+        let clean = this.value.replace(/[^0-9.]/g, '');
+        let pts = clean.split('.');
+        if (pts[0]) pts[0] = Number(pts[0]).toLocaleString('en-US');
+        this.value = pts.join('.');
+        this.setSelectionRange(pos + (this.value.length - oldLen), pos + (this.value.length - oldLen));
+        calculateDFTotals();
+      });
+
+      input.addEventListener('blur', function() {
+        let raw = Number(this.value.replace(/,/g, '')) || 0;
+        this.value = raw.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        calculateDFTotals();
+      });
+    });
+  }
+
+  function calculateDFTotals() {
+    let grandRowTotal = 0;
+    doctors.forEach(doc => {
+      const input = document.querySelector(`.df-val[data-doc="${doc}"]`);
+      const val = input ? (Number(input.value.replace(/,/g, '')) || 0) : 0;
+      grandRowTotal += val;
+      
+      // อัพเดทยอดสรุปด้านล่างตาราง (ในกรณีใช้งานจริงตรงนี้สามารถดึงค่ารวมสะสมทบยอดจาก Firebase ได้)
+      document.getElementById(`sum-${doc}`).innerText = val.toLocaleString('th-TH', { minimumFractionDigits: 2 });
+      document.getElementById(`avg-${doc}`).innerText = val.toLocaleString('th-TH', { minimumFractionDigits: 2 });
+    });
+
+    document.getElementById('df-row-grand').innerText = grandRowTotal.toLocaleString('th-TH', { minimumFractionDigits: 2 });
+    document.getElementById('total-all-df').innerText = grandRowTotal.toLocaleString('th-TH', { minimumFractionDigits: 2 });
+    document.getElementById('avg-all-df').innerText = grandRowTotal.toLocaleString('th-TH', { minimumFractionDigits: 2 });
+  }
+
+  function saveDoctorData() {
+    const date = document.getElementById('doc-date-input').value;
+    const branch = document.getElementById('doc-branch-select').value;
+    if(!date) return alert("โปรดเลือกวันที่ก่อนเซฟค่ะ");
+
+    const payload = {};
+    doctors.forEach(doc => {
+      const input = document.querySelector(`.df-val[data-doc="${doc}"]`);
+      payload[doc] = input ? input.value : "0.00";
+    });
+
+    if(window.firebase && firebase.apps.length) {
+      firebase.database().ref(`doctor_finance/${date}/${branch}`).set(payload)
+        .then(() => alert(`บันทึกยอดรายได้แพทย์ของสาขา ${branch} ประจำวันที่ ${date} สำเร็จ!`));
+    } else {
+      if(!window.dbMock) window.dbMock = {};
+      if(!window.dbMock.doctor_finance) window.dbMock.doctor_finance = {};
+      if(!window.dbMock.doctor_finance[date]) window.dbMock.doctor_finance[date] = {};
+      window.dbMock.doctor_finance[date][branch] = payload;
+      alert("[Mock Mode] บันทึกยอดส่วนแบ่งหัตถการแพทย์รายสาขาลงหน่วยความจำจำลองแล้ว");
+    }
+  }
+
+  // --------------------------------------------------
+  // 5.6 CORE INPUT DATA FORMATTER & MATHEMATICS LOGIC
+  // --------------------------------------------------
+  function setupFormattingAndCalculations() {
+    document.querySelectorAll('#revenue-tab .comma-format').forEach(input => {
+      input.addEventListener('input', function() {
+        let pos = this.selectionStart; let oldLen = this.value.length;
+        let clean = this.value.replace(/[^0-9.]/g, '');
+        let pts = clean.split('.');
+        if (pts[0]) pts[0] = Number(pts[0]).toLocaleString('en-US');
+        this.value = pts.join('.');
+        this.setSelectionRange(pos + (this.value.length - oldLen), pos + (this.value.length - oldLen));
+        calculateRevenueTotals();
+      });
+
+      input.addEventListener('blur', function() {
+        let raw = Number(this.value.replace(/,/g, '')) || 0;
+        if(this.value !== "") this.value = raw.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        calculateRevenueTotals();
+      });
+    });
+  }
+
+  function calculateRevenueTotals() {
+    let totalProc = 0;
+    document.querySelectorAll('#revenue-tab .calc-proc').forEach(i => { totalProc += Number(i.value.replace(/,/g, '')) || 0; });
+    document.getElementById('total-proc-disp').value = totalProc.toLocaleString('th-TH', { minimumFractionDigits: 2 });
+
+    let totalCC = 0;
+    document.querySelectorAll('#revenue-tab .calc-cc').forEach(i => { totalCC += Number(i.value.replace(/,/g, '')) || 0; });
+    document.getElementById('total-cc-disp').value = totalCC.toLocaleString('th-TH', { minimumFractionDigits: 2 });
+
+    let appHd = Number(document.getElementById('app-hd-amt').value.replace(/,/g, '')) || 0;
+    let appGw = Number(document.getElementById('app-gw-amt').value.replace(/,/g, '')) || 0;
+    let totalApp = appHd + appGw;
+    document.getElementById('pay-app-disp').value = totalApp.toLocaleString('th-TH', { minimumFractionDigits: 2 });
+
+    let grand = totalCC + totalApp;
+    grand += Number(document.getElementById('pay-cash').value.replace(/,/g, '')) || 0;
+    grand += Number(document.getElementById('pay-transfer').value.replace(/,/g, '')) || 0;
+    document.getElementById('grand-total-disp').value = grand.toLocaleString('th-TH', { minimumFractionDigits: 2 });
+  }
 </script>
 
 </body>
