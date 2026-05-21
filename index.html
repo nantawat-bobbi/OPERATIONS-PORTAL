@@ -196,7 +196,7 @@
     // 2. ฟังก์ชันดึงรายชื่อพนักงาน/แพทย์มาใส่ดรอปดาวน์อัตโนมัติ
     // --------------------------------------------------
     function loadStaffAndDoctors() {
-        database.ref('system_settings').on('value', (snapshot) => {
+       database.ref('firebase_setup/system_settings').on('value', (snapshot) => {
             if (snapshot.exists()) {
                 const data = snapshot.val();
                 
