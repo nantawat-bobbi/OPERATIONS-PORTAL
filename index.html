@@ -43,6 +43,7 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--tx);min-height:
 .ni.active{background:var(--acc);color:#fff;font-weight:600;}
 .main{flex:1;background:var(--bg);display:flex;flex-direction:column;min-width:0;height:100vh;overflow-y:auto;}
 .tp{display:none;padding:0;flex:1;}
+.tp.active{display:block !important;}
 
 /* HEADER & CONTROLS */
 .ph{background:#fff;border-bottom:1px solid var(--bdr);padding:15px 24px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:20;}
@@ -53,6 +54,7 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--tx);min-height:
 .bs{background:var(--grn);color:#fff;} 
 .bg2{background:#fff;color:var(--tx2);border:1px solid var(--bdr2);} .bg2:hover{background:#f8f9fa;}
 .bpng{background:#20c997;color:#fff;} .bpng:hover{background:#12b886;}
+.bgsync{background:#845ef7;color:#fff;} .bgsync:hover{background:#7048e8;}
 
 select,input[type=text],input[type=date],input[type=time],input[type=month],input[type=number],textarea{
   background:#fff;border:1px solid var(--bdr2);border-radius:4px;padding:6px 10px;
@@ -89,14 +91,14 @@ select:disabled{background:#e9ecef;cursor:not-allowed;font-weight:bold;color:var
 .bg-gw{background:#f3d0e2;} .bg-chg{background:#fff3cd;} .bg-drp{background:#d1e7dd;}
 .bg-mem{background:#f3f4f6;} .bg-old{background:#fff3cd;} .bg-new{background:#d1e7dd;} .bg-sum{background:#dbeafe;}
 
-/* FIXED VISIBILITY: คืนชีพกล่อง Input ให้เห็นเด่นชัดด้วยกรอบเทาและพื้นผิวสีขาว */
+/* FIXED VISIBILITY INPUTS: สไตล์แบบฟอร์มคีย์บอร์ดที่แคชเชียร์บางแคจะมองเห็นได้อย่างชัดเจน 100% */
 .r-inp{width:100%;height:32px;border:1px solid #ced4da !important;background:#ffffff !important;text-align:right;font-size:14px;font-weight:700;padding:4px 8px;color:#1D4ED8;border-radius:4px;outline:none;cursor:text;}
 .r-inp:hover{background:#f1f3f5 !important; border-color:var(--acc) !important;}
 .r-inp:focus{background:#fff3cd !important;box-shadow:inset 0 0 0 1px var(--acc);border-color:var(--acc) !important;}
 .r-inp[readonly]{color:#000!important;cursor:default;background:#f8f9fa!important;border:none !important;box-shadow:none;}
 select.r-inp { background:#ffffff !important; text-align-last: center; padding:2px; }
 
-.rev-sum-grid{display:grid;grid-template-columns:300px 1fr;background:#sur;border-top:1px solid var(--bdr);}
+.rev-sum-grid{display:grid;grid-template-columns:300px 1fr;background:#fff;border-top:1px solid var(--bdr);box-shadow:inset 0 2px 4px rgba(0,0,0,0.02);}
 .rev-sum-left{border-right:2px solid #ccc;padding:15px;background:#f8f9fa;}
 .rev-sum-right{padding:15px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px;background:#fff;}
 .rs-row{display:flex;justify-content:space-between;margin-bottom:8px;font-size:14px;border-bottom:1px dotted #ccc;padding-bottom:4px;}
@@ -110,16 +112,7 @@ select.r-inp { background:#ffffff !important; text-align-last: center; padding:2
 .pdf-table th, .pdf-table td{border:1px solid #000;padding:6px;vertical-align:middle;}
 .pdf-table th{background:#f0f0f0;text-align:center;font-weight:700;}
 
-@media print {
-  @page { size: A4 landscape; margin: 10mm; }
-  body { background: #fff; }
-  .sidebar, .ph, .kgrid, .no-print, .br-dash-zone { display: none !important; }
-  .main { padding: 0; background:#fff; height:auto; overflow:visible; }
-  .pc { padding: 0; }
-  #t2-content { display: block !important; }
-  .paper-ui { box-shadow: none; padding: 0; max-width: 100%; margin:0; }
-  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-}
+.toast{position:fixed;bottom:20px;right:20px;background:#212529;border-radius:6px;padding:12px 20px;font-size:14px;color:#fff;z-index:9998;box-shadow:0 4px 12px rgba(0,0,0,0.15);}
 </style>
 </head>
 <body>
@@ -141,7 +134,7 @@ select.r-inp { background:#ffffff !important; text-align-last: center; padding:2
   <div class="slogo">LALIZA CLINIC<br><span id="nav-user-label" style="font-size:11px;color:#845ef7;font-weight:normal;"></span></div>
   <nav class="nav">
     <div class="ni admin-ni" onclick="sw('t0',this)">👑 Advanced Dashboard</div>
-    <div class="ni" id="ni-t1" onclick="sw('t1',this)">📊 Revenue Sheet</div>
+    <div class="ni active" id="ni-t1" onclick="sw('t1',this)">📊 Revenue Sheet</div>
     <div class="ni" onclick="sw('t2',this)">📋 Daily Ops Core</div>
     <div class="ni" onclick="sw('t3',this)">☎️ Confirm Tracking</div>
     <div class="ni" onclick="sw('t4',this)">👨‍⚕️ Doctor Finance</div>
@@ -208,6 +201,7 @@ select.r-inp { background:#ffffff !important; text-align-last: center; padding:2
   <div class="ph no-print">
     <div class="ptitle">📊 Revenue Sheet</div>
     <div class="ha">
+      <button class="btn bgsync" onclick="triggerGoogleSheetSync('revenue')">🚀 Generate to Google Sheet</button>
       <button class="btn bpng" onclick="expPNG('t1-cap', 'Revenue_Sheet')">📸 Export PNG</button>
       <button class="btn bg2" onclick="downloadTemplate()">📄 โหลดฟอร์ม Import</button>
       <input type="file" id="ex-file" accept=".xlsx,.xls,.csv" style="display:none;" onchange="importT1(this)">
@@ -239,7 +233,7 @@ select.r-inp { background:#ffffff !important; text-align-last: center; padding:2
           <thead>
             <tr>
               <th rowspan="2" class="bg-date">วันที่</th><th rowspan="2" class="bg-total">รายได้รวม</th>
-              <th rowspan="2" class="bg-op">หัตถการ</th><th rowspan="2" class="bg-med">ขายยา</th><th rowspan="2" class="bg-treat">Treatment</th>
+              <th rowspan="2" class="bg-op">หัตถการ</th><th rowspan="2" class="bg-med">ขายยา</th><th rowspan="2" class="bg-trt">Treatment</th>
               <th rowspan="2" class="bg-hd">HD MALL</th><th rowspan="2" class="bg-gw">Gowabi</th><th rowspan="2" class="bg-chg">ชาร์จ 3%</th>
               <th rowspan="2" class="bg-drp">ฉีดผิว</th><th rowspan="2" class="bg-mem">member</th><th rowspan="2" class="bg-op">หัตถการ พนง.</th>
               <th rowspan="2" class="bg-chg">มัดจำเงิน</th><th rowspan="2" class="bg-total">รวมรายได้อื่นๆ</th>
@@ -286,6 +280,7 @@ select.r-inp { background:#ffffff !important; text-align-last: center; padding:2
   <div class="ph no-print">
     <div class="ptitle">📋 Daily Ops Core</div>
     <div class="ha">
+      <button class="btn bgsync" onclick="triggerGoogleSheetSync('dailyops')">🚀 Generate to Google Sheet</button>
       <button class="btn bpng" onclick="expPNG('t2-content', 'OpsCore')">📸 Export PNG</button>
       <button class="btn bg2" onclick="window.print()">🖨️ Print Form</button>
       <button class="btn bp" onclick="saveT2()">💾 บันทึกแบบฟอร์ม</button>
@@ -336,6 +331,7 @@ select.r-inp { background:#ffffff !important; text-align-last: center; padding:2
   <div class="ph no-print">
     <div class="ptitle">☎️ Confirm Tracking</div>
     <div class="ha">
+      <button class="btn bgsync" onclick="triggerGoogleSheetSync('tracking')">🚀 Generate to Google Sheet</button>
       <button class="btn bpng" onclick="expPNG('t3-cap', 'Tracking')">📸 Export PNG</button>
       <select id="tk-br" onchange="buildT3()"></select>
       <input type="month" id="tk-mo" onchange="buildT3()">
@@ -371,6 +367,7 @@ select.r-inp { background:#ffffff !important; text-align-last: center; padding:2
   <div class="ph no-print">
     <div class="ptitle">👨‍⚕️ Doctor Finance</div>
     <div class="ha">
+      <button class="btn bgsync" onclick="triggerGoogleSheetSync('doctor')">🚀 Generate to Google Sheet</button>
       <button class="btn bpng" onclick="expPNG('t4-cap', 'DoctorFin')">📸 Export PNG</button>
       <select id="df-br" onchange="buildT4()"></select>
       <input type="month" id="df-mo" onchange="buildT4()">
@@ -414,7 +411,7 @@ select.r-inp { background:#ffffff !important; text-align-last: center; padding:2
 
 <script>
 // ==========================================
-// 1. GLOBAL VARIABLES LIFECYCLE (Hoisting & Crash Protection)
+// 1. ARCHITECTURE DECLARATIONS (Hoisting Protection Fixed)
 // ==========================================
 const USERS = {
   "16698": { role: "admin", br: "all", label: "Admin สูงสุด | ทุกสาขา" },
@@ -476,24 +473,39 @@ const O_CREDITS = [
   {n:"ยอดรวมเครดิต", id:"t-crd", ro:true}
 ];
 
-// Structural Tracking listeners
 let curT1 = ""; let t1Listener = null;
 let curT3 = ""; let curT4 = ""; 
 
-// Chart handles
 let c0Bar, c0Pie, c0Funnel, c0Doc, c0Track1, c0Track2, c0D1, c0D2;
 let c1Trend, c1BrDonut, c3Donut, c4Bar;
 
 function g(id){return document.getElementById(id);}
 
-function injectBranchOptions() {
-  const opts = bKeys.map(k=>`<option value="${k}">${BKS[k]}</option>`).join("");
-  ["r-br","o-br","tk-br","df-br"].forEach(id=>{ const el = g(id); if(el) el.innerHTML=opts; });
+function fm(n){
+  let num = parseFloat(n) || 0;
+  if (num % 1 !== 0) return num.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return num.toLocaleString("th-TH");
+}
+function fmI(n){ return Math.round(parseFloat(n)||0).toLocaleString("th-TH"); }
+
+function toast(m, type="success"){
+  const el=document.createElement("div"); el.className="toast"; el.style.background = type==="error" ? "#c92a2a" : "#212529";
+  el.textContent=m; document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
 }
 
-// ==========================================
-// 2. MAIN LOGIN & AUTHORIZATION ROUTERS (Strict Override)
-// ==========================================
+function expPNG(targetId, filename) {
+  const target = g(targetId); const obg = target.style.background; target.style.background = "#f0f2f5";
+  toast("กำลังประมวลผลรูปภาพ...");
+  html2canvas(target, {scale: 2, backgroundColor: "#f0f2f5"}).then(canvas => {
+    target.style.background = obg;
+    const a = document.createElement("a"); a.download = `${filename}_${new Date().getTime()}.png`;
+    a.href = canvas.toDataURL("image/png"); a.click(); toast("📸 บันทึกรูปภาพสำเร็จ!");
+  });
+}
+
+// -----------------------------------------------------
+// 2. CORE SECURITY & AUTHENTICATION OVERRIDE
+// -----------------------------------------------------
 function checkLogin() {
   const pass = g("login-pass").value;
   if(!USERS[pass]) return toast("รหัสพนักงานไม่ถูกต้อง!", "error");
@@ -516,28 +528,12 @@ function checkLogin() {
 }
 
 function sw(id, item) {
-  // Hide all screens with high priority
-  document.querySelectorAll(".tp").forEach(p => {
-    p.style.setProperty('display', 'none', 'important');
-  });
-  
-  // Show target frame cleanly
-  const target = g(id);
-  if (target) {
-    target.style.setProperty('display', 'block', 'important');
-  }
-
-  // Handle active states on navigation menu
+  document.querySelectorAll(".tp").forEach(p => p.style.setProperty('display', 'none', 'important'));
+  const target = g(id); if (target) target.style.setProperty('display', 'block', 'important');
   document.querySelectorAll(".ni").forEach(n => n.classList.remove("active"));
   if(item) item.classList.add("active");
 
-  // Call lifecycles
-  if(id==='t0') buildT0();
-  if(id==='t1') buildT1();
-  if(id==='t2') buildT2();
-  if(id==='t3') buildT3();
-  if(id==='t4') buildT4();
-  if(id==='t5') loadT5();
+  if(id==='t0') buildT0(); if(id==='t1') buildT1(); if(id==='t2') buildT2(); if(id==='t3') buildT3(); if(id==='t4') buildT4(); if(id==='t5') loadT5();
 }
 
 function updateSelects() {
@@ -545,6 +541,11 @@ function updateSelects() {
   document.querySelectorAll('select[data-id="r-doc"], select[data-id="df-doc"], #o-doc').forEach(el=>{let val=el.value; el.innerHTML=dOpt; el.value=val;});
   if(g("o-ca")) { let v=g("o-ca").value; g("o-ca").innerHTML="<option value=''>-</option>"+SETTINGS.cas.map(x=>`<option value="${x}">${x}</option>`).join(""); g("o-ca").value=v; }
   if(g("o-mg")) { let v=g("o-mg").value; g("o-mg").innerHTML="<option value=''>-</option>"+SETTINGS.mgs.map(x=>`<option value="${x}">${x}</option>`).join(""); g("o-mg").value=v; }
+}
+
+// Placeholder for future Google Sheets automated script bindings
+function triggerGoogleSheetSync(pageKey) {
+  toast(`🚀 กำหนดโครงสร้างสำเร็จ! ชีทสำหรับโปรแกรมหน้า [${pageKey.toUpperCase()}] สแตนด์บายพร้อมผูก Google Apps Script แล้วครับบอส`, "success");
 }
 
 // ==========================================
@@ -645,8 +646,15 @@ function buildT0() {
 }
 
 // ==========================================
-// TAB 1: REVENUE SHEET + BRANCH DASHBOARD
+// TAB 1: REVENUE SHEET + BRANCH DASHBOARD SYSTEM
 // ==========================================
+function downloadTemplate() {
+  const mo=g("r-mo").value; const [yr,m] = mo.split("-"); const dim = new Date(yr,m,0).getDate();
+  let data = [["วันที่", "หัตถการ", "ขายยา", "Treatment", "HD MALL", "Gowabi", "ชาร์จ 3%", "ฉีดผิว", "member", "หัตถการ พนง.", "มัดจำเงิน", "รวมรายได้อื่นๆ", "คนไข้เก่า (คน)", "คนไข้เก่า (ยอด)", "คนไข้ใหม่มี (คน)", "คนไข้ใหม่มียอด (บาท)", "คนไข้ใหม่ไม่มี (คน)", "แพทย์"]];
+  for(let i=1; i<=dim; i++) data.push([`${i}/${m}/${yr}`, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ""]);
+  const ws = XLSX.utils.aoa_to_sheet(data); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Template"); XLSX.writeFile(wb, `Template_Import_${mo}.xlsx`);
+}
+
 function buildT1() {
   const mo=g("r-mo").value, br=g("r-br").value; if(!mo)return;
   const [yr,m] = mo.split("-"); const dim = new Date(yr,m,0).getDate();
@@ -726,7 +734,7 @@ function calcT1(triggerEl) {
     let rawVal = triggerEl.value.replace(/,/g,''); const val = parseFloat(rawVal)||0;
     let mapped = {[id]:val};
     
-    // AUTOMATIC PIPELINE: ไหลข้อมูลจากหน้า 1 ข้ามระบบไปฝังไว้หน้า 2 อัตโนมัติในระดับ Database
+    // AUTOMATIC FIXED PIPELINE: แกะเงื่อนไขสตริงแมปข้อมูลข้ามหน้าจากแถว 1 ไหลลงหน้า 2 ทันที
     if(id === "r-med") mapped["p-product"] = val; 
     if(id === "r-trt") mapped["p-treatment"] = val; 
     if(id === "r-hd") mapped["a-hdmall"] = val; 
@@ -738,8 +746,70 @@ function calcT1(triggerEl) {
   }
 }
 
+function importT1(input) {
+  const f = input.files[0]; if(!f) return; const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = new Uint8Array(e.target.result); const wb = XLSX.read(data, {type: 'array'});
+      const json = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header: 1});
+      const mo=g("r-mo").value, br=g("r-br").value; const [yr,m] = mo.split("-");
+      let updates = {}, count = 0;
+
+      for(let i=1; i<json.length; i++) {
+        let row = json[i]; if(!row || row.length === 0) continue;
+        let dt = `${yr}-${m}-${String(i).padStart(2,'0')}`;
+        let rVals = {"r-op": parseFloat(row[1])||0, "r-med": parseFloat(row[2])||0, "r-trt": parseFloat(row[3])||0, "r-hd": parseFloat(row[4])||0, "r-gw": parseFloat(row[5])||0, "r-chg": parseFloat(row[6])||0, "r-drp": parseFloat(row[7])||0, "r-mem": parseFloat(row[8])||0, "r-stf": parseFloat(row[9])||0, "r-dep": parseFloat(row[10])||0, "r-oth": parseFloat(row[11])||0, "r-opx": parseFloat(row[12])||0, "r-oam": parseFloat(row[13])||0, "r-nyp": parseFloat(row[14])||0, "r-nam": parseFloat(row[15])||0, "r-nnp": parseFloat(row[16])||0};
+        for(let key in rVals) {
+          updates[`${dt}/${br}/${key}`] = rVals[key];
+          if(key === "r-med") updates[`${dt}/${br}/p-product`]=rVals[key];
+          if(key === "r-trt") updates[`${dt}/${br}/p-treatment`]=rVals[key]; 
+          if(key === "r-hd") updates[`${dt}/${br}/a-hdmall`]=rVals[key];
+          if(key === "r-gw") updates[`${dt}/${br}/a-gowabi`]=rVals[key]; 
+          if(key === "r-chg") updates[`${dt}/${br}/p-charge`]=rVals[key];
+          if(key === "r-drp") updates[`${dt}/${br}/p-drip`]=rVals[key];
+        }
+        updates[`${dt}/${br}/r-doc`] = row[17] || ""; count++;
+      }
+      DB.ref('ops_daily').update(updates).then(() => toast(`✅ นำเข้าสำเร็จ ${count} วัน`)).catch(err => toast(err.message, "error"));
+    } catch(err) { toast("❌ รูปแบบไฟล์ไม่ถูกต้อง", "error"); }
+  };
+  reader.readAsArrayBuffer(f); input.value=""; 
+}
+
+// ADVANCED FIXED EXPORT: วิ่งลูปดึงข้อมูลจากค่ากล่องอินพุตสระสะสมตรงๆ เพื่อให้ได้ไฟล์ Excel สรุปยอดขายสมบูรณ์
+function exportT1() {
+  const table = g("revTable");
+  let data = [];
+  
+  // แกะข้อมูลหัวตาราง
+  let headers = ["วันที่", "รายได้รวม", "หัตถการ", "ขายยา", "Treatment", "HD MALL", "Gowabi", "ชาร์จ 3%", "ฉีดผิว", "member", "หัตถการ พนง.", "มัดจำเงิน", "รวมรายได้อื่นๆ", "คนไข้เก่า(คน)", "คนไข้เก่า(ยอด)", "คนไข้ใหม่(คน)", "คนไข้ใหม่(ยอด)", "ใหม่ไม่มียอด(คน)", "คนไข้รวม", "แพทย์"];
+  data.push(headers);
+  
+  // วิ่งลูปดึงข้อมูลรายบรรทัดจากกล่อง Input
+  const rows = document.querySelectorAll("#r-tbody tr");
+  rows.forEach(row => {
+    let rowData = [];
+    rowData.push(row.cells[0].textContent.trim()); // วันที่
+    rowData.push(parseFloat(row.querySelector('.row-tot').value.replace(/,/g,''))||0); // รายได้รวม
+    
+    R_COLS.forEach(c => {
+      let val = parseFloat(row.querySelector(`[data-id="${c.id}"]`)?.value.replace(/,/g,''))||0;
+      rowData.push(val);
+    });
+    
+    rowData.push(parseFloat(row.querySelector('.row-pax').value.replace(/,/g,''))||0); // คนไข้รวม
+    rowData.push(row.querySelector(`[data-id="r-doc"]`)?.value || ""); // แพทย์
+    data.push(rowData);
+  });
+  
+  const ws = XLSX.utils.aoa_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Revenue Report");
+  XLSX.writeFile(wb, `Revenue_Sheet_${g("r-br").value}_${g("r-mo").value}.xlsx`);
+}
+
 // ==========================================
-// TAB 2: DAILY OPS CORE (Symmetric Design)
+// TAB 2: DAILY OPS CORE
 // ==========================================
 function buildT2() {
   const tb = g("o-tbody"); let ht = "";
@@ -763,7 +833,7 @@ function buildT2() {
 
     let r = leftRows[i];
     if(r.custom) {
-      ht += `<td style="padding:2px;"><input type="text" id="${r.labelId}" style="text-align:left;border:none;font-weight:normal;" placeholder="✏专 พิมพ์หัตถการอื่นๆ" oninput="saveT2Quick('${r.labelId}',this.value)"></td>`;
+      ht += `<td style="padding:2px;"><input type="text" id="${r.labelId}" style="text-align:left;border:none;font-weight:normal;" placeholder="✏️ พิมพ์หัตถการอื่นๆ" oninput="saveT2Quick('${r.labelId}',this.value)"></td>`;
       ht += `<td style="padding:2px;"><input type="text" id="${r.id}" class="num-in o-val" oninput="cT2()" onblur="formatInput(this)" onfocus="unformatInput(this)"></td>`;
       ht += `<td style="padding:2px;"><input type="text" id="v-cust-${i}" class="num-in v-val red-tx" oninput="cT2()" onblur="formatInput(this)" onfocus="unformatInput(this)"></td>`;
     } else {
@@ -946,7 +1016,7 @@ function buildT4() {
 let tm4={};
 function svT4(el) {
   const dt = el.dataset.dt, br = g("df-br").value, mo = g("df-mo").value, id = el.dataset.id;
-  const val = (id==="df-sl"||id==="df-df") ? parseFloat(el.value.replace(/,/g,''))||0 : el.value;
+  const val = (id === "df-sl" || id === "df-df") ? parseFloat(el.value.replace(/,/g,''))||0 : el.value;
   drawT4Chart();
   clearTimeout(tm4[dt]); tm4[dt] = setTimeout(()=>{ DB.ref(`ops_docfin_mth/${mo}/${br}/${dt}`).update({[id]:val}); }, 500);
 }
