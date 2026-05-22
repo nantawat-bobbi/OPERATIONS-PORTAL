@@ -102,17 +102,6 @@ select:disabled{background:#e9ecef;cursor:not-allowed;font-weight:bold;color:var
 .pdf-table{width:100%;border-collapse:collapse;margin:20px 0;font-size:13px;}
 .pdf-table th, .pdf-table td{border:1px solid #000;padding:6px;vertical-align:middle;}
 .pdf-table th{background:#f0f0f0;text-align:center;font-weight:700;}
-
-@media print {
-  @page { size: A4 landscape; margin: 10mm; }
-  body { background: #fff; }
-  .sidebar, .ph, .kgrid, .no-print, .br-dash-zone { display: none !important; }
-  .main { padding: 0; background:#fff; height:auto; overflow:visible; }
-  .pc { padding: 0; }
-  #t2-content { display: block !important; }
-  .paper-ui { box-shadow: none; padding: 0; max-width: 100%; margin:0; }
-  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-}
 </style>
 </head>
 <body>
@@ -134,7 +123,7 @@ select:disabled{background:#e9ecef;cursor:not-allowed;font-weight:bold;color:var
   <div class="slogo">LALIZA CLINIC<br><span id="nav-user-label" style="font-size:11px;color:#845ef7;font-weight:normal;"></span></div>
   <nav class="nav">
     <div class="ni admin-ni" onclick="sw('t0',this)">👑 Advanced Dashboard</div>
-    <div class="ni" onclick="sw('t1',this)">📊 Revenue Sheet</div>
+    <div class="ni active" onclick="sw('t1',this)">📊 Revenue Sheet</div>
     <div class="ni" onclick="sw('t2',this)">📋 Daily Ops Core</div>
     <div class="ni" onclick="sw('t3',this)">☎️ Confirm Tracking</div>
     <div class="ni" onclick="sw('t4',this)">👨‍⚕️ Doctor Finance</div>
@@ -147,7 +136,7 @@ select:disabled{background:#e9ecef;cursor:not-allowed;font-weight:bold;color:var
 
 <div class="main">
 
-<div id="t0" class="tp admin-tp">
+<div id="t0" class="tp">
   <div class="ph no-print">
     <div class="ptitle">👑 Master Dashboard <span style="font-size:12px;color:var(--tx3);font-weight:400;margin-left:10px;">วิเคราะห์เจาะลึกภาพรวมคลินิกทั้งหมด (All Modules)</span></div>
     <div class="ha">
@@ -197,7 +186,7 @@ select:disabled{background:#e9ecef;cursor:not-allowed;font-weight:bold;color:var
   </div>
 </div>
 
-<div id="t1" class="tp">
+<div id="t1" class="tp active">
   <div class="ph no-print">
     <div class="ptitle">📊 Revenue Sheet</div>
     <div class="ha">
@@ -216,7 +205,7 @@ select:disabled{background:#e9ecef;cursor:not-allowed;font-weight:bold;color:var
       <h3 style="margin-bottom:15px; font-size:15px; border-bottom:2px solid #845ef7; padding-bottom:5px; color:#5c7cfa;">📈 Dashboard สรุปข้อมูลวิเคราะห์ยอดขายประจำสาขา</h3>
       <div class="kgrid" style="grid-template-columns: repeat(4, 1fr); margin-bottom:20px;">
         <div class="kc" style="border-left:4px solid var(--grn);"><div class="klbl">ยอดขายปัจจุบัน (Current Revenue)</div><div class="kval" style="color:var(--grn);" id="k1-rev-val">฿0</div></div>
-        <div class="kc" style="border-left:4px solid var(--tx2);"><div class="klbl">เป้าหมายสาขา (Branch Target)</div><div class="kval" id="k1-tg-val">฿0</div></div>
+        <div class="kc" style="border-left:4px solid var(--tx2);"><div class="klbl">เป้าหมายสาขา (Branch Target)</div><div class="kval" id="k1-tg-val" data-val="0">฿0</div></div>
         <div class="kc" style="border-left:4px solid var(--acc);"><div class="klbl">% ความสำเร็จ (Achievement %)</div><div class="kval" style="color:var(--acc);" id="k1-pct-val">0%</div></div>
         <div class="kc" style="border-left:4px solid var(--red); background:rgba(201, 42, 42, 0.03);"><div class="klbl" style="color:var(--red);">ยอดที่ขาดอีก (Remaining) 🔥</div><div class="kval" style="color:var(--red);" id="k1-rem-val">฿0</div></div>
       </div>
@@ -407,7 +396,7 @@ select:disabled{background:#e9ecef;cursor:not-allowed;font-weight:bold;color:var
 
 <script>
 // ==========================================
-// GLOBALS & CONFIG (Declared First to prevent Crash)
+// GLOBALS VARIABLES DEFINITION (Hoisting Protection)
 // ==========================================
 const USERS = {
   "16698": { role: "admin", br: "all", label: "Admin สูงสุด | สาขา: ทุกสาขา" },
@@ -479,8 +468,32 @@ function injectBranchOptions() {
 }
 injectBranchOptions();
 
+function g(id){return document.getElementById(id);}
+
+function fm(n){
+  let num = parseFloat(n) || 0;
+  if (num % 1 !== 0) return num.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return num.toLocaleString("th-TH");
+}
+function fmI(n){ return Math.round(parseFloat(n)||0).toLocaleString("th-TH"); }
+
+function toast(m, type="success"){
+  const el=document.createElement("div"); el.className="toast"; el.style.background = type==="error" ? "#c92a2a" : "#212529";
+  el.textContent=m; document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
+}
+
+function expPNG(targetId, filename) {
+  const target = g(targetId); const obg = target.style.background; target.style.background = "#f0f2f5";
+  toast("กำลังประมวลผลรูปภาพ...");
+  html2canvas(target, {scale: 2, backgroundColor: "#f0f2f5"}).then(canvas => {
+    target.style.background = obg;
+    const a = document.createElement("a"); a.download = `${filename}_${new Date().getTime()}.png`;
+    a.href = canvas.toDataURL("image/png"); a.click(); toast("📸 บันทึกรูปภาพสำเร็จ!");
+  });
+}
+
 // -----------------------------------------------------
-// LOGIN & PERMISSION ACCESS CONTROL (100% Fixed Nav Bug)
+// LOGIN & ACCESS CONTROLLER (God-Tier Refactored)
 // -----------------------------------------------------
 function checkLogin() {
   const pass = g("login-pass").value;
@@ -488,8 +501,10 @@ function checkLogin() {
   
   CURRENT_USER = USERS[pass];
   g("login-screen").style.display = "none"; 
-  g("main-app").style.display = "flex";
   g("nav-user-label").textContent = `[${CURRENT_USER.label}]`;
+
+  // Reset all tabs element to inactive state
+  document.querySelectorAll(".tp").forEach(p => p.classList.remove("active"));
 
   if(CURRENT_USER.role === "admin") {
     document.querySelectorAll('.admin-ni').forEach(el => el.style.display = "flex");
@@ -705,6 +720,42 @@ function calcT1(triggerEl) {
     clearTimeout(tm1[dt]); tm1[dt] = setTimeout(()=>{ DB.ref(`ops_daily/${dt}/${br}`).update(mapped); }, 500);
   }
 }
+
+function downloadTemplate() {
+  const mo=g("r-mo").value; const [yr,m] = mo.split("-"); const dim = new Date(yr,m,0).getDate();
+  let data = [["วันที่", "หัตถการ", "ขายยา", "Treatment", "HD MALL", "Gowabi", "ชาร์จ 3%", "ฉีดผิว", "member", "หัตถการ พนง.", "มัดจำเงิน", "รวมรายได้อื่นๆ", "คนไข้เก่า (คน)", "คนไข้เก่า (ยอด)", "คนไข้ใหม่มี (คน)", "คนไข้ใหม่มียอด (บาท)", "คนไข้ใหม่ไม่มี (คน)", "แพทย์"]];
+  for(let i=1; i<=dim; i++) data.push([`${i}/${m}/${yr}`, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ""]);
+  const ws = XLSX.utils.aoa_to_sheet(data); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Template"); XLSX.writeFile(wb, `Template_Import_${mo}.xlsx`);
+}
+
+function importT1(input) {
+  const f = input.files[0]; if(!f) return; const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = new Uint8Array(e.target.result); const wb = XLSX.read(data, {type: 'array'});
+      const json = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header: 1});
+      const mo=g("r-mo").value, br=g("r-br").value; const [yr,m] = mo.split("-");
+      let updates = {}, count = 0;
+
+      for(let i=1; i<json.length; i++) {
+        let row = json[i]; if(!row || row.length === 0) continue;
+        let dt = `${yr}-${m}-${String(i).padStart(2,'0')}`;
+        let rVals = {"r-op": parseFloat(row[1])||0, "r-med": parseFloat(row[2])||0, "r-trt": parseFloat(row[3])||0, "r-hd": parseFloat(row[4])||0, "r-gw": parseFloat(row[5])||0, "r-chg": parseFloat(row[6])||0, "r-drp": parseFloat(row[7])||0, "r-mem": parseFloat(row[8])||0, "r-stf": parseFloat(row[9])||0, "r-dep": parseFloat(row[10])||0, "r-oth": parseFloat(row[11])||0, "r-opx": parseFloat(row[12])||0, "r-oam": parseFloat(row[13])||0, "r-nyp": parseFloat(row[14])||0, "r-nam": parseFloat(row[15])||0, "r-nnp": parseFloat(row[16])||0};
+        for(let key in rVals) {
+          updates[`${dt}/${br}/${key}`] = rVals[key];
+          if(key==="r-med") updates[`${dt}/${br}/p-product`]=rVals[key];
+          if(key==="r-trt") updates[`${dt}/${br}/p-treatment`]=rVals[key]; if(key==="r-hd") updates[`${dt}/${br}/a-hdmall`]=rVals[key];
+          if(key==="r-gw") updates[`${dt}/${br}/a-gowabi`]=rVals[key]; if(key==="r-chg") updates[`${dt}/${br}/p-charge`]=rVals[key];
+          if(key==="r-drp") updates[`${dt}/${br}/p-drip`]=rVals[key];
+        }
+        updates[`${dt}/${br}/r-doc`] = row[17] || ""; count++;
+      }
+      DB.ref('ops_daily').update(updates).then(() => toast(`✅ นำเข้าสำเร็จ ${count} วัน`)).catch(err => toast(err.message, "error"));
+    } catch(err) { toast("❌ รูปแบบไฟล์ไม่ถูกต้อง", "error"); }
+  };
+  reader.readAsArrayBuffer(f); input.value=""; 
+}
+function exportT1() { const wb = XLSX.utils.table_to_book(g("revTable")); XLSX.writeFile(wb, `Revenue_${g("r-mo").value}_${g("r-br").value}.xlsx`); }
 
 // ==========================================
 // TAB 2: DAILY OPS CORE
