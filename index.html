@@ -186,7 +186,7 @@ select:disabled{background:#e9ecef;cursor:not-allowed;font-weight:bold;color:var
   </div>
 </div>
 
-<div id="t1" class="tp active">
+<div id="t1" class="tp">
   <div class="ph no-print">
     <div class="ptitle">📊 Revenue Sheet</div>
     <div class="ha">
@@ -396,11 +396,12 @@ select:disabled{background:#e9ecef;cursor:not-allowed;font-weight:bold;color:var
 
 <script>
 // ==========================================
-// GLOBALS VARIABLES DEFINITION (Hoisting Protection)
+// 1. GLOBAL VARIABLES DEFINITIONS (Hoisting Fixed)
 // ==========================================
 const USERS = {
   "16698": { role: "admin", br: "all", label: "Admin สูงสุด | สาขา: ทุกสาขา" },
-  // Cashiers
+  
+  // Cashiers (5 Digits)
   "64752": { role: "cashier", br: "rama9", label: "Cashier | สาขา: พระราม 9" },
   "92165": { role: "cashier", br: "pinklao", label: "Cashier | สาขา: ปิ่นเกล้า" },
   "29817": { role: "cashier", br: "bangkae", label: "Cashier | สาขา: บางแค" },
@@ -409,7 +410,8 @@ const USERS = {
   "38926": { role: "cashier", br: "ngamwongwan", label: "Cashier | สาขา: งามวงศ์วาน" },
   "47291": { role: "cashier", br: "srinakarin", label: "Cashier | สาขา: ศรีนครินทร์" },
   "83640": { role: "cashier", br: "westgate", label: "Cashier | สาขา: เวสต์เกต" },
-  // Managers
+  
+  // Managers (6 Digits)
   "847291": { role: "manager", br: "rama9", label: "Manager | สาขา: พระราม 9" },
   "362058": { role: "manager", br: "pinklao", label: "Manager | สาขา: ปิ่นเกล้า" },
   "519374": { role: "manager", br: "bangkae", label: "Manager | สาขา: บางแค" },
@@ -421,6 +423,7 @@ const USERS = {
 };
 let CURRENT_USER = null;
 
+// Firebase & Branch mapping configuration
 const FBC = {
   apiKey: "AIzaSyC0P1LGtglA_t1Nc5PyM5uD3MOLnfBZwFM",
   authDomain: "lalizaclinic-work-schedule.firebaseapp.com",
@@ -431,7 +434,7 @@ const FBC = {
   appId: "1:1052920426382:web:e07f91f2e56d0fc7497edf",
   measurementId: "G-1HHWXV0FW7"
 };
-if(!firebase.apps.length)firebase.initializeApp(FBC);
+if(!firebase.apps.length) firebase.initializeApp(FBC);
 const DB = firebase.database();
 
 const BKS = {rama9:"พระราม 9", pinklao:"ปิ่นเกล้า", bangkae:"บางแค", rangsit:"รังสิต", promanat:"พรอมานาด", ngamwongwan:"งามวงศ์วาน", srinakarin:"ศรีนครินทร์", westgate:"เวสต์เกต"};
@@ -458,52 +461,34 @@ const O_CREDITS = [
   {n:"ยอดรวมเครดิต", id:"t-crd", ro:true}
 ];
 
+// Tracking Tab control keys
+let curT1 = ""; let t1Listener = null;
+let curT3 = ""; let curT4 = ""; // FIXED REFERENCE ERROR IN LATEST VERSION
+
+// Chart variables
 let c0Bar, c0Pie, c0Funnel, c0Doc, c0Track1, c0Track2, c0D1, c0D2;
 let c1Trend, c1BrDonut, c3Donut, c4Bar;
-let curT1 = ""; let t1Listener = null;
-
-function injectBranchOptions() {
-  const opts = bKeys.map(k=>`<option value="${k}">${BKS[k]}</option>`).join("");
-  ["r-br","o-br","tk-br","df-br"].forEach(id=>{ const el = document.getElementById(id); if(el) el.innerHTML=opts; });
-}
-injectBranchOptions();
 
 function g(id){return document.getElementById(id);}
 
-function fm(n){
-  let num = parseFloat(n) || 0;
-  if (num % 1 !== 0) return num.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  return num.toLocaleString("th-TH");
-}
-function fmI(n){ return Math.round(parseFloat(n)||0).toLocaleString("th-TH"); }
-
-function toast(m, type="success"){
-  const el=document.createElement("div"); el.className="toast"; el.style.background = type==="error" ? "#c92a2a" : "#212529";
-  el.textContent=m; document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
+function injectBranchOptions() {
+  const opts = bKeys.map(k=>`<option value="${k}">${BKS[k]}</option>`).join("");
+  ["r-br","o-br","tk-br","df-br"].forEach(id=>{ const el = g(id); if(el) el.innerHTML=opts; });
 }
 
-function expPNG(targetId, filename) {
-  const target = g(targetId); const obg = target.style.background; target.style.background = "#f0f2f5";
-  toast("กำลังประมวลผลรูปภาพ...");
-  html2canvas(target, {scale: 2, backgroundColor: "#f0f2f5"}).then(canvas => {
-    target.style.background = obg;
-    const a = document.createElement("a"); a.download = `${filename}_${new Date().getTime()}.png`;
-    a.href = canvas.toDataURL("image/png"); a.click(); toast("📸 บันทึกรูปภาพสำเร็จ!");
-  });
-}
-
-// -----------------------------------------------------
-// LOGIN & ACCESS CONTROLLER (God-Tier Refactored)
-// -----------------------------------------------------
+// ==========================================
+// 2. AUTHENTICATION & CORE CONTROLLER
+// ==========================================
 function checkLogin() {
   const pass = g("login-pass").value;
   if(!USERS[pass]) return toast("รหัสพนักงานไม่ถูกต้อง!", "error");
   
   CURRENT_USER = USERS[pass];
   g("login-screen").style.display = "none"; 
+  g("main-app").style.display = "flex";
   g("nav-user-label").textContent = `[${CURRENT_USER.label}]`;
 
-  // Reset all tabs element to inactive state
+  // Hide all screens to reset state cleanly
   document.querySelectorAll(".tp").forEach(p => p.classList.remove("active"));
 
   if(CURRENT_USER.role === "admin") {
@@ -517,10 +502,6 @@ function checkLogin() {
     sw('t1', document.querySelector('.ni[onclick="sw(\'t1\',this)"]'));
   }
 }
-
-document.getElementById("login-pass").addEventListener("keypress", function(event) {
-  if (event.key === "Enter") { event.preventDefault(); checkLogin(); }
-});
 
 function sw(id,item){
   document.querySelectorAll(".tp").forEach(p=>p.classList.remove("active"));
@@ -636,6 +617,13 @@ function buildT0() {
 // ==========================================
 // TAB 1: REVENUE SHEET + BRANCH DASHBOARD
 // ==========================================
+function downloadTemplate() {
+  const mo=g("r-mo").value; const [yr,m] = mo.split("-"); const dim = new Date(yr,m,0).getDate();
+  let data = [["วันที่", "หัตถการ", "ขายยา", "Treatment", "HD MALL", "Gowabi", "ชาร์จ 3%", "ฉีดผิว", "member", "หัตถการ พนง.", "มัดจำเงิน", "รวมรายได้อื่นๆ", "คนไข้เก่า (คน)", "คนไข้เก่า (ยอด)", "คนไข้ใหม่มี (คน)", "คนไข้ใหม่มียอด (บาท)", "คนไข้ใหม่ไม่มี (คน)", "แพทย์"]];
+  for(let i=1; i<=dim; i++) data.push([`${i}/${m}/${yr}`, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ""]);
+  const ws = XLSX.utils.aoa_to_sheet(data); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Template"); XLSX.writeFile(wb, `Template_Import_${mo}.xlsx`);
+}
+
 function buildT1() {
   const mo=g("r-mo").value, br=g("r-br").value; if(!mo)return;
   const [yr,m] = mo.split("-"); const dim = new Date(yr,m,0).getDate();
@@ -721,13 +709,6 @@ function calcT1(triggerEl) {
   }
 }
 
-function downloadTemplate() {
-  const mo=g("r-mo").value; const [yr,m] = mo.split("-"); const dim = new Date(yr,m,0).getDate();
-  let data = [["วันที่", "หัตถการ", "ขายยา", "Treatment", "HD MALL", "Gowabi", "ชาร์จ 3%", "ฉีดผิว", "member", "หัตถการ พนง.", "มัดจำเงิน", "รวมรายได้อื่นๆ", "คนไข้เก่า (คน)", "คนไข้เก่า (ยอด)", "คนไข้ใหม่มี (คน)", "คนไข้ใหม่มียอด (บาท)", "คนไข้ใหม่ไม่มี (คน)", "แพทย์"]];
-  for(let i=1; i<=dim; i++) data.push([`${i}/${m}/${yr}`, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ""]);
-  const ws = XLSX.utils.aoa_to_sheet(data); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Template"); XLSX.writeFile(wb, `Template_Import_${mo}.xlsx`);
-}
-
 function importT1(input) {
   const f = input.files[0]; if(!f) return; const reader = new FileReader();
   reader.onload = (e) => {
@@ -743,8 +724,8 @@ function importT1(input) {
         let rVals = {"r-op": parseFloat(row[1])||0, "r-med": parseFloat(row[2])||0, "r-trt": parseFloat(row[3])||0, "r-hd": parseFloat(row[4])||0, "r-gw": parseFloat(row[5])||0, "r-chg": parseFloat(row[6])||0, "r-drp": parseFloat(row[7])||0, "r-mem": parseFloat(row[8])||0, "r-stf": parseFloat(row[9])||0, "r-dep": parseFloat(row[10])||0, "r-oth": parseFloat(row[11])||0, "r-opx": parseFloat(row[12])||0, "r-oam": parseFloat(row[13])||0, "r-nyp": parseFloat(row[14])||0, "r-nam": parseFloat(row[15])||0, "r-nnp": parseFloat(row[16])||0};
         for(let key in rVals) {
           updates[`${dt}/${br}/${key}`] = rVals[key];
-          if(key==="r-med") updates[`${dt}/${br}/p-product`]=rVals[key];
-          if(key==="r-trt") updates[`${dt}/${br}/p-treatment`]=rVals[key]; if(key==="r-hd") updates[`${dt}/${br}/a-hdmall`]=rVals[key];
+          if(key["r-med"]) updates[`${dt}/${br}/p-product`]=rVals[key];
+          if(key["r-trt"]) updates[`${dt}/${br}/p-treatment`]=rVals[key]; if(key==="r-hd") updates[`${dt}/${br}/a-hdmall`]=rVals[key];
           if(key==="r-gw") updates[`${dt}/${br}/a-gowabi`]=rVals[key]; if(key==="r-chg") updates[`${dt}/${br}/p-charge`]=rVals[key];
           if(key==="r-drp") updates[`${dt}/${br}/p-drip`]=rVals[key];
         }
@@ -829,21 +810,6 @@ function buildT2() {
   }).catch(()=>cT2(true));
 }
 
-function cT2(fromLoad = false) {
-  let tp=0, tv=0, tc=0;
-  document.querySelectorAll(".o-val").forEach(e=>tp+=parseFloat(e.value.replace(/,/g,''))||0);
-  document.querySelectorAll(".v-val").forEach(e=>tv+=parseFloat(e.value.replace(/,/g,''))||0);
-  document.querySelectorAll(".c-val").forEach(e=>tc+=parseFloat(e.value.replace(/,/g,''))||0);
-  if(g("t-prog")) g("t-prog").value = fm(tp); if(g("t-vip")) g("t-vip").textContent = fm(tv);
-  if(g("t-crd")) g("t-crd").value = fm(tc);
-  let grandInput = g("t-grand");
-  if(grandInput) {
-    let autoSum = tc + (parseFloat(g("pay-cash")?.value.replace(/,/g,''))||0) + (parseFloat(g("pay-trans")?.value.replace(/,/g,''))||0);
-    if(fromLoad || document.activeElement !== grandInput) grandInput.value = fm(autoSum);
-  }
-}
-
-let t2Listener = null;
 function loadT2() {
   buildT2(); const dt=g("o-dt").value, br=g("o-br").value; if(!dt)return;
   if(t2Listener) DB.ref(`ops_daily`).off('value', t2Listener);
@@ -946,7 +912,6 @@ function drawT3Chart() {
 // ==========================================
 // TAB 4: DOCTOR FINANCE
 // ==========================================
-let curT4 = "";
 function buildT4() {
   const mo=g("df-mo").value, br=g("df-br").value; if(!mo)return;
   const [yr,m] = mo.split("-"); const dim = new Date(yr,m,0).getDate();
@@ -1017,6 +982,7 @@ function saveT5() {
 }
 
 window.onload = () => {
+  injectBranchOptions();
   const today = new Date().toISOString().split('T')[0]; g("o-dt").value = today;
   g("d0-mo").value = today.slice(0,7); g("r-mo").value = today.slice(0,7); g("tk-mo").value = today.slice(0,7); g("df-mo").value = today.slice(0,7);
   DB.ref(`ops_system_settings`).once('value').then(snap=>{
