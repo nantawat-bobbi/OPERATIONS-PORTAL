@@ -55,25 +55,33 @@ select:focus,input:focus,textarea:focus{border-color:var(--acc);}
 .klbl{font-size:12px;color:var(--tx3);font-weight:600;margin-bottom:5px;}
 .kval{font-size:22px;font-weight:700;}
 
-/* TAB 1: REVENUE SHEET (Excel-like Grid) */
+/* TAB 1: REVENUE SHEET (Excel Theme) */
 .rev-wrap{background:#fff;border:1px solid var(--bdr);border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.05);display:flex;flex-direction:column;}
 .rev-table-container{overflow-x:auto;max-height:65vh;border-bottom:2px solid #000;}
-.rev-tbl{width:100%;border-collapse:collapse;font-size:12px;min-width:1800px;}
-.rev-tbl th{padding:8px 4px;border:1px solid #999;text-align:center;font-weight:700;white-space:nowrap;position:sticky;top:0;z-index:2;box-shadow:0 1px 0 #999;}
+.rev-tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:1800px;}
+.rev-tbl th{padding:8px 4px;border:1px solid #aaa;text-align:center;font-weight:700;white-space:nowrap;position:sticky;top:0;z-index:2;box-shadow:0 1px 0 #999;}
 .rev-tbl th:first-child{left:0;z-index:3;}
-.rev-tbl td{border:1px solid #ccc;padding:0;}
-.rev-tbl td:first-child{text-align:center;font-weight:600;background:#e9ecef;position:sticky;left:0;z-index:1;box-shadow:1px 0 0 #ccc;padding:0 8px;}
+.rev-tbl td{border:1px solid #ccc;padding:0;position:relative;}
+.rev-tbl td:first-child{text-align:center;font-weight:600;background:#f3f4f6;position:sticky;left:0;z-index:1;box-shadow:1px 0 0 #ccc;}
 
-/* Excel Colors */
-.bg-date{background:#e9ecef;} .bg-total{background:#cce5ff;} .bg-op{background:#f8d7da;}
-.bg-med{background:#d3f9d8;} .bg-treat{background:#eebefa;} .bg-hd{background:#e0f7fa;}
-.bg-gw{background:#f3e5f5;} .bg-chg{background:#fff3cd;} .bg-drip{background:#d1e7dd;}
-.bg-mem{background:#e2e3e5;} .bg-old{background:#fff8e1;} .bg-new{background:#e8f5e9;}
-.bg-sum{background:#e3f2fd;}
+/* Excel Pastel Colors */
+.bg-date{background:#f3f4f6;} .bg-total{background:#dbeafe;} .bg-op{background:#f8d7da;}
+.bg-med{background:#d1e7dd;} .bg-trt{background:#e2d9f3;} .bg-hd{background:#cff4fc;}
+.bg-gw{background:#f3d0e2;} .bg-chg{background:#fff3cd;} .bg-drp{background:#d1e7dd;}
+.bg-mem{background:#f3f4f6;} .bg-stf{background:#f8d7da;} .bg-dep{background:#fff3cd;}
+.bg-oth{background:#dbeafe;} .bg-old{background:#fff3cd;} .bg-new{background:#d1e7dd;}
+.bg-sum{background:#dbeafe;}
 
-.r-inp{width:100%;height:100%;border:none;background:transparent;text-align:right;font-size:12px;padding:8px 4px;color:#1D4ED8;font-weight:600;outline:none;}
+.r-inp{
+  width:100%;height:100%;min-height:32px;
+  border:none;background:transparent;
+  text-align:right;font-size:13px;
+  padding:4px 8px;color:#1D4ED8;font-weight:600;
+  outline:none;cursor:text;
+}
+.r-inp:hover{background:rgba(255,255,255,0.4);}
 .r-inp:focus{background:#fff!important;box-shadow:inset 0 0 0 2px var(--acc);}
-.r-inp[readonly]{color:#000!important;}
+.r-inp[readonly]{color:#000!important;cursor:default;background:transparent!important;box-shadow:none;}
 input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 
 .rev-sum-grid{display:grid;grid-template-columns:300px 1fr;background:#f8f9fa;}
@@ -84,7 +92,7 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 .rs-val{font-weight:700;color:#000;}
 .rs-val.fire{color:#d9381e;font-size:16px;}
 
-/* TAB 2: DAILY OPS CORE (PDF CLONE) */
+/* TAB 2: DAILY OPS CORE */
 .paper-ui{background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.05);max-width:1100px;margin:0 auto;}
 .paper-ui input{border:none;border-bottom:1px dotted #ccc;background:transparent;color:#1D4ED8;font-weight:600;text-align:center;width:100%;}
 .paper-ui input.red-tx{color:var(--red)!important;}
@@ -134,7 +142,7 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 
 <div id="t1" class="tp active">
   <div class="ph no-print">
-    <div class="ptitle">📊 Revenue Sheet <span style="font-size:12px;color:var(--tx3);font-weight:400;margin-left:10px;">ตารางกรอกรายได้ทั้งเดือนแบบ Real-time</span></div>
+    <div class="ptitle">📊 Revenue Sheet <span style="font-size:12px;color:var(--tx3);font-weight:400;margin-left:10px;">คลิกที่ช่องสีๆ เพื่อพิมพ์ยอดรายวัน (บันทึกอัตโนมัติ)</span></div>
     <div class="ha">
       <input type="file" id="ex-file" accept=".xlsx,.xls,.csv" style="display:none;" onchange="importT1(this)">
       <button class="btn bs" onclick="g('ex-file').click()">📥 Import</button>
@@ -160,15 +168,15 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
               <th rowspan="2" class="bg-total">รายได้รวม</th>
               <th rowspan="2" class="bg-op">หัตถการ</th>
               <th rowspan="2" class="bg-med">ขายยา</th>
-              <th rowspan="2" class="bg-treat">Treatment</th>
+              <th rowspan="2" class="bg-trt">Treatment</th>
               <th rowspan="2" class="bg-hd">HD MALL</th>
               <th rowspan="2" class="bg-gw">Gowabi</th>
               <th rowspan="2" class="bg-chg">ชาร์จ 3%</th>
-              <th rowspan="2" class="bg-drip">ฉีดผิว</th>
+              <th rowspan="2" class="bg-drp">ฉีดผิว</th>
               <th rowspan="2" class="bg-mem">member</th>
-              <th rowspan="2" class="bg-op">หัตถการ พนง.</th>
-              <th rowspan="2" class="bg-chg">มัดจำเงิน</th>
-              <th rowspan="2" class="bg-total">รวมรายได้อื่นๆ</th>
+              <th rowspan="2" class="bg-stf">หัตถการ พนง.</th>
+              <th rowspan="2" class="bg-dep">มัดจำเงิน</th>
+              <th rowspan="2" class="bg-oth">รวมรายได้อื่นๆ</th>
               <th colspan="2" class="bg-old">คนไข้เก่า</th>
               <th colspan="3" class="bg-new">คนไข้ใหม่</th>
               <th rowspan="2" class="bg-sum">คนไข้รวม</th>
@@ -327,7 +335,7 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
       <div><div style="font-size:12px;color:var(--tx2);margin-bottom:3px;">ผู้จัดการ (คั่นด้วย ,)</div><textarea id="s-mg" rows="2" style="width:100%;"></textarea></div>
     </div>
     <div style="background:#fff;padding:20px;border:1px solid var(--bdr);border-radius:8px;grid-column:1/-1;">
-      <h3 style="margin-bottom:10px;border-bottom:2px solid var(--acc);padding-bottom:5px;">ตั้งค่าหัวข้อ Program (สำหรับตารางหน้า 2)</h3>
+      <h3 style="margin-bottom:10px;border-bottom:2px solid var(--acc);padding-bottom:5px;">ตั้งค่าหัวข้อ Program (หน้า 2)</h3>
       <div style="color:var(--red);font-size:12px;margin-bottom:10px;">* แก้ไข/เพิ่ม/ลด ชื่อโปรแกรมที่นี่ ระบบจะนำไปสร้างเป็นแถวในหน้า Daily Ops Core อัตโนมัติ (ขึ้นบรรทัดใหม่)</div>
       <textarea id="s-pr" rows="8" style="width:100%;"></textarea>
     </div>
@@ -407,23 +415,46 @@ function popSels() {
 }
 
 // ==========================================
-// TAB 1: REVENUE SHEET
+// TAB 1: REVENUE SHEET (Excel Theme)
 // ==========================================
 const R_F = ["r-op","r-med","r-trt","r-hd","r-gw","r-chg","r-drp","r-mem","r-stf","r-dep","r-oth","r-opx","r-oam","r-nyp","r-nam","r-nnp"];
+let currentT1Key = "";
+let t1Listener = null;
+
 function loadT1() {
   const mo=g("r-mo").value, br=g("r-br").value; if(!mo)return;
   const [yr,m] = mo.split("-"); const dim = new Date(yr,m,0).getDate();
-  const tb = g("r-tbody"); tb.innerHTML = "";
+  const tb = g("r-tbody");
+  
+  // ตรวจสอบว่าต้องสร้าง DOM ใหม่หรือไม่ (ทำเมื่อเปลี่ยนเดือน/สาขา)
+  const reqKey = mo+"_"+br;
+  if(currentT1Key !== reqKey) {
+    currentT1Key = reqKey;
+    let ht = "";
+    for(let i=1; i<=dim; i++){
+      let dt = `${yr}-${m}-${String(i).padStart(2,'0')}`;
+      let docSel = `<select class="r-inp bg-date" style="text-align:center;cursor:pointer;" id="doc-${dt}" data-dt="${dt}" data-id="r-doc" onchange="svT1(this)"><option value="">-</option>${SETTINGS.docs.map(x=>`<option value="${x}">${x}</option>`).join("")}</select>`;
 
-  DB.ref(`daily`).on('value', snap=>{
+      ht += `<tr><td class="bg-date">${i}/${m}/${yr}</td><td class="bg-total"><input type="text" class="r-inp" id="tot-${dt}" value="0.00" readonly></td>`;
+      R_F.forEach((f) => {
+        let cls = f.includes('op')?'bg-op':f.includes('med')?'bg-med':f.includes('trt')?'bg-treat':f.includes('hd')?'bg-hd':f.includes('gw')?'bg-gw':f.includes('chg')||f.includes('dep')?'bg-chg':f.includes('drp')?'bg-drip':f.includes('mem')?'bg-mem':f.includes('oth')?'bg-total':f.includes('o')?'bg-old':'bg-new';
+        ht += `<td class="${cls}"><input type="number" class="r-inp" id="${f}-${dt}" data-dt="${dt}" data-id="${f}" value="" oninput="svT1(this)"></td>`;
+      });
+      ht += `<td class="bg-sum"><input type="text" class="r-inp" id="sum-${dt}" style="text-align:center;" value="0" readonly></td><td class="bg-date">${docSel}</td></tr>`;
+    }
+    tb.innerHTML = ht;
+  }
+
+  // ดึงข้อมูลและอัปเดตลงตารางโดยไม่ให้เสีย Focus
+  if(t1Listener) DB.ref(`daily`).off('value', t1Listener);
+  t1Listener = snap => {
     const all = snap.val()||{};
-    let ht="", gt=0, go=0, gn=0, gop=0, gmed=0, gtrt=0;
+    let gt=0, go=0, gn=0, gop=0, gmed=0, gtrt=0;
     
     for(let i=1; i<=dim; i++){
       let dt = `${yr}-${m}-${String(i).padStart(2,'0')}`;
       let d = all[dt]?.[br]||{};
       
-      // Auto sum from Tab 2 logic mapping
       let p_op=0, p_hd=0, p_gw=0, p_chg=0, p_med=0, p_trt=0, p_drp=0;
       for(let j=0; j<SETTINGS.progs.length; j++){
         let nm = (d[`name${j}`]||SETTINGS.progs[j]).toLowerCase();
@@ -434,7 +465,6 @@ function loadT1() {
         else p_op+=val;
       }
       
-      // Merge typed values in Tab 1 vs mapped from Tab 2
       let v_op = d["r-op"]!==undefined?d["r-op"]:p_op;
       let v_med= d["r-med"]!==undefined?d["r-med"]:p_med;
       let v_trt= d["r-trt"]!==undefined?d["r-trt"]:p_trt;
@@ -443,26 +473,26 @@ function loadT1() {
       let v_chg= d["r-chg"]!==undefined?d["r-chg"]:p_chg;
       let v_drp= d["r-drp"]!==undefined?d["r-drp"]:p_drp;
       
-      // Map back array
       let rVals = [v_op, v_med, v_trt, v_hd, v_gw, v_chg, v_drp, d["r-mem"], d["r-stf"], d["r-dep"], d["r-oth"], d["r-opx"], d["r-oam"], d["r-nyp"], d["r-nam"], d["r-nnp"]];
       
-      // Calculate Total Rev (from items 0 to 10)
       let tot = 0; for(let j=0; j<=10; j++) tot += (parseFloat(rVals[j])||0);
-      
       let pTot = (parseFloat(rVals[11])||0) + (parseFloat(rVals[13])||0) + (parseFloat(rVals[15])||0);
-      let docSel = `<select class="r-inp bg-date" style="text-align:center;" data-dt="${dt}" data-id="r-doc" onchange="svT1(this)"><option value="">-</option>${SETTINGS.docs.map(x=>`<option value="${x}" ${d["r-doc"]===x?'selected':''}>${x}</option>`).join("")}</select>`;
 
-      ht += `<tr><td class="bg-date">${i}/${m}/${yr}</td><td class="bg-total" style="font-weight:bold;color:var(--grn);padding-right:8px;">฿${fm(tot)}</td>`;
+      // หยอดค่าใส่ช่องที่ไม่ได้กำลังถูกพิมพ์อยู่
       R_F.forEach((f, idx) => {
-        let v = rVals[idx]||"";
-        ht += `<td class="${f.includes('op')?'bg-op':f.includes('med')?'bg-med':f.includes('trt')?'bg-treat':f.includes('hd')?'bg-hd':f.includes('gw')?'bg-gw':f.includes('chg')||f.includes('dep')?'bg-chg':f.includes('drp')?'bg-drip':f.includes('mem')?'bg-mem':f.includes('oth')?'bg-total':f.includes('o')?'bg-old':'bg-new'}"><input type="number" class="r-inp" data-dt="${dt}" data-id="${f}" value="${v}" oninput="svT1(this)"></td>`;
+        let el = g(`${f}-${dt}`);
+        if(el && document.activeElement !== el) {
+          el.value = rVals[idx] || "";
+        }
       });
-      ht += `<td class="bg-sum" style="text-align:center;font-weight:bold;">${fmI(pTot)}</td><td class="bg-date">${docSel}</td></tr>`;
       
+      let elTot = g(`tot-${dt}`); if(elTot) elTot.value = fm(tot);
+      let elSum = g(`sum-${dt}`); if(elSum) elSum.value = fmI(pTot);
+      let elDoc = g(`doc-${dt}`); if(elDoc && document.activeElement !== elDoc) elDoc.value = d["r-doc"] || "";
+
       gt+=tot; go+=(parseFloat(rVals[11])||0); gn+=(parseFloat(rVals[13])||0);
       gop+=(parseFloat(v_op)||0); gmed+=(parseFloat(v_med)||0); gtrt+=(parseFloat(v_trt)||0);
     }
-    tb.innerHTML = ht;
     
     let tg = SETTINGS.tgs[br]||0;
     g("k1-rev").textContent = "฿"+fm(gt); g("k1-tg").textContent = "฿"+fm(tg);
@@ -476,12 +506,25 @@ function loadT1() {
     
     g("rs-pax").textContent = fmI(go+gn); g("rs-old").textContent = fmI(go); g("rs-new-y").textContent = fmI(gn);
     g("rs-sop").textContent = fm(gop); g("rs-smed").textContent = fm(gmed); g("rs-strt").textContent = fm(gtrt);
-  });
+  };
+  DB.ref(`daily`).on('value', t1Listener);
 }
 
 let tm1={};
 function svT1(el) {
   const dt=el.dataset.dt, br=g("r-br").value, id=el.dataset.id, val=el.type==="number"?parseFloat(el.value)||0 : el.value;
+  
+  // Real-time calculation feedback
+  let rowTot=0, rowPax=0;
+  R_F.forEach((f, idx) => {
+    let inp = g(`${f}-${dt}`);
+    let v = inp ? (parseFloat(inp.value)||0) : 0;
+    if(idx <= 10) rowTot += v;
+    if(idx === 11 || idx === 13 || idx === 15) rowPax += v;
+  });
+  let elTot = g(`tot-${dt}`); if(elTot) elTot.value = fm(rowTot);
+  let elSum = g(`sum-${dt}`); if(elSum) elSum.value = fmI(rowPax);
+
   clearTimeout(tm1[dt]);
   tm1[dt] = setTimeout(()=>{ DB.ref(`daily/${dt}/${br}`).update({[id]:val}); }, 500);
 }
@@ -492,7 +535,7 @@ function exportT1() {
 }
 function importT1(input) {
   const f = input.files[0]; if(!f) return;
-  toast("นำเข้าไฟล์ Excel สำเร็จ! ข้อมูลวิ่งเข้าตาราง Real-time แล้ว"); input.value="";
+  toast("นำเข้าไฟล์ Excel สำเร็จ! ข้อมูลจะอัปเดตลงตารางอัตโนมัติ"); input.value="";
 }
 
 // ==========================================
@@ -548,17 +591,21 @@ function cT2() {
   if(g("t-grand")) g("t-grand").value = fm(tc + vv("pay-cash") + vv("pay-app") + vv("pay-trans"));
 }
 
+let t2Listener = null;
 function loadT2() {
   buildT2();
   const dt=g("o-dt").value, br=g("o-br").value; if(!dt)return;
-  DB.ref(`daily/${dt}/${br}`).on('value', snap=>{
+  
+  if(t2Listener) DB.ref(`daily`).off('value', t2Listener);
+  t2Listener = snap => {
     document.querySelectorAll('#t2-content input').forEach(e=>{if(!e.readOnly)e.value=""});
     if(snap.exists()) {
-      const d = snap.val();
+      const d = snap.child(dt).child(br).val() || {};
       for(let k in d) if(g(k)) g(k).value = d[k];
     }
     cT2();
-  });
+  };
+  DB.ref(`daily`).on('value', t2Listener);
 }
 
 function saveT2() {
@@ -567,8 +614,8 @@ function saveT2() {
   document.querySelectorAll('#t2-content input, #t2-content select').forEach(e=>{
     if(e.id && !e.readOnly) p[e.id] = e.type==="number"?parseFloat(e.value)||0 : e.value;
   });
-  SETTINGS.progs.forEach((x,i)=>{ p[`name${i}`] = x; }); // Save map names for Tab 1 parsing
-  DB.ref(`daily/${dt}/${br}`).update(p).then(()=>toast("บันทึกหน้า 2 สำเร็จ! ข้อมูลจะไหลไป Tab 1 อัตโนมัติ"));
+  SETTINGS.progs.forEach((x,i)=>{ p[`name${i}`] = x; });
+  DB.ref(`daily/${dt}/${br}`).update(p).then(()=>toast("บันทึกหน้า 2 สำเร็จ! ข้อมูลจะไหลไปหน้า 1 อัตโนมัติ"));
 }
 
 // ==========================================
@@ -660,9 +707,8 @@ function saveT5() {
   SETTINGS.mgs = g("s-mg").value.split(",").map(s=>s.trim()).filter(Boolean);
   SETTINGS.progs = g("s-pr").value.split("\n").map(s=>s.trim()).filter(Boolean);
   
-  // Save to DB
   DB.ref(`system_settings`).set(SETTINGS).then(()=>{
-    popSels(); buildT2(); toast("บันทึกการตั้งค่าลงฐานข้อมูลแล้ว!");
+    popSels(); buildT2(); currentT1Key=""; loadT1(); toast("บันทึกการตั้งค่าลงฐานข้อมูลแล้ว!");
   });
 }
 
