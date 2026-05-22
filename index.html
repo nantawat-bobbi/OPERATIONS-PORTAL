@@ -46,7 +46,7 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--tx);min-height:
 
 /* HEADER & CONTROLS */
 .ph{background:#fff;border-bottom:1px solid var(--bdr);padding:15px 24px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:20;}
-.ptitle(font-size:18px;font-weight:700;color:var(--tx);}
+.ptitle{font-size:18px;font-weight:700;color:var(--tx);}
 .ha{display:flex;gap:8px;}
 .btn{padding:8px 16px;border-radius:6px;border:1px solid transparent;cursor:pointer;font-size:13px;font-family:inherit;font-weight:600;transition:0.2s;display:flex;align-items:center;gap:5px;}
 .bp{background:var(--acc);color:#fff;} .bp:hover{background:var(--acc2);}
@@ -90,7 +90,7 @@ select:disabled{background:#e9ecef;cursor:not-allowed;font-weight:bold;color:var
 .bg-gw{background:#f3d0e2;} .bg-chg{background:#fff3cd;} .bg-drp{background:#d1e7dd;}
 .bg-mem{background:#f3f4f6;} .bg-old{background:#fff3cd;} .bg-new{background:#d1e7dd;} .bg-sum{background:#dbeafe;}
 
-/* STABLE BOX INPUTS: คืนสภาพกล่องคีย์ข้อมูลให้เห็นเด่นชัด พนักงานมองเห็นง่าย กรอบเส้นเทาพื้นผิวขาว */
+/* FIXED INPUT STYLE: ป้องกันกล่องคีย์ข้อมูลกลืนหายไปกับหน้าตาราง เพิ่มสไตล์กล่องสีขาวตัดขอบเทาพนักงานมองเห็นง่าย */
 .r-inp{width:100%;height:32px;border:1px solid #ced4da !important;background:#ffffff !important;text-align:right;font-size:14px;font-weight:700;padding:4px 8px;color:#1D4ED8;border-radius:4px;outline:none;cursor:text;}
 .r-inp:hover{background:#f1f3f5 !important; border-color:var(--acc) !important;}
 .r-inp:focus{background:#fff3cd !important;box-shadow:inset 0 0 0 1px var(--acc);border-color:var(--acc) !important;}
@@ -410,7 +410,7 @@ select.r-inp { background:#ffffff !important; text-align-last: center; padding:2
 
 <script>
 // ==========================================
-// 1. GLOBAL LOGIC ENVIRONMENT (Hoisting Protection Matrix)
+// 1. GLOBAL SCOPE UNIQUE MATRIX (Anti-Crash Architecture)
 // ==========================================
 const USERS = {
   "16698": { role: "admin", br: "all", label: "Admin สูงสุด | ทุกสาขา" },
@@ -472,12 +472,13 @@ const O_CREDITS = [
   {n:"ยอดรวมเครดิต", id:"t-crd", ro:true}
 ];
 
-// Structural State Handlers
 let curT1 = ""; let t1Listener = null;
 let curT3 = ""; let curT4 = ""; 
 
-// FIX RUNTIME INTERACTION CRASH: ดึงตัวแปรหน่วงเวลาและตัวแปรจัดการขึ้นแท่นระดับบนสุดร้อยเปอร์เซ็นต์
-let tm1 = {}, tm3 = {}, tm4 = {}; 
+// FIX 2: GLOBAL OBJECTS INITIALIZATION (Removes ReferenceErrors globally)
+const tm1 = {}; const tm3 = {}; const tm4 = {};
+
+// FIX 1: HIGHLY ROBUST UNIQUE CHART OBJECT DECLARATIONS (Absolutely NO duplicate 'let' blocks anywhere)
 let c0Bar, c0Pie, c0Funnel, c0Doc, c0Track1, c0Track2, c0D1, c0D2;
 let c1Trend, c1BrDonut, c3Donut, c4Bar;
 
@@ -489,7 +490,7 @@ function injectBranchOptions() {
 }
 
 // ==========================================
-// 2. CORE SECURITY ACCESS MANAGER
+// 2. PRIVILEGE ACCESS & VIEW CONTROLLER 
 // ==========================================
 function checkLogin() {
   const pass = g("login-pass").value;
@@ -611,46 +612,71 @@ function buildT0() {
 
     const donutTooltipOption = { callbacks: { label: function(ctx) { let total = ctx.dataset.data.reduce((a,b)=>a+b,0); let pct = total > 0 ? ((ctx.raw/total)*100).toFixed(1) : 0; return `${ctx.label}: ฿${fm(ctx.raw)} (${pct}%)`; } } };
 
+    // FIX 4 & 5: INSULATED CHART RUNTIME CATCH (Prevents DOM Null Exceptions permanently)
     try {
-      if(c0Bar) c0Bar.destroy();
-      c0Bar = new Chart(g("c0-bar"), { type:'bar', data:{ labels:bKeys.map(k=>BKS[k]), datasets:[{label:'รายได้จริง', data:bKeys.map(k=>bRev[k]), backgroundColor:'#1971c2'}, {label:'เป้าหมาย', data:bKeys.map(k=>bTg[k]), backgroundColor:'#ced4da'}] }, options:{responsive:true, maintainAspectRatio:false} });
-    } catch(err) { console.warn(err); }
+      const c1El = g("c0-bar");
+      if(c1El) {
+        if(c0Bar) c0Bar.destroy();
+        c0Bar = new Chart(c1El, { type:'bar', data:{ labels:bKeys.map(k=>BKS[k]), datasets:[{label:'รายได้จริง', data:bKeys.map(k=>bRev[k]), backgroundColor:'#1971c2'}, {label:'เป้าหมาย', data:bKeys.map(k=>bTg[k]), backgroundColor:'#ced4da'}] }, options:{responsive:true, maintainAspectRatio:false} });
+      }
+    } catch(e){ console.error(e); }
 
     try {
-      if(c0Funnel) c0Funnel.destroy();
-      c0Funnel = new Chart(g("c0-funnel"), { type:'bar', data:{ labels:['📞 โทรทั้งหมด', '✅ คอนเฟิร์มจะมา', '🏥 มาจริง (Success)'], datasets:[{label:'จำนวนคนไข้', data:[tkCall, tkConf, tkAct], backgroundColor:['#f08c00', '#1971c2', '#2f9e44'], borderRadius:4}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}} });
-    } catch(err) { console.warn(err); }
+      const c2El = g("c0-funnel");
+      if(c2El) {
+        if(c0Funnel) c0Funnel.destroy();
+        c0Funnel = new Chart(c2El, { type:'bar', data:{ labels:['📞 โทรทั้งหมด', '✅ คอนเฟิร์มจะมา', '🏥 มาจริง (Success)'], datasets:[{label:'จำนวนคนไข้', data:[tkCall, tkConf, tkAct], backgroundColor:['#f08c00', '#1971c2', '#2f9e44'], borderRadius:4}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}} });
+      }
+    } catch(e){ console.error(e); }
 
     try {
-      if(c0Pie) c0Pie.destroy();
-      c0Pie = new Chart(g("c0-pie"), { type:'doughnut', data:{ labels:['เงินสด', 'แอปพลิเคชัน', 'เงินโอน', 'บัตรเครดิต'], datasets:[{data:[tCash, tApp, tTrans, tCrd], backgroundColor:['#2f9e44', '#845ef7', '#f08c00', '#1971c2']}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{tooltip: donutTooltipOption}} });
-    } catch(err) { console.warn(err); }
+      const c3El = g("c0-pie");
+      if(c3El) {
+        if(c0Pie) c0Pie.destroy();
+        c0Pie = new Chart(c3El, { type:'doughnut', data:{ labels:['เงินสด', 'แอปพลิเคชัน', 'เงินโอน', 'บัตรเครดิต'], datasets:[{data:[tCash, tApp, tTrans, tCrd], backgroundColor:['#2f9e44', '#845ef7', '#f08c00', '#1971c2']}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{tooltip: donutTooltipOption}} });
+      }
+    } catch(e){ console.error(e); }
 
     try {
-      let sortedDocs = Object.keys(docStats).sort((a,b)=>docStats[b]-docStats[a]).slice(0,5);
-      if(c0Doc) c0Doc.destroy();
-      c0Doc = new Chart(g("c0-doc"), { type:'bar', data:{ labels:sortedDocs, datasets:[{label:'ยอดขายแพทย์รวม (บาท)', data:sortedDocs.map(d=>docStats[d]), backgroundColor:'#e64980', borderRadius:4}] }, options:{responsive:true, maintainAspectRatio:false, indexAxis:'y'} });
-    } catch(err) { console.warn(err); }
+      const c4El = g("c0-doc");
+      if(c4El) {
+        let sortedDocs = Object.keys(docStats).sort((a,b)=>docStats[b]-docStats[a]).slice(0,5);
+        if(c0Doc) c0Doc.destroy();
+        c0Doc = new Chart(c4El, { type:'bar', data:{ labels:sortedDocs, datasets:[{label:'ยอดขายแพทย์รวม (บาท)', data:sortedDocs.map(d=>docStats[d]), backgroundColor:'#e64980', borderRadius:4}] }, options:{responsive:true, maintainAspectRatio:false, indexAxis:'y'} });
+      }
+    } catch(e){ console.error(e); }
 
     try {
-      if(c0Track1) c0Track1.destroy();
-      c0Track1 = new Chart(g("c0-track1"), { type:'doughnut', data:{ labels:['ขอเลื่อนนัด', 'ไม่รับสาย/ปิดเครื่อง'], datasets:[{data:[tP_PP, tP_NA], backgroundColor:['#f08c00', '#c92a2a']}] }, options:{responsive:true, maintainAspectRatio:false} });
-    } catch(err) { console.warn(err); }
+      const c5El = g("c0-track1");
+      if(c5El) {
+        if(c0Track1) c0Track1.destroy();
+        c0Track1 = new Chart(c5El, { type:'doughnut', data:{ labels:['ขอเลื่อนนัด', 'ไม่รับสาย/ปิดเครื่อง'], datasets:[{data:[tP_PP, tP_NA], backgroundColor:['#f08c00', '#c92a2a']}] }, options:{responsive:true, maintainAspectRatio:false} });
+      }
+    } catch(e){ console.error(e); }
 
     try {
-      if(c0Track2) c0Track2.destroy();
-      c0Track2 = new Chart(g("c0-track2"), { type:'doughnut', data:{ labels:['คนไข้เก่า', 'คนไข้ใหม่'], datasets:[{data:[tP_Old, tP_New], backgroundColor:['#1971c2', '#20c997']}] }, options:{responsive:true, maintainAspectRatio:false} });
-    } catch(err) { console.warn(err); }
+      const c6El = g("c0-track2");
+      if(c6El) {
+        if(c0Track2) c0Track2.destroy();
+        c0Track2 = new Chart(c6El, { type:'doughnut', data:{ labels:['คนไข้เก่า', 'คนไข้ใหม่'], datasets:[{data:[tP_Old, tP_New], backgroundColor:['#1971c2', '#20c997']}] }, options:{responsive:true, maintainAspectRatio:false} });
+      }
+    } catch(e){ console.error(e); }
 
     try {
-      if(c0D1) c0D1.destroy();
-      c0D1 = new Chart(g("c0-d1"), { type:'doughnut', data:{ labels:['หัตถการ', 'ขายยา', 'Treatment'], datasets:[{data:[tOp, tMed, tTrt], backgroundColor:['#f08c00', '#2f9e44', '#845ef7']}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{tooltip: donutTooltipOption}} });
-    } catch(err) { console.warn(err); }
+      const c7El = g("c0-d1");
+      if(c7El) {
+        if(c0D1) c0D1.destroy();
+        c0D1 = new Chart(c7El, { type:'doughnut', data:{ labels:['หัตถการ', 'ขายยา', 'Treatment'], datasets:[{data:[tOp, tMed, tTrt], backgroundColor:['#f08c00', '#2f9e44', '#845ef7']}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{tooltip: donutTooltipOption}} });
+      }
+    } catch(e){ console.error(e); }
 
     try {
-      if(c0D2) c0D2.destroy();
-      c0D2 = new Chart(g("c0-d2"), { type:'doughnut', data:{ labels:['Co2', 'Pico', 'Vbeam'], datasets:[{data:[tCo2, tPico, tVb], backgroundColor:['#1971c2', '#e64980', '#20c997']}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{tooltip: donutTooltipOption}} });
-    } catch(err) { console.warn(err); }
+      const c8El = g("c0-d2");
+      if(c8El) {
+        if(c0D2) c0D2.destroy();
+        c0D2 = new Chart(c8El, { type:'doughnut', data:{ labels:['Co2', 'Pico', 'Vbeam'], datasets:[{data:[tCo2, tPico, tVb], backgroundColor:['#1971c2', '#e64980', '#20c997']}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{tooltip: donutTooltipOption}} });
+      }
+    } catch(e){ console.error(e); }
   });
 }
 
@@ -671,8 +697,7 @@ function buildT1() {
       ht += `<td class="bg-sum"><input type="text" class="r-inp row-pax" style="text-align:center;" readonly value="0"></td><td class="bg-date"><select class="r-inp bg-date" style="text-align:center;cursor:pointer;" data-dt="${dt}" data-id="r-doc" onchange="calcT1(this)"></select></td></tr>`;
     }
     g("r-tbody").innerHTML = ht; updateSelects(); 
-    g("k1-tg-val").textContent = "฿"+fm(SETTINGS.tgs[br]||0);
-    g("k1-tg-val").dataset.val = SETTINGS.tgs[br]||0;
+    const tgEl = g("k1-tg-val"); if(tgEl) { tgEl.textContent = "฿"+fm(SETTINGS.tgs[br]||0); tgEl.dataset.val = SETTINGS.tgs[br]||0; }
   }
 
   if(t1Listener) DB.ref(`ops_daily`).off('value', t1Listener);
@@ -711,29 +736,46 @@ function calcT1(triggerEl) {
     chartData.push(rTot);
   });
 
-  let tg = parseFloat(g("k1-tg-val").dataset.val)||0;
-  g("k1-rev-val").textContent = "฿"+fm(gTot); 
-  g("k1-pct-val").textContent = tg>0 ? ((gTot/tg)*100).toFixed(1)+"%" : "0%";
-  g("k1-rem-val").textContent = tg>gTot ? "฿"+fm(tg-gTot) : "ทะลุเป้า!";
+  const tgEl = g("k1-tg-val"); let tg = tgEl ? parseFloat(tgEl.dataset.val)||0 : 0;
+  if(g("k1-rev-val")) g("k1-rev-val").textContent = "฿"+fm(gTot); 
+  if(g("k1-pct-val")) g("k1-pct-val").textContent = tg>0 ? ((gTot/tg)*100).toFixed(1)+"%" : "0%";
+  if(g("k1-rem-val")) g("k1-rem-val").textContent = tg>gTot ? "฿"+fm(tg-gTot) : "🏆 ทะลุเป้า!";
 
-  g("rs-curr").textContent = fm(gTot); g("rs-pct").textContent = tg>0 ? ((gTot/tg)*100).toFixed(1)+"%" : "0%";
-  g("rs-rem").textContent = tg>gTot ? fm(tg-gTot) : "0";
-  let [yr,m] = g("r-mo").value.split("-"); let dim = new Date(yr,m,0).getDate();
-  let dL = dim - new Date().getDate(); g("rs-days").textContent = dL>0?dL:0;
+  if(g("rs-curr")) g("rs-curr").textContent = fm(gTot); 
+  if(g("rs-pct")) g("rs-pct").textContent = tg>0 ? ((gTot/tg)*100).toFixed(1)+"%" : "0%";
+  if(g("rs-rem")) g("rs-rem").textContent = tg>gTot ? fm(tg-gTot) : "0";
   
-  g("rs-pax").textContent = fmI(gOldP+gNewP); g("rs-old").textContent = fmI(gOldP); g("rs-new").textContent = fmI(gNewP);
-  g("rs-avg-old").textContent = gOldP>0 ? fm(gOldA/gOldP) : "0"; g("rs-avg-new").textContent = gNewP>0 ? fm(gNewA/gNewP) : "0";
-  g("rs-sop").textContent = fm(gOp); g("rs-smed").textContent = fm(gMed); g("rs-strt").textContent = fm(gTrt);
+  let rMoEl = g("r-mo");
+  if(rMoEl && rMoEl.value) {
+    let [yr,m] = rMoEl.value.split("-"); let dim = new Date(yr,m,0).getDate();
+    let dL = dim - new Date().getDate(); if(g("rs-days")) g("rs-days").textContent = dL>0?dL:0;
+  }
+  
+  if(g("rs-pax")) g("rs-pax").textContent = fmI(gOldP+gNewP); 
+  if(g("rs-old")) g("rs-old").textContent = fmI(gOldP); 
+  if(g("rs-new")) g("rs-new").textContent = fmI(gNewP);
+  if(g("rs-avg-old")) g("rs-avg-old").textContent = gOldP>0 ? fm(gOldA/gOldP) : "0"; 
+  if(g("rs-avg-new")) g("rs-avg-new").textContent = gNewP>0 ? fm(gNewA/gNewP) : "0";
+  if(g("rs-sop")) g("rs-sop").textContent = fm(gOp); 
+  if(g("rs-smed")) g("rs-smed").textContent = fm(gMed); 
+  if(g("rs-strt")) g("rs-strt").textContent = fm(gTrt);
+
+  // FIX 4: Safety Isolated Branch Chart Handlers
+  try {
+    const ctxTrend = g("c1-trend");
+    if(ctxTrend) {
+      if(c1Trend) c1Trend.destroy();
+      c1Trend = new Chart(ctxTrend, { type:'line', data:{ labels:Array.from({length:chartData.length},(_,i)=>i+1), datasets:[{label:'ยอดขายรายวัน', data:chartData, borderColor:'#845ef7', tension:0.2, fill:true, backgroundColor:'rgba(132, 94, 247, 0.08)'}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}} });
+    }
+  } catch(e){ console.warn(e); }
 
   try {
-    if(c1Trend) c1Trend.destroy();
-    c1Trend = new Chart(g("c1-trend"), { type:'line', data:{ labels:Array.from({length:chartData.length},(_,i)=>i+1), datasets:[{label:'ยอดขายรายวัน', data:chartData, borderColor:'#845ef7', tension:0.2, fill:true, backgroundColor:'rgba(132, 94, 247, 0.08)'}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}} });
-  } catch(err) { console.warn(err); }
-
-  try {
-    if(c1BrDonut) c1BrDonut.destroy();
-    c1BrDonut = new Chart(g("c1-br-donut"), { type:'doughnut', data:{ labels:['หัตถการ', 'ขายยา', 'Treatment'], datasets:[{data:[gOp, gMed, gTrt], backgroundColor:['#f08c00', '#2f9e44', '#845ef7']}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'right'}}} });
-  } catch(err) { console.warn(err); }
+    const ctxDonut = g("c1-br-donut");
+    if(ctxDonut) {
+      if(c1BrDonut) c1BrDonut.destroy();
+      c1BrDonut = new Chart(ctxDonut, { type:'doughnut', data:{ labels:['หัตถการ', 'ขายยา', 'Treatment'], datasets:[{data:[gOp, gMed, gTrt], backgroundColor:['#f08c00', '#2f9e44', '#845ef7']}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'right'}}} });
+    }
+  } catch(e){ console.warn(e); }
 
   if(triggerEl) {
     const dt = triggerEl.dataset.dt, br = g("r-br").value, id = triggerEl.dataset.id;
@@ -748,55 +790,58 @@ function calcT1(triggerEl) {
   }
 }
 
-// INTELLIGENT IMPORT CORRECTION MATRIX: ซ่อมแซมระบบแกะวิเคราะห์วันที่จากคอลัมน์แรก คัดกรองตัวเลขแม่นยำ แจ้งเตือนสถานะสำเร็จ
+// FIX 3: PRODUCTION-SAFE INTERPRETATION LOGIC (Reads Column A date content, ignores rows metrics completely)
 function importT1(input) {
   const f = input.files[0]; if(!f) return; const reader = new FileReader();
   reader.onload = (e) => {
     try {
-      const data = new Uint8Array(e.target.result); const wb = XLSX.read(data, {type: 'array'});
+      const data = new Uint8Array(e.target.result); const wb = XLSX.read(data, {type: 'array', cellDates: true});
       const json = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header: 1});
-      const mo=g("r-mo").value, br=g("r-br").value; const [yr,m] = mo.split("-");
+      const mo=g("r-mo").value, br=g("r-br").value; if(!mo || !br) { toast("❌ กรุณาระบุเงื่อนไขเดือนและสาขาให้ครบถ้วน", "error"); return; }
+      const [yr,m] = mo.split("-");
       let updates = {}, count = 0;
 
       for(let i=1; i<json.length; i++) {
         let row = json[i]; if(!row || row.length === 0) continue;
-        let dateStr = String(row[0] || "").trim();
-        if(!dateStr || dateStr.includes("วันที่") || dateStr.includes("รวม")) continue; 
+        let cellZero = row[0]; if(!cellZero) continue;
         
-        let dayPart = "";
-        if(dateStr.includes("/")) dayPart = dateStr.split("/")[0].padStart(2, '0');
-        else if(dateStr.includes("-")) dayPart = dateStr.split("-")[2].padStart(2, '0');
-        else {
-          let pNum = parseInt(dateStr);
-          if(!isNaN(pNum) && pNum >= 1 && pNum <= 31) dayPart = String(pNum).padStart(2, '0');
+        let targetDay = null;
+        if(cellZero instanceof Date) {
+          if(!isNaN(cellZero.getTime())) targetDay = cellZero.getDate();
+        } else {
+          let strD = String(cellZero).trim();
+          if(!strD || strD.includes("วันที่") || strD.includes("รวม") || strD.includes("Total")) continue;
+          if(strD.includes("/")) { targetDay = parseInt(strD.split("/")[0]); }
+          else if(strD.includes("-")) { targetDay = parseInt(strD.split("-")[2]); }
+          else { targetDay = parseInt(strD); }
         }
-        if(!dayPart || dayPart === "NaN") continue;
-        let dt = `${yr}-${m}-${dayPart}`;
+
+        if(!targetDay || isNaN(targetDay) || targetDay < 1 || targetDay > 31) continue;
+        let dayKey = String(targetDay).padStart(2, '0');
+        let fullDatePath = `${yr}-${m}-${dayKey}`;
 
         let rVals = {"r-op": parseFloat(row[1])||0, "r-med": parseFloat(row[2])||0, "r-trt": parseFloat(row[3])||0, "r-hd": parseFloat(row[4])||0, "r-gw": parseFloat(row[5])||0, "r-chg": parseFloat(row[6])||0, "r-drp": parseFloat(row[7])||0, "r-mem": parseFloat(row[8])||0, "r-stf": parseFloat(row[9])||0, "r-dep": parseFloat(row[10])||0, "r-oth": parseFloat(row[11])||0, "r-opx": parseFloat(row[12])||0, "r-oam": parseFloat(row[13])||0, "r-nyp": parseFloat(row[14])||0, "r-nam": parseFloat(row[15])||0, "r-nnp": parseFloat(row[16])||0};
         
-        for(let key in rVals) {
-          updates[`${dt}/${br}/${key}`] = rVals[key];
-        }
-        updates[`${dt}/${br}/p-product`] = rVals["r-med"];
-        updates[`${dt}/${br}/p-treatment`] = rVals["r-trt"];
-        updates[`${dt}/${br}/a-hdmall`] = rVals["r-hd"];
-        updates[`${dt}/${br}/a-gowabi`] = rVals["r-gw"];
-        updates[`${dt}/${br}/p-charge`] = rVals["r-chg"];
-        updates[`${dt}/${br}/p-drip`] = rVals["r-drp"];
-        updates[`${dt}/${br}/r-doc`] = row[17] || "";
+        for(let key in rVals) { updates[`${fullDatePath}/${br}/${key}`] = rVals[key]; }
+        updates[`${fullDatePath}/${br}/p-product`] = rVals["r-med"];
+        updates[`${fullDatePath}/${br}/p-treatment`] = rVals["r-trt"];
+        updates[`${fullDatePath}/${br}/a-hdmall`] = rVals["r-hd"];
+        updates[`${fullDatePath}/${br}/a-gowabi`] = rVals["r-gw"];
+        updates[`${fullDatePath}/${br}/p-charge`] = rVals["r-chg"];
+        updates[`${fullDatePath}/${br}/p-drip`] = rVals["r-drp"];
+        updates[`${fullDatePath}/${br}/r-doc`] = row[17] || "";
         count++;
       }
-      
+
       if(count > 0) {
         DB.ref('ops_daily').update(updates).then(() => {
-          toast(`📥 นำเข้าไฟล์เรียบร้อย! อัปเดตข้อมูลสาขาสำเร็จ ${count} รายการ`);
+          toast(`📥 Import Success: นำเข้าไฟล์สาขาสำเร็จจำนวน ${count} วัน`);
           buildT1();
-        }).catch(err => toast("Firebase Sync Error: " + err.message, "error"));
+        }).catch(err => toast("Firebase Set Failed: " + err.message, "error"));
       } else {
-        toast("❌ ไม่พบข้อมูลแถววันที่ที่ถูกต้องในไฟล์", "error");
+        toast("❌ ไม่พบโครงสร้างแถววันที่ที่ถูกต้องระบุในไฟล์ Excel", "error");
       }
-    } catch(err) { toast("❌ เกิดข้อผิดพลาดในการประมวลผลไฟล์", "error"); }
+    } catch(err) { toast("❌ Excel Import Crash: โครงสร้างไฟล์ขัดข้อง", "error"); }
   };
   reader.readAsArrayBuffer(f); input.value=""; 
 }
@@ -830,7 +875,8 @@ function exportT1() {
 // TAB 2: DAILY OPS CORE
 // ==========================================
 function buildT2() {
-  const tb = g("o-tbody"); let ht = "";
+  const tb = g("o-tbody"); if(!tb) return;
+  let ht = "";
   const leftRows = [
     {label:"Co2", id:"p0"}, {label:"Pico", id:"p1"}, {label:"Vbeam", id:"p2"}, {label:"Elos", id:"p3"},
     {label:"Botox", id:"p4"}, {label:"Filler", id:"p5"}, {label:"Meso", id:"p6"}, {label:"Thermage", id:"p7"},
@@ -898,18 +944,39 @@ function buildT2() {
   }).catch(()=>cT2(true));
 }
 
-function cT2(fromLoad = false) {
-  let tp=0, tv=0, tc=0;
-  document.querySelectorAll(".o-val").forEach(e=>tp+=parseFloat(e.value.replace(/,/g,''))||0);
-  document.querySelectorAll(".v-val").forEach(e=>tv+=parseFloat(e.value.replace(/,/g,''))||0);
-  document.querySelectorAll(".c-val").forEach(e=>tc+=parseFloat(e.value.replace(/,/g,''))||0);
-  if(g("t-prog")) g("t-prog").value = fm(tp); if(g("t-vip")) g("t-vip").textContent = fm(tv);
-  if(g("t-crd")) g("t-crd").value = fm(tc);
-  let grandInput = g("t-grand");
-  if(grandInput) {
-    let autoSum = tc + (parseFloat(g("pay-cash")?.value.replace(/,/g,''))||0) + (parseFloat(g("pay-trans")?.value.replace(/,/g,''))||0);
-    if(fromLoad || document.activeElement !== grandInput) grandInput.value = fm(autoSum);
-  }
+let t2Listener = null;
+function loadT2() {
+  buildT2(); const dt=g("o-dt").value, br=g("o-br").value; if(!dt)return;
+  if(t2Listener) DB.ref(`ops_daily`).off('value', t2Listener);
+  t2Listener = snap => {
+    if(snap.exists()) {
+      const d = snap.child(dt).child(br).val() || {};
+      for(let k in d) {
+        if(g(k) && document.activeElement !== g(k)) {
+          if(g(k).id.includes('lbl') || g(k).id.includes('rsn') || g(k).id.includes('note')) g(k).value = d[k];
+          else g(k).value = d[k]!=="" ? fm(d[k]) : "";
+        }
+      }
+    }
+    cT2(true);
+  };
+  DB.ref(`ops_daily`).on('value', t2Listener);
+}
+
+function saveT2Quick(id, val) { 
+  const dt=g("o-dt").value, br=g("o-br").value; let rawVal = val.toString().replace(/,/g, '');
+  DB.ref(`ops_daily/${dt}/${br}`).update({[id]: isNaN(parseFloat(rawVal)) ? rawVal : parseFloat(rawVal)}); 
+}
+
+function saveT2() {
+  const dt=g("o-dt").value, br=g("o-br").value; if(!dt)return;
+  let p={}; document.querySelectorAll('#t2-content input, #t2-content select').forEach(e=>{ 
+    if(e.id && !e.readOnly) {
+      let rawVal = e.value.toString().replace(/,/g, '');
+      p[e.id] = (!isNaN(rawVal) && rawVal !== "" && !e.id.includes('lbl') && !e.id.includes('rsn') && !e.id.includes('note') && !e.id.includes('c-oth-n')) ? parseFloat(rawVal) : e.value; 
+    }
+  });
+  DB.ref(`ops_daily/${dt}/${br}`).update(p).then(()=>toast("✅ บันทึกฟอร์มบัญชี Daily Ops เข้า Firebase สำเร็จแล้ว!"));
 }
 
 // ==========================================
@@ -973,8 +1040,11 @@ function drawT3Chart() {
   document.querySelectorAll("[id^='tk-na-']").forEach(i=>na+=parseFloat(i.value.replace(/,/g,''))||0);
   g("k3-cf").textContent=fmI(cf); g("k3-act").textContent=fmI(act); g("k3-pp").textContent=fmI(pp); g("k3-na").textContent=fmI(na);
   try {
-    if(c3Donut) c3Donut.destroy();
-    c3Donut = new Chart(g("c3-donut"), { type:'doughnut', data:{ labels:['มาจริง', 'ขอเลื่อน', 'ไม่รับสาย'], datasets:[{data:[act, pp, na], backgroundColor:['#2f9e44', '#f08c00', '#c92a2a']}] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:'right'} } } });
+    const ctxT3 = g("c3-donut");
+    if(ctxT3) {
+      if(c3Donut) c3Donut.destroy();
+      c3Donut = new Chart(ctxT3, { type:'doughnut', data:{ labels:['มาจริง', 'ขอเลื่อน', 'ไม่รับสาย'], datasets:[{data:[act, pp, na], backgroundColor:['#2f9e44', '#f08c00', '#c92a2a']}] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:'right'} } } });
+    }
   } catch(err) { console.warn(err); }
 }
 
@@ -1028,9 +1098,12 @@ function drawT4Chart() {
   });
   g("k4-sal").textContent="฿"+fm(sSal); g("k4-df").textContent="฿"+fm(sDf);
   try {
-    let sortedDocs = Object.keys(docStats).sort((a,b)=>docStats[b]-docStats[a]);
-    if(c4Bar) c4Bar.destroy();
-    c4Bar = new Chart(g("c4-bar"), { type:'bar', data:{ labels:sortedDocs, datasets:[{label:'ยอดขายแพทย์ (บาท)', data:sortedDocs.map(d=>docStats[d]), backgroundColor:'#1971c2', borderRadius:4}] }, options:{responsive:true, maintainAspectRatio:false, indexAxis:'y'} });
+    const ctxDF = g("c4-bar");
+    if(ctxDF) {
+      let sortedDocs = Object.keys(docStats).sort((a,b)=>docStats[b]-docStats[a]);
+      if(c4Bar) c4Bar.destroy();
+      c4Bar = new Chart(ctxDF, { type:'bar', data:{ labels:sortedDocs, datasets:[{label:'ยอดขายแพทย์ (บาท)', data:sortedDocs.map(d=>docStats[d]), backgroundColor:'#1971c2', borderRadius:4}] }, options:{responsive:true, maintainAspectRatio:false, indexAxis:'y'} });
+    }
   } catch(err) { console.warn(err); }
 }
 
@@ -1051,15 +1124,31 @@ function saveT5() {
   DB.ref(`ops_system_settings`).set(SETTINGS).then(()=>{ toast("✅ บันทึกการตั้งค่าลงฐานข้อมูลแล้ว!"); setTimeout(() => location.reload(), 1000); });
 }
 
-window.onload = () => {
+// FIX 6: BIND APPLICATION CYCLE TRIGGER ON DOM CONTENT LOADED EVENT OVERRIDE
+window.addEventListener('DOMContentLoaded', () => {
   injectBranchOptions();
-  const today = new Date().toISOString().split('T')[0]; g("o-dt").value = today;
-  g("d0-mo").value = today.slice(0,7); g("r-mo").value = today.slice(0,7); g("tk-mo").value = today.slice(0,7); g("df-mo").value = today.slice(0,7);
+  const today = new Date().toISOString().split('T')[0]; 
+  if(g("o-dt")) g("o-dt").value = today;
+  if(g("d0-mo")) g("d0-mo").value = today.slice(0,7); 
+  if(g("r-mo")) g("r-mo").value = today.slice(0,7); 
+  if(g("tk-mo")) g("tk-mo").value = today.slice(0,7); 
+  if(g("df-mo")) g("df-mo").value = today.slice(0,7);
+  
   DB.ref(`ops_system_settings`).once('value').then(snap=>{
-    if(snap.exists()) { const d=snap.val(); SETTINGS.tgs = d.tgs||SETTINGS.tgs; SETTINGS.docs = d.docs||SETTINGS.docs; SETTINGS.cas = d.cas||SETTINGS.cas; SETTINGS.mgs = d.mgs||SETTINGS.mgs; }
-    updateSelects(); loadT5(); 
-  }).catch(()=>{ updateSelects(); loadT5(); });
-}
+    if(snap.exists()) { 
+      const d=snap.val(); 
+      SETTINGS.tgs = d.tgs||SETTINGS.tgs; 
+      SETTINGS.docs = d.docs||SETTINGS.docs; 
+      SETTINGS.cas = d.cas||SETTINGS.cas; 
+      SETTINGS.mgs = d.mgs||SETTINGS.mgs; 
+    }
+    updateSelects(); 
+    loadT5(); 
+  }).catch(()=>{ 
+    updateSelects(); 
+    loadT5(); 
+  });
+});
 </script>
 </body>
 </html>
