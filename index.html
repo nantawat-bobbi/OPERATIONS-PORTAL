@@ -97,7 +97,7 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 .rs-row{display:flex;justify-content:space-between;margin-bottom:8px;font-size:14px;border-bottom:1px dotted #ccc;padding-bottom:4px;}
 .rs-lbl{font-weight:600;color:var(--tx2);} .rs-val{font-weight:700;color:#000;} .rs-val.fire{color:#d9381e;font-size:16px;}
 
-/* TAB 2: DAILY OPS CORE */
+/* TAB 2: DAILY OPS CORE (PDF) */
 .paper-ui{background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.05);max-width:1100px;margin:0 auto;}
 .paper-ui input{border:none;border-bottom:1px dotted #ccc;background:transparent;color:#1D4ED8;font-weight:600;text-align:center;width:100%;}
 .paper-ui input.red-tx{color:var(--red)!important;}
@@ -178,10 +178,10 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
   </div>
   <div class="pc" id="t0-cap">
     <div class="kgrid">
-      <div class="kc"><div class="klbl">รายได้รวมทุกสาขา (Total Rev)</div><div class="kval" style="color:var(--grn);" id="k0-rev">฿0.00</div></div>
-      <div class="kc"><div class="klbl">เป้ารวมทุกสาขา (Total Target)</div><div class="kval" id="k0-tg">฿0.00</div></div>
+      <div class="kc"><div class="klbl">รายได้รวมทุกสาขา (Total Rev)</div><div class="kval" style="color:var(--grn);" id="k0-rev">฿0</div></div>
+      <div class="kc"><div class="klbl">เป้ารวมทุกสาขา (Total Target)</div><div class="kval" id="k0-tg">฿0</div></div>
       <div class="kc"><div class="klbl">คนไข้เข้าใช้บริการรวม (Pax)</div><div class="kval" style="color:var(--acc);" id="k0-pax">0 คน</div></div>
-      <div class="kc"><div class="klbl">ค่า DF แพทย์รวมทั้งหมด</div><div class="kval" style="color:var(--amb);" id="k0-df">฿0.00</div></div>
+      <div class="kc"><div class="klbl">ค่า DF แพทย์รวมทั้งหมด</div><div class="kval" style="color:var(--amb);" id="k0-df">฿0</div></div>
     </div>
     
     <div style="display:grid; grid-template-columns: 2fr 1fr; gap:20px; margin-bottom:20px;">
@@ -212,10 +212,10 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
   </div>
   <div class="pc" id="t1-cap">
     <div class="kgrid">
-      <div class="kc"><div class="klbl">รายได้รวมเดือนนี้</div><div class="kval" style="color:var(--grn);" id="k1-rev">฿0.00</div></div>
-      <div class="kc"><div class="klbl">เป้าหมาย (Target)</div><div class="kval" id="k1-tg" data-val="0">฿0.00</div></div>
+      <div class="kc"><div class="klbl">รายได้รวมเดือนนี้</div><div class="kval" style="color:var(--grn);" id="k1-rev">฿0</div></div>
+      <div class="kc"><div class="klbl">เป้าหมาย (Target)</div><div class="kval" id="k1-tg" data-val="0">฿0</div></div>
       <div class="kc"><div class="klbl">% ความสำเร็จ</div><div class="kval" style="color:var(--acc);" id="k1-pct">0%</div></div>
-      <div class="kc"><div class="klbl">คงเหลือต้องทำ</div><div class="kval" style="color:var(--red);" id="k1-rem">฿0.00</div></div>
+      <div class="kc"><div class="klbl">คงเหลือต้องทำ</div><div class="kval" style="color:var(--red);" id="k1-rem">฿0</div></div>
     </div>
     
     <div class="chart-box" style="padding-bottom:10px;">
@@ -256,9 +256,9 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
       </div>
       <div class="rev-sum-grid">
         <div class="rev-sum-left">
-          <div class="rs-row"><span class="rs-lbl">ยอดปัจจุบัน 🔥</span><span class="rs-val fire" id="rs-curr">0.00</span></div>
-          <div class="rs-row"><span class="rs-lbl">% ความสำเร็จ 🚀</span><span class="rs-val fire" id="rs-pct">0.00%</span></div>
-          <div class="rs-row"><span class="rs-lbl">คงเหลือ 📉</span><span class="rs-val" id="rs-rem">0.00</span></div>
+          <div class="rs-row"><span class="rs-lbl">ยอดปัจจุบัน 🔥</span><span class="rs-val fire" id="rs-curr">0</span></div>
+          <div class="rs-row"><span class="rs-lbl">% ความสำเร็จ 🚀</span><span class="rs-val fire" id="rs-pct">0%</span></div>
+          <div class="rs-row"><span class="rs-lbl">คงเหลือ 📉</span><span class="rs-val" id="rs-rem">0</span></div>
           <div class="rs-row"><span class="rs-lbl">เหลืออีก (วัน) ⏳</span><span class="rs-val" id="rs-days">0</span></div>
         </div>
         <div class="rev-sum-right">
@@ -268,13 +268,13 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
             <div class="rs-row"><span class="rs-lbl">คนไข้ใหม่ (รวม)</span><span class="rs-val" id="rs-new">0</span></div>
           </div>
           <div>
-            <div class="rs-row"><span class="rs-lbl">ยอดจ่ายเฉลี่ย (เก่า)</span><span class="rs-val" id="rs-avg-old">0.00</span></div>
-            <div class="rs-row"><span class="rs-lbl">ยอดจ่ายเฉลี่ย (ใหม่)</span><span class="rs-val" id="rs-avg-new">0.00</span></div>
+            <div class="rs-row"><span class="rs-lbl">ยอดจ่ายเฉลี่ย (เก่า)</span><span class="rs-val" id="rs-avg-old">0</span></div>
+            <div class="rs-row"><span class="rs-lbl">ยอดจ่ายเฉลี่ย (ใหม่)</span><span class="rs-val" id="rs-avg-new">0</span></div>
           </div>
           <div>
-            <div class="rs-row"><span class="rs-lbl">รวมหัตถการ</span><span class="rs-val" id="rs-sop">0.00</span></div>
-            <div class="rs-row"><span class="rs-lbl">รวมขายยา</span><span class="rs-val" id="rs-smed">0.00</span></div>
-            <div class="rs-row"><span class="rs-lbl">รวม Treatment</span><span class="rs-val" id="rs-strt">0.00</span></div>
+            <div class="rs-row"><span class="rs-lbl">รวมหัตถการ</span><span class="rs-val" id="rs-sop">0</span></div>
+            <div class="rs-row"><span class="rs-lbl">รวมขายยา</span><span class="rs-val" id="rs-smed">0</span></div>
+            <div class="rs-row"><span class="rs-lbl">รวม Treatment</span><span class="rs-val" id="rs-strt">0</span></div>
           </div>
         </div>
       </div>
@@ -393,8 +393,8 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
   <div class="pc" id="t4-cap">
     <div style="display:grid; grid-template-columns:1fr 2fr; gap:20px; margin-bottom:20px;">
       <div style="display:flex;flex-direction:column;gap:15px;">
-        <div class="kc" style="margin:0;"><div class="klbl">ยอดขายแพทย์รวมเดือนนี้</div><div class="kval" style="color:var(--acc);" id="k4-sal">฿0.00</div></div>
-        <div class="kc" style="margin:0;"><div class="klbl">ค่า DF รวม</div><div class="kval" style="color:var(--amb);" id="k4-df">฿0.00</div></div>
+        <div class="kc" style="margin:0;"><div class="klbl">ยอดขายแพทย์รวมเดือนนี้</div><div class="kval" style="color:var(--acc);" id="k4-sal">฿0</div></div>
+        <div class="kc" style="margin:0;"><div class="klbl">ค่า DF รวม</div><div class="kval" style="color:var(--amb);" id="k4-df">฿0</div></div>
       </div>
       <div class="chart-box" style="margin:0;padding:10px;">
         <h3 style="font-size:14px;margin-bottom:5px;text-align:center;">🏆 จัดอันดับแพทย์ทำยอดสูงสุดประจำเดือน</h3>
@@ -474,8 +474,18 @@ function injectBranchOptions() {
 injectBranchOptions();
 
 function g(id){return document.getElementById(id);}
-function fm(n){return (parseFloat(n)||0).toLocaleString("th-TH",{minimumFractionDigits:2,maximumFractionDigits:2});}
-function fmI(n){return Math.round(parseFloat(n)||0).toLocaleString("th-TH");}
+
+// -----------------------------------------------------
+// ฟังก์ชันแปลงตัวเลข: โชว์ลูกน้ำ (,) แต่เอา .00 อัตโนมัติออก 
+// (ยังคงทศนิยมไว้ถ้าผู้ใช้ตั้งใจพิมพ์มาเอง เช่น .5)
+// -----------------------------------------------------
+function fm(n){
+  return (parseFloat(n)||0).toLocaleString("th-TH");
+}
+function fmI(n){
+  return Math.round(parseFloat(n)||0).toLocaleString("th-TH");
+}
+
 function toast(m, type="success"){
   const el=document.createElement("div"); el.className="toast"; el.style.background = type==="error" ? "#c92a2a" : "#212529";
   el.textContent=m; document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
@@ -593,7 +603,7 @@ function buildT1() {
     curT1 = req; let ht = "";
     for(let i=1; i<=dim; i++){
       let dt = `${yr}-${m}-${String(i).padStart(2,'0')}`;
-      ht += `<tr><td class="bg-date">${i}/${m}/${yr}</td><td class="bg-total"><input type="text" class="r-inp row-tot" readonly value="0.00"></td>`;
+      ht += `<tr><td class="bg-date">${i}/${m}/${yr}</td><td class="bg-total"><input type="text" class="r-inp row-tot" readonly value="0"></td>`;
       R_COLS.forEach(f => { ht += `<td class="${f.cls}"><input type="number" class="r-inp" data-dt="${dt}" data-id="${f.id}" oninput="calcT1(this)"></td>`; });
       ht += `<td class="bg-sum"><input type="text" class="r-inp row-pax" style="text-align:center;" readonly value="0"></td><td class="bg-date"><select class="r-inp bg-date" style="text-align:center;cursor:pointer;" data-dt="${dt}" data-id="r-doc" onchange="calcT1(this)"></select></td></tr>`;
     }
@@ -642,16 +652,18 @@ function calcT1(triggerEl) {
   });
 
   let tg = parseFloat(g("k1-tg").dataset.val)||0;
-  g("k1-rev").textContent = "฿"+fm(gTot); g("k1-pct").textContent = tg>0 ? (gTot/tg*100).toFixed(1)+"%" : "0%";
+  g("k1-rev").textContent = "฿"+fm(gTot); 
+  g("k1-pct").textContent = tg>0 ? +(gTot/tg*100).toFixed(1)+"%" : "0%";
   g("k1-rem").textContent = tg>gTot ? "฿"+fm(tg-gTot) : "ทะลุเป้า!";
 
-  g("rs-curr").textContent = fm(gTot); g("rs-pct").textContent = tg>0 ? (gTot/tg*100).toFixed(1)+"%" : "0.00%";
-  g("rs-rem").textContent = tg>gTot ? fm(tg-gTot) : "0.00";
+  g("rs-curr").textContent = fm(gTot); 
+  g("rs-pct").textContent = tg>0 ? +(gTot/tg*100).toFixed(1)+"%" : "0%";
+  g("rs-rem").textContent = tg>gTot ? fm(tg-gTot) : "0";
   let [yr,m] = g("r-mo").value.split("-"); let dim = new Date(yr,m,0).getDate();
   let dL = dim - new Date().getDate(); g("rs-days").textContent = dL>0?dL:0;
   
   g("rs-pax").textContent = fmI(gOldP+gNewP); g("rs-old").textContent = fmI(gOldP); g("rs-new").textContent = fmI(gNewP);
-  g("rs-avg-old").textContent = gOldP>0 ? fm(gOldA/gOldP) : "0.00"; g("rs-avg-new").textContent = gNewP>0 ? fm(gNewA/gNewP) : "0.00";
+  g("rs-avg-old").textContent = gOldP>0 ? fm(gOldA/gOldP) : "0"; g("rs-avg-new").textContent = gNewP>0 ? fm(gNewA/gNewP) : "0";
   g("rs-sop").textContent = fm(gOp); g("rs-smed").textContent = fm(gMed); g("rs-strt").textContent = fm(gTrt);
 
   if(c1Trend) c1Trend.destroy();
@@ -738,7 +750,7 @@ function buildT2() {
     } else ht += `<td></td><td></td><td></td>`;
 
     if(i < O_R.length) {
-      if(O_R[i].ro) ht += `<td style="text-align:right;font-weight:700;">${O_R[i].n}</td><td style="background:#f0f0f0;"><input type="text" id="${O_R[i].id}" class="num-in" readonly value="0.00"></td>`;
+      if(O_R[i].ro) ht += `<td style="text-align:right;font-weight:700;">${O_R[i].n}</td><td style="background:#f0f0f0;"><input type="text" id="${O_R[i].id}" class="num-in" readonly value="0"></td>`;
       else ht += `<td>${O_R[i].n}</td><td style="padding:2px;"><input type="number" id="${O_R[i].id}" class="num-in c-val" oninput="cT2()"></td>`;
       
       if(i===0) ht += `<td rowspan="2" style="vertical-align:bottom;text-align:center;">เงินสด<br><br><input type="number" id="pay-cash" class="num-in" style="font-size:18px;text-align:center;color:var(--tx)!important;" oninput="cT2()"></td>`;
@@ -748,7 +760,7 @@ function buildT2() {
     } else { ht += `<td></td><td></td>`; }
     ht += `</tr>`;
   }
-  ht += `<tr style="font-weight:700;"><td style="background:#f0f0f0;"><input type="text" id="t-prog" class="num-in" style="color:#000!important;" readonly value="0.00"></td><td style="background:#f0f0f0;text-align:right;color:red;padding-right:10px;" id="t-vip">0.00</td><td colspan="2" style="text-align:center;background:#f0f0f0;">คะแนน (Point)</td><td colspan="2" style="padding:2px;"><input type="number" id="t-point" class="num-in" style="width:100%;text-align:center;color:var(--tx)!important;"></td></tr>`;
+  ht += `<tr style="font-weight:700;"><td style="background:#f0f0f0;"><input type="text" id="t-prog" class="num-in" style="color:#000!important;" readonly value="0"></td><td style="background:#f0f0f0;text-align:right;color:red;padding-right:10px;" id="t-vip">0</td><td colspan="2" style="text-align:center;background:#f0f0f0;">คะแนน (Point)</td><td colspan="2" style="padding:2px;"><input type="number" id="t-point" class="num-in" style="width:100%;text-align:center;color:var(--tx)!important;"></td></tr>`;
   tb.innerHTML = ht;
   
   const dt=g("o-dt").value, br=g("o-br").value; if(!dt)return;
@@ -850,7 +862,7 @@ function calcT3Row(el) {
   if(!el) return; const row = el.closest('tr'); if(row) {
     let ro = parseFloat(row.querySelector(`[id^='tk-ro-']`).value)||0;
     let rn = parseFloat(row.querySelector(`[id^='tk-rn-']`).value)||0;
-    row.querySelector('.row-tk-tot').value = ro+rn;
+    row.querySelector('.row-tk-tot').value = fmI(ro+rn);
   }
 }
 
@@ -858,12 +870,12 @@ function drawT3Chart() {
   let cf=0, act=0, pp=0, na=0;
   document.querySelectorAll("[id^='tk-co-']").forEach(i=>cf+=parseFloat(i.value)||0);
   document.querySelectorAll("[id^='tk-cn-']").forEach(i=>cf+=parseFloat(i.value)||0);
-  document.querySelectorAll(".row-tk-tot").forEach(i=>act+=parseFloat(i.value)||0);
+  document.querySelectorAll(".row-tk-tot").forEach(i=>act+=parseFloat(i.value.replace(/,/g,''))||0);
   document.querySelectorAll("[id^='tk-po-']").forEach(i=>pp+=parseFloat(i.value)||0);
   document.querySelectorAll("[id^='tk-pn-']").forEach(i=>pp+=parseFloat(i.value)||0);
   document.querySelectorAll("[id^='tk-na-']").forEach(i=>na+=parseFloat(i.value)||0);
 
-  g("k3-cf").textContent=cf; g("k3-act").textContent=act; g("k3-pp").textContent=pp; g("k3-na").textContent=na;
+  g("k3-cf").textContent=fmI(cf); g("k3-act").textContent=fmI(act); g("k3-pp").textContent=fmI(pp); g("k3-na").textContent=fmI(na);
 
   if(c3Donut) c3Donut.destroy();
   c3Donut = new Chart(g("c3-donut"), {
@@ -940,7 +952,7 @@ function drawT4Chart() {
 }
 
 // ==========================================
-// TAB 5: SETTINGS (FIXED SAVE FUNCTION)
+// TAB 5: SETTINGS
 // ==========================================
 function loadT5() {
   let ht = "";
@@ -951,21 +963,16 @@ function loadT5() {
   g("s-mg").value = SETTINGS.mgs.join(", ");
   g("s-pr").value = SETTINGS.progs.join("\n");
 }
-
 function saveT5() {
-  bKeys.forEach(k => {
-    let el = g(`tg-${k}`);
-    SETTINGS.tgs[k] = el ? (parseFloat(el.value)||0) : 0;
-  });
+  bKeys.forEach(k => SETTINGS.tgs[k] = vv(`tg-${k}`));
   SETTINGS.docs = g("s-dr").value.split(",").map(s=>s.trim()).filter(Boolean);
   SETTINGS.cas = g("s-ca").value.split(",").map(s=>s.trim()).filter(Boolean);
   SETTINGS.mgs = g("s-mg").value.split(",").map(s=>s.trim()).filter(Boolean);
   SETTINGS.progs = g("s-pr").value.split("\n").map(s=>s.trim()).filter(Boolean);
   
   DB.ref(`system_settings`).set(SETTINGS).then(()=>{
-    toast("✅ บันทึกการตั้งค่าลงฐานข้อมูลสำเร็จ!");
-    setTimeout(() => location.reload(), 1000); // บังคับรีเฟรชหน้าเพื่ออัปเดตตารางหน้า 2 และ Dropdown ให้สมบูรณ์ที่สุด
-  }).catch(err => toast("❌ Error: " + err.message, "error"));
+    updateSelects(); curT1=""; curT3=""; curT4=""; toast("บันทึกการตั้งค่าลงฐานข้อมูลแล้ว!");
+  });
 }
 
 // ==========================================
