@@ -43,7 +43,6 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--tx);min-height:
 .ni.active{background:var(--acc);color:#fff;font-weight:600;}
 .main{flex:1;background:var(--bg);display:flex;flex-direction:column;min-width:0;height:100vh;overflow-y:auto;}
 .tp{display:none;padding:0;flex:1;}
-.tp.active{display:block;}
 
 /* HEADER & CONTROLS */
 .ph{background:#fff;border-bottom:1px solid var(--bdr);padding:15px 24px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:20;}
@@ -82,18 +81,26 @@ select:disabled{background:#e9ecef;cursor:not-allowed;font-weight:bold;color:var
 .rev-tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:1800px;}
 .rev-tbl th{padding:8px 4px;border:1px solid #aaa;text-align:center;font-weight:700;white-space:nowrap;position:sticky;top:0;z-index:2;box-shadow:0 1px 0 #999;}
 .rev-tbl th:first-child{left:0;z-index:3;}
-.rev-tbl td{border:1px solid #ccc;padding:0;position:relative;}
-.rev-tbl td:first-child{text-align:center;font-weight:600;background:#f3f4f6;position:sticky;left:0;z-index:1;box-shadow:1px 0 0 #ccc;}
+.rev-tbl td{border:1px solid #ccc;padding:2px;position:relative;}
+.rev-tbl td:first-child{text-align:center;font-weight:600;background:#f3f4f6;position:sticky;left:0;z-index:1;box-shadow:1px 0 0 #ccc;padding:0;}
 
 .bg-date{background:#f3f4f6;} .bg-total{background:#dbeafe;} .bg-op{background:#f8d7da;}
 .bg-med{background:#d1e7dd;} .bg-treat{background:#e2d9f3;} .bg-hd{background:#cff4fc;}
 .bg-gw{background:#f3d0e2;} .bg-chg{background:#fff3cd;} .bg-drp{background:#d1e7dd;}
 .bg-mem{background:#f3f4f6;} .bg-old{background:#fff3cd;} .bg-new{background:#d1e7dd;} .bg-sum{background:#dbeafe;}
 
-.r-inp{width:100%;height:32px;border:none;background:transparent;text-align:right;font-size:15px;font-weight:700;padding:4px 8px;color:#1D4ED8;outline:none;cursor:text;}
-.r-inp:hover{background:rgba(255,255,255,0.4);}
-.r-inp:focus{background:#fff!important;box-shadow:inset 0 0 0 2px var(--acc);}
-.r-inp[readonly]{color:#000!important;cursor:default;background:transparent!important;box-shadow:none;}
+/* FIXED VISIBILITY: คืนชีพกล่อง Input ให้เห็นเด่นชัดด้วยกรอบเทาและพื้นผิวสีขาว */
+.r-inp{width:100%;height:32px;border:1px solid #ced4da !important;background:#ffffff !important;text-align:right;font-size:14px;font-weight:700;padding:4px 8px;color:#1D4ED8;border-radius:4px;outline:none;cursor:text;}
+.r-inp:hover{background:#f1f3f5 !important; border-color:var(--acc) !important;}
+.r-inp:focus{background:#fff3cd !important;box-shadow:inset 0 0 0 1px var(--acc);border-color:var(--acc) !important;}
+.r-inp[readonly]{color:#000!important;cursor:default;background:#f8f9fa!important;border:none !important;box-shadow:none;}
+select.r-inp { background:#ffffff !important; text-align-last: center; padding:2px; }
+
+.rev-sum-grid{display:grid;grid-template-columns:300px 1fr;background:#sur;border-top:1px solid var(--bdr);}
+.rev-sum-left{border-right:2px solid #ccc;padding:15px;background:#f8f9fa;}
+.rev-sum-right{padding:15px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px;background:#fff;}
+.rs-row{display:flex;justify-content:space-between;margin-bottom:8px;font-size:14px;border-bottom:1px dotted #ccc;padding-bottom:4px;}
+.rs-lbl{font-weight:600;color:var(--tx2);} .rs-val{font-weight:700;color:#000;} .rs-val.fire{color:#d9381e;font-size:16px;}
 
 /* TAB 2: DAILY OPS CORE */
 .paper-ui{background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.05);max-width:1100px;margin:0 auto;}
@@ -102,6 +109,17 @@ select:disabled{background:#e9ecef;cursor:not-allowed;font-weight:bold;color:var
 .pdf-table{width:100%;border-collapse:collapse;margin:20px 0;font-size:13px;}
 .pdf-table th, .pdf-table td{border:1px solid #000;padding:6px;vertical-align:middle;}
 .pdf-table th{background:#f0f0f0;text-align:center;font-weight:700;}
+
+@media print {
+  @page { size: A4 landscape; margin: 10mm; }
+  body { background: #fff; }
+  .sidebar, .ph, .kgrid, .no-print, .br-dash-zone { display: none !important; }
+  .main { padding: 0; background:#fff; height:auto; overflow:visible; }
+  .pc { padding: 0; }
+  #t2-content { display: block !important; }
+  .paper-ui { box-shadow: none; padding: 0; max-width: 100%; margin:0; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+}
 </style>
 </head>
 <body>
@@ -123,7 +141,7 @@ select:disabled{background:#e9ecef;cursor:not-allowed;font-weight:bold;color:var
   <div class="slogo">LALIZA CLINIC<br><span id="nav-user-label" style="font-size:11px;color:#845ef7;font-weight:normal;"></span></div>
   <nav class="nav">
     <div class="ni admin-ni" onclick="sw('t0',this)">👑 Advanced Dashboard</div>
-    <div class="ni active" onclick="sw('t1',this)">📊 Revenue Sheet</div>
+    <div class="ni" id="ni-t1" onclick="sw('t1',this)">📊 Revenue Sheet</div>
     <div class="ni" onclick="sw('t2',this)">📋 Daily Ops Core</div>
     <div class="ni" onclick="sw('t3',this)">☎️ Confirm Tracking</div>
     <div class="ni" onclick="sw('t4',this)">👨‍⚕️ Doctor Finance</div>
@@ -396,34 +414,31 @@ select:disabled{background:#e9ecef;cursor:not-allowed;font-weight:bold;color:var
 
 <script>
 // ==========================================
-// 1. GLOBAL VARIABLES DEFINITIONS (Hoisting Fixed)
+// 1. GLOBAL VARIABLES LIFECYCLE (Hoisting & Crash Protection)
 // ==========================================
 const USERS = {
-  "16698": { role: "admin", br: "all", label: "Admin สูงสุด | สาขา: ทุกสาขา" },
-  
+  "16698": { role: "admin", br: "all", label: "Admin สูงสุด | ทุกสาขา" },
   // Cashiers (5 Digits)
-  "64752": { role: "cashier", br: "rama9", label: "Cashier | สาขา: พระราม 9" },
-  "92165": { role: "cashier", br: "pinklao", label: "Cashier | สาขา: ปิ่นเกล้า" },
-  "29817": { role: "cashier", br: "bangkae", label: "Cashier | สาขา: บางแค" },
-  "56034": { role: "cashier", br: "rangsit", label: "Cashier | สาขา: รังสิต" },
-  "71483": { role: "cashier", br: "promanat", label: "Cashier | สาขา: พรอมานาด" },
-  "38926": { role: "cashier", br: "ngamwongwan", label: "Cashier | สาขา: งามวงศ์วาน" },
-  "47291": { role: "cashier", br: "srinakarin", label: "Cashier | สาขา: ศรีนครินทร์" },
-  "83640": { role: "cashier", br: "westgate", label: "Cashier | สาขา: เวสต์เกต" },
-  
+  "64752": { role: "cashier", br: "rama9", label: "Cashier | พระราม 9" },
+  "92165": { role: "cashier", br: "pinklao", label: "Cashier | ปิ่นเกล้า" },
+  "29817": { role: "cashier", br: "bangkae", label: "Cashier | บางแค" },
+  "56034": { role: "cashier", br: "rangsit", label: "Cashier | รังสิต" },
+  "71483": { role: "cashier", br: "promanat", label: "Cashier | พรอมานาด" },
+  "38926": { role: "cashier", br: "ngamwongwan", label: "Cashier | งามวงศ์วาน" },
+  "47291": { role: "cashier", br: "srinakarin", label: "Cashier | ศรีนครินทร์" },
+  "83640": { role: "cashier", br: "westgate", label: "Cashier | เวสต์เกต" },
   // Managers (6 Digits)
-  "847291": { role: "manager", br: "rama9", label: "Manager | สาขา: พระราม 9" },
-  "362058": { role: "manager", br: "pinklao", label: "Manager | สาขา: ปิ่นเกล้า" },
-  "519374": { role: "manager", br: "bangkae", label: "Manager | สาขา: บางแค" },
-  "728163": { role: "manager", br: "rangsit", label: "Manager | สาขา: รังสิต" },
-  "945612": { role: "manager", br: "promanat", label: "Manager | สาขา: พรอมานาด" },
-  "183749": { role: "manager", br: "ngamwongwan", label: "Manager | สาขา: งามวงศ์วาน" },
-  "637482": { role: "manager", br: "srinakarin", label: "Manager | สาขา: ศรีนครินทร์" },
-  "291856": { role: "manager", br: "westgate", label: "Manager | สาขา: เวสต์เกต" }
+  "847291": { role: "manager", br: "rama9", label: "Manager | พระราม 9" },
+  "362058": { role: "manager", br: "pinklao", label: "Manager | ปิ่นเกล้า" },
+  "519374": { role: "manager", br: "bangkae", label: "Manager | บางแค" },
+  "728163": { role: "manager", br: "rangsit", label: "Manager | รังสิต" },
+  "945612": { role: "manager", br: "promanat", label: "Manager | พรอมานาด" },
+  "183749": { role: "manager", br: "ngamwongwan", label: "Manager | งามวงศ์วาน" },
+  "637482": { role: "manager", br: "srinakarin", label: "Manager | ศรีนครินทร์" },
+  "291856": { role: "manager", br: "westgate", label: "Manager | เวสต์เกต" }
 };
 let CURRENT_USER = null;
 
-// Firebase & Branch mapping configuration
 const FBC = {
   apiKey: "AIzaSyC0P1LGtglA_t1Nc5PyM5uD3MOLnfBZwFM",
   authDomain: "lalizaclinic-work-schedule.firebaseapp.com",
@@ -461,11 +476,11 @@ const O_CREDITS = [
   {n:"ยอดรวมเครดิต", id:"t-crd", ro:true}
 ];
 
-// Tracking Tab control keys
+// Structural Tracking listeners
 let curT1 = ""; let t1Listener = null;
-let curT3 = ""; let curT4 = ""; // FIXED REFERENCE ERROR IN LATEST VERSION
+let curT3 = ""; let curT4 = ""; 
 
-// Chart variables
+// Chart handles
 let c0Bar, c0Pie, c0Funnel, c0Doc, c0Track1, c0Track2, c0D1, c0D2;
 let c1Trend, c1BrDonut, c3Donut, c4Bar;
 
@@ -477,37 +492,52 @@ function injectBranchOptions() {
 }
 
 // ==========================================
-// 2. AUTHENTICATION & CORE CONTROLLER
+// 2. MAIN LOGIN & AUTHORIZATION ROUTERS (Strict Override)
 // ==========================================
 function checkLogin() {
   const pass = g("login-pass").value;
   if(!USERS[pass]) return toast("รหัสพนักงานไม่ถูกต้อง!", "error");
   
   CURRENT_USER = USERS[pass];
-  g("login-screen").style.display = "none"; 
-  g("main-app").style.display = "flex";
+  g("login-screen").style.setProperty('display', 'none', 'important');
+  g("main-app").style.setProperty('display', 'flex', 'important');
   g("nav-user-label").textContent = `[${CURRENT_USER.label}]`;
 
-  // Hide all screens to reset state cleanly
-  document.querySelectorAll(".tp").forEach(p => p.classList.remove("active"));
-
   if(CURRENT_USER.role === "admin") {
-    document.querySelectorAll('.admin-ni').forEach(el => el.style.display = "flex");
+    document.querySelectorAll('.admin-ni').forEach(el => el.style.setProperty('display', 'flex', 'important'));
     sw('t0', document.querySelector('.ni[onclick="sw(\'t0\',this)"]'));
   } else {
-    document.querySelectorAll('.admin-ni').forEach(el => el.style.display = "none");
+    document.querySelectorAll('.admin-ni').forEach(el => el.style.setProperty('display', 'none', 'important'));
     ['r-br','o-br','tk-br','df-br'].forEach(id => {
       let el = g(id); if(el) { el.value = CURRENT_USER.br; el.disabled = true; }
     });
-    sw('t1', document.querySelector('.ni[onclick="sw(\'t1\',this)"]'));
+    sw('t1', document.getElementById('ni-t1'));
   }
 }
 
-function sw(id,item){
-  document.querySelectorAll(".tp").forEach(p=>p.classList.remove("active"));
-  document.querySelectorAll(".ni").forEach(n=>n.classList.remove("active"));
-  g(id).classList.add("active"); if(item) item.classList.add("active");
-  if(id==='t0') buildT0(); if(id==='t1') buildT1(); if(id==='t2') buildT2(); if(id==='t3') buildT3(); if(id==='t4') buildT4(); if(id==='t5') loadT5();
+function sw(id, item) {
+  // Hide all screens with high priority
+  document.querySelectorAll(".tp").forEach(p => {
+    p.style.setProperty('display', 'none', 'important');
+  });
+  
+  // Show target frame cleanly
+  const target = g(id);
+  if (target) {
+    target.style.setProperty('display', 'block', 'important');
+  }
+
+  // Handle active states on navigation menu
+  document.querySelectorAll(".ni").forEach(n => n.classList.remove("active"));
+  if(item) item.classList.add("active");
+
+  // Call lifecycles
+  if(id==='t0') buildT0();
+  if(id==='t1') buildT1();
+  if(id==='t2') buildT2();
+  if(id==='t3') buildT3();
+  if(id==='t4') buildT4();
+  if(id==='t5') loadT5();
 }
 
 function updateSelects() {
@@ -617,13 +647,6 @@ function buildT0() {
 // ==========================================
 // TAB 1: REVENUE SHEET + BRANCH DASHBOARD
 // ==========================================
-function downloadTemplate() {
-  const mo=g("r-mo").value; const [yr,m] = mo.split("-"); const dim = new Date(yr,m,0).getDate();
-  let data = [["วันที่", "หัตถการ", "ขายยา", "Treatment", "HD MALL", "Gowabi", "ชาร์จ 3%", "ฉีดผิว", "member", "หัตถการ พนง.", "มัดจำเงิน", "รวมรายได้อื่นๆ", "คนไข้เก่า (คน)", "คนไข้เก่า (ยอด)", "คนไข้ใหม่มี (คน)", "คนไข้ใหม่มียอด (บาท)", "คนไข้ใหม่ไม่มี (คน)", "แพทย์"]];
-  for(let i=1; i<=dim; i++) data.push([`${i}/${m}/${yr}`, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ""]);
-  const ws = XLSX.utils.aoa_to_sheet(data); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Template"); XLSX.writeFile(wb, `Template_Import_${mo}.xlsx`);
-}
-
 function buildT1() {
   const mo=g("r-mo").value, br=g("r-br").value; if(!mo)return;
   const [yr,m] = mo.split("-"); const dim = new Date(yr,m,0).getDate();
@@ -702,44 +725,21 @@ function calcT1(triggerEl) {
     const dt = triggerEl.dataset.dt, br = g("r-br").value, id = triggerEl.dataset.id;
     let rawVal = triggerEl.value.replace(/,/g,''); const val = parseFloat(rawVal)||0;
     let mapped = {[id]:val};
-    if(id === "r-med") mapped["p-product"] = val; if(id === "r-trt") mapped["p-treatment"] = val; 
-    if(id === "r-hd") mapped["a-hdmall"] = val; if(id === "r-gw") mapped["a-gowabi"] = val; 
-    if(id === "r-chg") mapped["p-charge"] = val; if(id === "r-drp") mapped["p-drip"] = val;
+    
+    // AUTOMATIC PIPELINE: ไหลข้อมูลจากหน้า 1 ข้ามระบบไปฝังไว้หน้า 2 อัตโนมัติในระดับ Database
+    if(id === "r-med") mapped["p-product"] = val; 
+    if(id === "r-trt") mapped["p-treatment"] = val; 
+    if(id === "r-hd") mapped["a-hdmall"] = val; 
+    if(id === "r-gw") mapped["a-gowabi"] = val; 
+    if(id === "r-chg") mapped["p-charge"] = val; 
+    if(id === "r-drp") mapped["p-drip"] = val;
+    
     clearTimeout(tm1[dt]); tm1[dt] = setTimeout(()=>{ DB.ref(`ops_daily/${dt}/${br}`).update(mapped); }, 500);
   }
 }
 
-function importT1(input) {
-  const f = input.files[0]; if(!f) return; const reader = new FileReader();
-  reader.onload = (e) => {
-    try {
-      const data = new Uint8Array(e.target.result); const wb = XLSX.read(data, {type: 'array'});
-      const json = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header: 1});
-      const mo=g("r-mo").value, br=g("r-br").value; const [yr,m] = mo.split("-");
-      let updates = {}, count = 0;
-
-      for(let i=1; i<json.length; i++) {
-        let row = json[i]; if(!row || row.length === 0) continue;
-        let dt = `${yr}-${m}-${String(i).padStart(2,'0')}`;
-        let rVals = {"r-op": parseFloat(row[1])||0, "r-med": parseFloat(row[2])||0, "r-trt": parseFloat(row[3])||0, "r-hd": parseFloat(row[4])||0, "r-gw": parseFloat(row[5])||0, "r-chg": parseFloat(row[6])||0, "r-drp": parseFloat(row[7])||0, "r-mem": parseFloat(row[8])||0, "r-stf": parseFloat(row[9])||0, "r-dep": parseFloat(row[10])||0, "r-oth": parseFloat(row[11])||0, "r-opx": parseFloat(row[12])||0, "r-oam": parseFloat(row[13])||0, "r-nyp": parseFloat(row[14])||0, "r-nam": parseFloat(row[15])||0, "r-nnp": parseFloat(row[16])||0};
-        for(let key in rVals) {
-          updates[`${dt}/${br}/${key}`] = rVals[key];
-          if(key["r-med"]) updates[`${dt}/${br}/p-product`]=rVals[key];
-          if(key["r-trt"]) updates[`${dt}/${br}/p-treatment`]=rVals[key]; if(key==="r-hd") updates[`${dt}/${br}/a-hdmall`]=rVals[key];
-          if(key==="r-gw") updates[`${dt}/${br}/a-gowabi`]=rVals[key]; if(key==="r-chg") updates[`${dt}/${br}/p-charge`]=rVals[key];
-          if(key==="r-drp") updates[`${dt}/${br}/p-drip`]=rVals[key];
-        }
-        updates[`${dt}/${br}/r-doc`] = row[17] || ""; count++;
-      }
-      DB.ref('ops_daily').update(updates).then(() => toast(`✅ นำเข้าสำเร็จ ${count} วัน`)).catch(err => toast(err.message, "error"));
-    } catch(err) { toast("❌ รูปแบบไฟล์ไม่ถูกต้อง", "error"); }
-  };
-  reader.readAsArrayBuffer(f); input.value=""; 
-}
-function exportT1() { const wb = XLSX.utils.table_to_book(g("revTable")); XLSX.writeFile(wb, `Revenue_${g("r-mo").value}_${g("r-br").value}.xlsx`); }
-
 // ==========================================
-// TAB 2: DAILY OPS CORE
+// TAB 2: DAILY OPS CORE (Symmetric Design)
 // ==========================================
 function buildT2() {
   const tb = g("o-tbody"); let ht = "";
@@ -763,7 +763,7 @@ function buildT2() {
 
     let r = leftRows[i];
     if(r.custom) {
-      ht += `<td style="padding:2px;"><input type="text" id="${r.labelId}" style="text-align:left;border:none;font-weight:normal;" placeholder="✏️ พิมพ์หัตถการอื่นๆ" oninput="saveT2Quick('${r.labelId}',this.value)"></td>`;
+      ht += `<td style="padding:2px;"><input type="text" id="${r.labelId}" style="text-align:left;border:none;font-weight:normal;" placeholder="✏专 พิมพ์หัตถการอื่นๆ" oninput="saveT2Quick('${r.labelId}',this.value)"></td>`;
       ht += `<td style="padding:2px;"><input type="text" id="${r.id}" class="num-in o-val" oninput="cT2()" onblur="formatInput(this)" onfocus="unformatInput(this)"></td>`;
       ht += `<td style="padding:2px;"><input type="text" id="v-cust-${i}" class="num-in v-val red-tx" oninput="cT2()" onblur="formatInput(this)" onfocus="unformatInput(this)"></td>`;
     } else {
@@ -810,6 +810,7 @@ function buildT2() {
   }).catch(()=>cT2(true));
 }
 
+let t2Listener = null;
 function loadT2() {
   buildT2(); const dt=g("o-dt").value, br=g("o-br").value; if(!dt)return;
   if(t2Listener) DB.ref(`ops_daily`).off('value', t2Listener);
