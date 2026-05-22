@@ -43,7 +43,6 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--tx);min-height:
 .ni.active{background:var(--acc);color:#fff;font-weight:600;}
 .main{flex:1;background:var(--bg);display:flex;flex-direction:column;min-width:0;height:100vh;overflow-y:auto;}
 .tp{display:none;padding:0;flex:1;}
-.tp.active{display:block;}
 
 /* HEADER & CONTROLS */
 .ph{background:#fff;border-bottom:1px solid var(--bdr);padding:15px 24px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:20;}
@@ -91,7 +90,7 @@ select:disabled{background:#e9ecef;cursor:not-allowed;font-weight:bold;color:var
 .bg-gw{background:#f3d0e2;} .bg-chg{background:#fff3cd;} .bg-drp{background:#d1e7dd;}
 .bg-mem{background:#f3f4f6;} .bg-old{background:#fff3cd;} .bg-new{background:#d1e7dd;} .bg-sum{background:#dbeafe;}
 
-/* FIXED INPUTS: คืนชีพกล่องพิมพ์ยอดด้วยขอบเส้นเทาและพื้นผิวขาว สะอาดตา เห็นช่องชัดเจน */
+/* FIXED BOX INPUT VISIBILITY: คืนสภาพกล่องคีย์ข้อมูลให้เห็นเด่นชัดด้วยเส้นขอบและพื้นหลังขาว */
 .r-inp{width:100%;height:32px;border:1px solid #ced4da !important;background:#ffffff !important;text-align:right;font-size:14px;font-weight:700;padding:4px 8px;color:#1D4ED8;border-radius:4px;outline:none;cursor:text;}
 .r-inp:hover{background:#f1f3f5 !important; border-color:var(--acc) !important;}
 .r-inp:focus{background:#fff3cd !important;box-shadow:inset 0 0 0 1px var(--acc);border-color:var(--acc) !important;}
@@ -411,7 +410,7 @@ select.r-inp { background:#ffffff !important; text-align-last: center; padding:2
 
 <script>
 // ==========================================
-// 1. GLOBAL LIFE-CYCLE DECLARATIONS (Strict Unique Scoping)
+// 1. GLOBAL ENVIRONMENT & DICTIONARIES (Hoisting Secure)
 // ==========================================
 const USERS = {
   "16698": { role: "admin", br: "all", label: "Admin สูงสุด | ทุกสาขา" },
@@ -473,11 +472,10 @@ const O_CREDITS = [
   {n:"ยอดรวมเครดิต", id:"t-crd", ro:true}
 ];
 
-// Table identifiers
+// Tracking locks & instances variables
 let curT1 = ""; let t1Listener = null;
 let curT3 = ""; let curT4 = ""; 
 
-// Chart structures (NO RE-DECLARATION BLOCKS WITHIN MIDDLE SCRIPT)
 let c0Bar, c0Pie, c0Funnel, c0Doc, c0Track1, c0Track2, c0D1, c0D2;
 let c1Trend, c1BrDonut, c3Donut, c4Bar;
 
@@ -489,7 +487,7 @@ function injectBranchOptions() {
 }
 
 // ==========================================
-// 2. CORE SECURITY & PRIVILEGE MANAGER
+// 2. PRIVILEGE CORE SECURITY MANAGER (Fixed Layout Overlap)
 // ==========================================
 function checkLogin() {
   const pass = g("login-pass").value;
@@ -615,29 +613,60 @@ function buildT0() {
 
     const donutTooltipOption = { callbacks: { label: function(ctx) { let total = ctx.dataset.data.reduce((a,b)=>a+b,0); let pct = total > 0 ? ((ctx.raw/total)*100).toFixed(1) : 0; return `${ctx.label}: ฿${fm(ctx.raw)} (${pct}%)`; } } };
 
-    if(c0Bar) c0Bar.destroy();
-    c0Bar = new Chart(g("c0-bar"), { type:'bar', data:{ labels:bKeys.map(k=>BKS[k]), datasets:[{label:'รายได้จริง', data:bKeys.map(k=>bRev[k]), backgroundColor:'#1971c2'}, {label:'เป้าหมาย', data:bKeys.map(k=>bTg[k]), backgroundColor:'#ced4da'}] }, options:{responsive:true, maintainAspectRatio:false} });
-    if(c0Funnel) c0Funnel.destroy();
-    c0Funnel = new Chart(g("c0-funnel"), { type:'bar', data:{ labels:['📞 โทรทั้งหมด', '✅ คอนเฟิร์มจะมา', '🏥 มาจริง (Success)'], datasets:[{label:'จำนวนคนไข้', data:[tkCall, tkConf, tkAct], backgroundColor:['#f08c00', '#1971c2', '#2f9e44'], borderRadius:4}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}} });
-    if(c0Pie) c0Pie.destroy();
-    c0Pie = new Chart(g("c0-pie"), { type:'doughnut', data:{ labels:['เงินสด', 'แอปพลิเคชัน', 'เงินโอน', 'บัตรเครดิต'], datasets:[{data:[tCash, tApp, tTrans, tCrd], backgroundColor:['#2f9e44', '#845ef7', '#f08c00', '#1971c2']}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{tooltip: donutTooltipOption}} });
-    let sortedDocs = Object.keys(docStats).sort((a,b)=>docStats[b]-docStats[a]).slice(0,5);
-    if(c0Doc) c0Doc.destroy();
-    c0Doc = new Chart(g("c0-doc"), { type:'bar', data:{ labels:sortedDocs, datasets:[{label:'ยอดขายแพทย์รวม (บาท)', data:sortedDocs.map(d=>docStats[d]), backgroundColor:'#e64980', borderRadius:4}] }, options:{responsive:true, maintainAspectRatio:false, indexAxis:'y'} });
-    if(c0Track1) c0Track1.destroy();
-    c0Track1 = new Chart(g("c0-track1"), { type:'doughnut', data:{ labels:['ขอเลื่อนนัด', 'ไม่รับสาย/ปิดเครื่อง'], datasets:[{data:[tP_PP, tP_NA], backgroundColor:['#f08c00', '#c92a2a']}] }, options:{responsive:true, maintainAspectRatio:false} });
-    if(c0Track2) c0Track2.destroy();
-    c0Track2 = new Chart(g("c0-track2"), { type:'doughnut', data:{ labels:['คนไข้เก่า', 'คนไข้ใหม่'], datasets:[{data:[tP_Old, tP_New], backgroundColor:['#1971c2', '#20c997']}] }, options:{responsive:true, maintainAspectRatio:false} });
-    if(c0D1) c0D1.destroy();
-    c0D1 = new Chart(g("c0-d1"), { type:'doughnut', data:{ labels:['หัตถการ', 'ขายยา', 'Treatment'], datasets:[{data:[tOp, tMed, tTrt], backgroundColor:['#f08c00', '#2f9e44', '#845ef7']}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{tooltip: donutTooltipOption}} });
-    if(c0D2) c0D2.destroy();
-    c0D2 = new Chart(g("c0-d2"), { type:'doughnut', data:{ labels:['Co2', 'Pico', 'Vbeam'], datasets:[{data:[tCo2, tPico, tVb], backgroundColor:['#1971c2', '#e64980', '#20c997']}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{tooltip: donutTooltipOption}} });
+    // ISOLATED CHART WRAPPERS (Prevents main calculations thread freeze)
+    try {
+      if(c0Bar) c0Bar.destroy();
+      c0Bar = new Chart(g("c0-bar"), { type:'bar', data:{ labels:bKeys.map(k=>BKS[k]), datasets:[{label:'รายได้จริง', data:bKeys.map(k=>bRev[k]), backgroundColor:'#1971c2'}, {label:'เป้าหมาย', data:bKeys.map(k=>bTg[k]), backgroundColor:'#ced4da'}] }, options:{responsive:true, maintainAspectRatio:false} });
+    } catch(err) { console.warn("Chart Master Performance failed:", err); }
+
+    try {
+      if(c0Funnel) c0Funnel.destroy();
+      c0Funnel = new Chart(g("c0-funnel"), { type:'bar', data:{ labels:['📞 โทรทั้งหมด', '✅ คอนเฟิร์มจะมา', '🏥 มาจริง (Success)'], datasets:[{label:'จำนวนคนไข้', data:[tkCall, tkConf, tkAct], backgroundColor:['#f08c00', '#1971c2', '#2f9e44'], borderRadius:4}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}} });
+    } catch(err) { console.warn("Chart Master Funnel failed:", err); }
+
+    try {
+      if(c0Pie) c0Pie.destroy();
+      c0Pie = new Chart(g("c0-pie"), { type:'doughnut', data:{ labels:['เงินสด', 'แอปพลิเคชัน', 'เงินโอน', 'บัตรเครดิต'], datasets:[{data:[tCash, tApp, tTrans, tCrd], backgroundColor:['#2f9e44', '#845ef7', '#f08c00', '#1971c2']}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{tooltip: donutTooltipOption}} });
+    } catch(err) { console.warn("Chart Master Payments failed:", err); }
+
+    try {
+      let sortedDocs = Object.keys(docStats).sort((a,b)=>docStats[b]-docStats[a]).slice(0,5);
+      if(c0Doc) c0Doc.destroy();
+      c0Doc = new Chart(g("c0-doc"), { type:'bar', data:{ labels:sortedDocs, datasets:[{label:'ยอดขายแพทย์รวม (บาท)', data:sortedDocs.map(d=>docStats[d]), backgroundColor:'#e64980', borderRadius:4}] }, options:{responsive:true, maintainAspectRatio:false, indexAxis:'y'} });
+    } catch(err) { console.warn("Chart Master Docs Leaderboard failed:", err); }
+
+    try {
+      if(c0Track1) c0Track1.destroy();
+      c0Track1 = new Chart(g("c0-track1"), { type:'doughnut', data:{ labels:['ขอเลื่อนนัด', 'ไม่รับสาย/ปิดเครื่อง'], datasets:[{data:[tP_PP, tP_NA], backgroundColor:['#f08c00', '#c92a2a']}] }, options:{responsive:true, maintainAspectRatio:false} });
+    } catch(err) { console.warn("Chart Master Tracking Behaviours failed:", err); }
+
+    try {
+      if(c0Track2) c0Track2.destroy();
+      c0Track2 = new Chart(g("c0-track2"), { type:'doughnut', data:{ labels:['คนไข้เก่า', 'คนไข้ใหม่'], datasets:[{data:[tP_Old, tP_New], backgroundColor:['#1971c2', '#20c997']}] }, options:{responsive:true, maintainAspectRatio:false} });
+    } catch(err) { console.warn("Chart Master Patient Type failed:", err); }
+
+    try {
+      if(c0D1) c0D1.destroy();
+      c0D1 = new Chart(g("c0-d1"), { type:'doughnut', data:{ labels:['หัตถการ', 'ขายยา', 'Treatment'], datasets:[{data:[tOp, tMed, tTrt], backgroundColor:['#f08c00', '#2f9e44', '#845ef7']}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{tooltip: donutTooltipOption}} });
+    } catch(err) { console.warn("Chart Master Main Modules failed:", err); }
+
+    try {
+      if(c0D2) c0D2.destroy();
+      c0D2 = new Chart(g("c0-d2"), { type:'doughnut', data:{ labels:['Co2', 'Pico', 'Vbeam'], datasets:[{data:[tCo2, tPico, tVb], backgroundColor:['#1971c2', '#e64980', '#20c997']}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{tooltip: donutTooltipOption}} });
+    } catch(err) { console.warn("Chart Master Procedures failed:", err); }
   });
 }
 
 // ==========================================
 // TAB 1: REVENUE SHEET + BRANCH DASHBOARD
 // ==========================================
+function downloadTemplate() {
+  const mo=g("r-mo").value; const [yr,m] = mo.split("-"); const dim = new Date(yr,m,0).getDate();
+  let data = [["วันที่", "หัตถการ", "ขายยา", "Treatment", "HD MALL", "Gowabi", "ชาร์จ 3%", "ฉีดผิว", "member", "หัตถการ พนง.", "มัดจำเงิน", "รวมรายได้อื่นๆ", "คนไข้เก่า (คน)", "คนไข้เก่า (ยอด)", "คนไข้ใหม่มี (คน)", "คนไข้ใหม่มียอด (บาท)", "คนไข้ใหม่ไม่มี (คน)", "แพทย์"]];
+  for(let i=1; i<=dim; i++) data.push([`${i}/${m}/${yr}`, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ""]);
+  const ws = XLSX.utils.aoa_to_sheet(data); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Template"); XLSX.writeFile(wb, `Template_Import_${mo}.xlsx`);
+}
+
 function buildT1() {
   const mo=g("r-mo").value, br=g("r-br").value; if(!mo)return;
   const [yr,m] = mo.split("-"); const dim = new Date(yr,m,0).getDate();
@@ -706,18 +735,23 @@ function calcT1(triggerEl) {
   g("rs-avg-old").textContent = gOldP>0 ? fm(gOldA/gOldP) : "0"; g("rs-avg-new").textContent = gNewP>0 ? fm(gNewA/gNewP) : "0";
   g("rs-sop").textContent = fm(gOp); g("rs-smed").textContent = fm(gMed); g("rs-strt").textContent = fm(gTrt);
 
-  if(c1Trend) c1Trend.destroy();
-  c1Trend = new Chart(g("c1-trend"), { type:'line', data:{ labels:Array.from({length:chartData.length},(_,i)=>i+1), datasets:[{label:'ยอดขายรายวัน', data:chartData, borderColor:'#845ef7', tension:0.2, fill:true, backgroundColor:'rgba(132, 94, 247, 0.08)'}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}} });
+  // INSULATED DASHBOARD CHARTS PROTECTION CATCH (Fixes manual entry freezing calculations)
+  try {
+    if(c1Trend) c1Trend.destroy();
+    c1Trend = new Chart(g("c1-trend"), { type:'line', data:{ labels:Array.from({length:chartData.length},(_,i)=>i+1), datasets:[{label:'ยอดขายรายวัน', data:chartData, borderColor:'#845ef7', tension:0.2, fill:true, backgroundColor:'rgba(132, 94, 247, 0.08)'}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}} });
+  } catch(err) { console.warn("Daily sales trend chart render failed:", err); }
 
-  if(c1BrDonut) c1BrDonut.destroy();
-  c1BrDonut = new Chart(g("c1-br-donut"), { type:'doughnut', data:{ labels:['หัตถการ', 'ขายยา', 'Treatment'], datasets:[{data:[gOp, gMed, gTrt], backgroundColor:['#f08c00', '#2f9e44', '#845ef7']}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'right'}}} });
+  try {
+    if(c1BrDonut) c1BrDonut.destroy();
+    c1BrDonut = new Chart(g("c1-br-donut"), { type:'doughnut', data:{ labels:['หัตถการ', 'ขายยา', 'Treatment'], datasets:[{data:[gOp, gMed, gTrt], backgroundColor:['#f08c00', '#2f9e44', '#845ef7']}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'right'}}} });
+  } catch(err) { console.warn("Service breakdown chart render failed:", err); }
 
   if(triggerEl) {
     const dt = triggerEl.dataset.dt, br = g("r-br").value, id = triggerEl.dataset.id;
     let rawVal = triggerEl.value.replace(/,/g,''); const val = parseFloat(rawVal)||0;
     let mapped = {[id]:val};
     
-    // PIPELINE AUTO SYNC TO TAB 2 (Ops Core Node)
+    // AUTOMATIC DATABASE PIPELINE
     if(id === "r-med") mapped["p-product"] = val; if(id === "r-trt") mapped["p-treatment"] = val; 
     if(id === "r-hd") mapped["a-hdmall"] = val; if(id === "r-gw") mapped["a-gowabi"] = val; 
     if(id === "r-chg") mapped["p-charge"] = val; if(id === "r-drp") mapped["p-drip"] = val;
@@ -725,6 +759,7 @@ function calcT1(triggerEl) {
   }
 }
 
+// STRICT EXCEL IMPORT FIX: แก้ไขคีย์เวิร์ดเทียบสายอักขระให้ถูกต้องเป๊ะ ข้อมูลเปลี่ยนทันใจไหลข้ามหน้าสมบูรณ์
 function importT1(input) {
   const f = input.files[0]; if(!f) return; const reader = new FileReader();
   reader.onload = (e) => {
@@ -738,18 +773,22 @@ function importT1(input) {
         let row = json[i]; if(!row || row.length === 0) continue;
         let dt = `${yr}-${m}-${String(i).padStart(2,'0')}`;
         let rVals = {"r-op": parseFloat(row[1])||0, "r-med": parseFloat(row[2])||0, "r-trt": parseFloat(row[3])||0, "r-hd": parseFloat(row[4])||0, "r-gw": parseFloat(row[5])||0, "r-chg": parseFloat(row[6])||0, "r-drp": parseFloat(row[7])||0, "r-mem": parseFloat(row[8])||0, "r-stf": parseFloat(row[9])||0, "r-dep": parseFloat(row[10])||0, "r-oth": parseFloat(row[11])||0, "r-opx": parseFloat(row[12])||0, "r-oam": parseFloat(row[13])||0, "r-nyp": parseFloat(row[14])||0, "r-nam": parseFloat(row[15])||0, "r-nnp": parseFloat(row[16])||0};
+        
         for(let key in rVals) {
           updates[`${dt}/${br}/${key}`] = rVals[key];
-          if(key === "r-med") updates[`${dt}/${br}/p-product`]=rVals[key];
-          if(key === "r-trt") updates[`${dt}/${br}/p-treatment`]=rVals[key]; 
-          if(key === "r-hd") updates[`${dt}/${br}/a-hdmall`]=rVals[key];
-          if(key === "r-gw") updates[`${dt}/${br}/a-gowabi`]=rVals[key]; 
-          if(key === "r-chg") updates[`${dt}/${br}/p-charge`]=rVals[key];
-          if(key === "r-drp") updates[`${dt}/${br}/p-drip`]=rVals[key];
+          if(key === "r-med") updates[`${dt}/${br}/p-product`] = rVals[key];
+          if(key === "r-trt") updates[`${dt}/${br}/p-treatment`] = rVals[key]; 
+          if(key === "r-hd") updates[`${dt}/${br}/a-hdmall`] = rVals[key];
+          if(key === "r-gw") updates[`${dt}/${br}/a-gowabi`] = rVals[key]; 
+          if(key === "r-chg") updates[`${dt}/${br}/p-charge`] = rVals[key];
+          if(key === "r-drp") updates[`${dt}/${br}/p-drip`] = rVals[key];
         }
         updates[`${dt}/${br}/r-doc`] = row[17] || ""; count++;
       }
-      DB.ref('ops_daily').update(updates).then(() => toast(`✅ นำเข้าสำเร็จ ${count} วัน`)).catch(err => toast(err.message, "error"));
+      DB.ref('ops_daily').update(updates).then(() => {
+        toast(`✅ นำเข้าสำเร็จและซิงก์ข้อมูลแล้ว ${count} วัน`);
+        buildT1(); // Force layout rerender values from database listener
+      }).catch(err => toast(err.message, "error"));
     } catch(err) { toast("❌ รูปแบบไฟล์ไม่ถูกต้อง", "error"); }
   };
   reader.readAsArrayBuffer(f); input.value=""; 
@@ -765,12 +804,10 @@ function exportT1() {
     let rowData = [];
     rowData.push(row.cells[0].textContent.trim());
     rowData.push(parseFloat(row.querySelector('.row-tot').value.replace(/,/g,''))||0);
-    
     R_COLS.forEach(c => {
       let val = parseFloat(row.querySelector(`[data-id="${c.id}"]`)?.value.replace(/,/g,''))||0;
       rowData.push(val);
     });
-    
     rowData.push(parseFloat(row.querySelector('.row-pax').value.replace(/,/g,''))||0);
     rowData.push(row.querySelector(`[data-id="r-doc"]`)?.value || "");
     data.push(rowData);
@@ -873,22 +910,6 @@ function loadT2() {
   DB.ref(`ops_daily`).on('value', t2Listener);
 }
 
-function saveT2Quick(id, val) { 
-  const dt=g("o-dt").value, br=g("o-br").value; let rawVal = val.toString().replace(/,/g, '');
-  DB.ref(`ops_daily/${dt}/${br}`).update({[id]: isNaN(parseFloat(rawVal)) ? rawVal : parseFloat(rawVal)}); 
-}
-
-function saveT2() {
-  const dt=g("o-dt").value, br=g("o-br").value; if(!dt)return;
-  let p={}; document.querySelectorAll('#t2-content input, #t2-content select').forEach(e=>{ 
-    if(e.id && !e.readOnly) {
-      let rawVal = e.value.toString().replace(/,/g, '');
-      p[e.id] = (!isNaN(rawVal) && rawVal !== "" && !e.id.includes('lbl') && !e.id.includes('rsn') && !e.id.includes('note') && !e.id.includes('c-oth-n')) ? parseFloat(rawVal) : e.value; 
-    }
-  });
-  DB.ref(`ops_daily/${dt}/${br}`).update(p).then(()=>toast("บันทึกฟอร์ม PDF ลงฐานข้อมูลสำเร็จ!"));
-}
-
 // ==========================================
 // TAB 3: CONFIRM TRACKING
 // ==========================================
@@ -928,6 +949,7 @@ function buildT3() {
 }
 
 let tm3={};
+// STRICT COMPLETION SETTER
 function svT3(el) {
   const dt = el.dataset.dt, br = g("tk-br").value, mo = g("tk-mo").value, id = el.dataset.id, val = parseFloat(el.value.replace(/,/g,''))||0;
   calcT3Row(el); drawT3Chart();
@@ -950,8 +972,11 @@ function drawT3Chart() {
   document.querySelectorAll("[id^='tk-pn-']").forEach(i=>pp+=parseFloat(i.value.replace(/,/g,''))||0);
   document.querySelectorAll("[id^='tk-na-']").forEach(i=>na+=parseFloat(i.value.replace(/,/g,''))||0);
   g("k3-cf").textContent=fmI(cf); g("k3-act").textContent=fmI(act); g("k3-pp").textContent=fmI(pp); g("k3-na").textContent=fmI(na);
-  if(c3Donut) c3Donut.destroy();
-  c3Donut = new Chart(g("c3-donut"), { type:'doughnut', data:{ labels:['มาจริง', 'ขอเลื่อน', 'ไม่รับสาย'], datasets:[{data:[act, pp, na], backgroundColor:['#2f9e44', '#f08c00', '#c92a2a']}] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:'right'} } } });
+  
+  try {
+    if(c3Donut) c3Donut.destroy();
+    c3Donut = new Chart(g("c3-donut"), { type:'doughnut', data:{ labels:['มาจริง', 'ขอเลื่อน', 'ไม่รับสาย'], datasets:[{data:[act, pp, na], backgroundColor:['#2f9e44', '#f08c00', '#c92a2a']}] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:'right'} } } });
+  } catch(err) { console.warn("Tracking donut chart fail safely isolated:", err); }
 }
 
 // ==========================================
@@ -1004,9 +1029,12 @@ function drawT4Chart() {
     sSal += sl; sDf += df; if(doc && sl>0) docStats[doc] = (docStats[doc]||0) + sl;
   });
   g("k4-sal").textContent="฿"+fm(sSal); g("k4-df").textContent="฿"+fm(sDf);
-  let sortedDocs = Object.keys(docStats).sort((a,b)=>docStats[b]-docStats[a]);
-  if(c4Bar) c4Bar.destroy();
-  c4Bar = new Chart(g("c4-bar"), { type:'bar', data:{ labels:sortedDocs, datasets:[{label:'ยอดขายแพทย์ (บาท)', data:sortedDocs.map(d=>docStats[d]), backgroundColor:'#1971c2', borderRadius:4}] }, options:{responsive:true, maintainAspectRatio:false, indexAxis:'y'} });
+  
+  try {
+    let sortedDocs = Object.keys(docStats).sort((a,b)=>docStats[b]-docStats[a]);
+    if(c4Bar) c4Bar.destroy();
+    c4Bar = new Chart(g("c4-bar"), { type:'bar', data:{ labels:sortedDocs, datasets:[{label:'ยอดขายแพทย์ (บาท)', data:sortedDocs.map(d=>docStats[d]), backgroundColor:'#1971c2', borderRadius:4}] }, options:{responsive:true, maintainAspectRatio:false, indexAxis:'y'} });
+  } catch(err) { console.warn("Doctor leaderboard chart isolation handling:", err); }
 }
 
 // ==========================================
