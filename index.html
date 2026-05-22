@@ -6,7 +6,6 @@
 <title>Laliza Clinic — Operations Portal</title>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
@@ -14,773 +13,633 @@
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#f0f2f5;--sur:#ffffff;--sur2:#f8f9fa;--sur3:#e9ecef;
-  --bdr:#dee2e6;--bdr2:#ced4da;
-  --tx:#212529;--tx2:#495057;--tx3:#868e96;
-  --acc:#1971c2;--acc2:#1864ab;
-  --grn:#2f9e44;--grn2:#d3f9d8;
-  --amb:#f08c00;--amb2:#fff3bf;
-  --red:#c92a2a;--red2:#ffe3e3;
-  --blue2:#dbe4ff;--blue3:#4c6ef5;
-  --pink2:#fce4ec;--pink3:#e91e8c;
-  --teal2:#e6fcf5;--teal3:#0ca678;
-  --yellow2:#fff9db;
-  --r:6px;--rl:8px;
+  --bg:#f0f2f5; --sur:#ffffff; --acc:#1971c2; --acc2:#1864ab;
+  --grn:#2f9e44; --amb:#f08c00; --red:#c92a2a;
+  --tx:#212529; --tx2:#495057; --tx3:#868e96;
+  --bdr:#dee2e6; --bdr2:#ced4da;
+  --font-ui: 'Sarabun', sans-serif;
+  --text-input: #1D4ED8; /* สีน้ำเงินสำหรับกรอกตัวเลข */
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;font-size:14px;}
+body{font-family:var(--font-ui);background:var(--bg);color:var(--tx);min-height:100vh;font-size:14px;}
 .app{display:flex;min-height:100vh;}
 
 /* SIDEBAR */
-.sidebar{width:200px;background:#1a1d23;border-right:1px solid #2d3139;display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh;}
-.slogo{padding:18px 16px 14px;border-bottom:1px solid #2d3139;}
-.slogo .brand{font-size:13px;font-weight:700;color:#ffffff;letter-spacing:.03em;}
-.slogo .sub{font-size:10px;color:#6c7280;margin-top:2px;letter-spacing:.04em;text-transform:uppercase;}
-.nav{flex:1;padding:8px 7px;overflow-y:auto;}
-.ni{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:6px;cursor:pointer;color:#9ca3af;font-size:13px;transition:all .15s;margin-bottom:2px;border:1px solid transparent;}
+.sidebar{width:220px;background:#1a1d23;border-right:1px solid #2d3139;display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh;}
+.slogo{padding:20px;border-bottom:1px solid #2d3139;color:#fff;font-weight:700;letter-spacing:1px;}
+.nav{flex:1;padding:10px;overflow-y:auto;}
+.ni{display:flex;align-items:center;gap:10px;padding:12px;border-radius:6px;cursor:pointer;color:#9ca3af;font-size:14px;transition:0.2s;margin-bottom:5px;}
 .ni:hover{background:#252830;color:#fff;}
-.ni.active{background:#1971c2;color:#fff;border-color:#1864ab;}
-.ni .ico{font-size:14px;width:16px;text-align:center;}
-.nn{font-size:10px;background:#2d3139;border-radius:3px;padding:1px 5px;color:#6c7280;margin-left:auto;}
-.ni.active .nn{background:rgba(255,255,255,.2);color:#fff;}
-.sbar{padding:10px 14px;border-top:1px solid #2d3139;font-size:11px;color:#6c7280;}
-.sdot{display:inline-block;width:5px;height:5px;border-radius:50%;background:#51cf66;margin-right:5px;}
-.main{flex:1;overflow-y:auto;background:var(--bg);position:relative;}
-.tp{display:none;padding:0;min-height:100vh;}
+.ni.active{background:var(--acc);color:#fff;}
+.main{flex:1;overflow-y:auto;background:var(--bg);position:relative;display:flex;flex-direction:column;}
+.tp{display:none;padding:0;}
 .tp.active{display:block;}
 
-/* PAGE HEADER */
-.ph{background:#fff;border-bottom:1px solid var(--bdr);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
-.ptitle{font-size:16px;font-weight:700;color:var(--tx);}
-.psub{font-size:12px;color:var(--tx3);margin-top:1px;}
-.ha{display:flex;gap:7px;align-items:center;}
-.pc{padding:20px 24px;}
-
-/* FORM CONTROLS */
-select,input[type=text],input[type=date],input[type=time],input[type=month],input[type=number]{
-  background:#fff;border:1px solid var(--bdr2);border-radius:var(--r);padding:6px 10px;
-  color:var(--tx);font-size:13px;font-family:inherit;outline:none;transition:border-color .15s;
-}
-select:focus,input:focus{border-color:var(--acc);}
-.flbl{font-size:12px;color:var(--tx2);margin-bottom:4px;font-weight:500;}
-.fg{display:grid;gap:10px;}
-.fg4{grid-template-columns:repeat(4,1fr);}
-.fg3{grid-template-columns:repeat(3,1fr);}
-.fg2{grid-template-columns:1fr 1fr;}
-
-/* BUTTONS */
-.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:var(--r);border:1px solid transparent;cursor:pointer;font-size:13px;font-family:inherit;font-weight:500;transition:all .15s;}
-.bp{background:var(--acc);color:#fff;border-color:var(--acc2);}
-.bp:hover{background:var(--acc2);}
-.bs{background:var(--grn);color:#fff;border-color:#276b34;}
-.bs:hover{background:#276b34;}
-.bg2{background:#fff;color:var(--tx2);border:1px solid var(--bdr2);}
-.bg2:hover{background:var(--sur2);color:var(--tx);}
-.bam{background:var(--amb);color:#fff;}
-.bam:hover{background:#d97706;}
+/* HEADER & CONTROLS */
+.ph{background:#fff;border-bottom:1px solid var(--bdr);padding:15px 24px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;}
+.ptitle{font-size:18px;font-weight:700;color:var(--tx);}
+.ha{display:flex;gap:8px;}
+.btn{padding:8px 16px;border-radius:6px;border:1px solid transparent;cursor:pointer;font-size:13px;font-family:inherit;font-weight:600;transition:0.2s;}
+.bp{background:var(--acc);color:#fff;} .bp:hover{background:var(--acc2);}
+.bs{background:var(--grn);color:#fff;} 
+.bg2{background:#fff;color:var(--tx2);border:1px solid var(--bdr2);} .bg2:hover{background:#f8f9fa;}
 .bred{background:var(--red);color:#fff;}
-.bfull{width:100%;justify-content:center;padding:10px;font-size:14px;font-weight:600;}
 
-/* KPI CARDS */
-.kgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px;}
-.kc{background:#fff;border:1px solid var(--bdr);border-radius:var(--rl);padding:14px 16px;}
-.klbl{font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;font-weight:600;}
-.kval{font-size:21px;font-weight:700;color:var(--tx);}
-.kval.g{color:var(--grn);}
-.kval.a{color:var(--acc);}
-.kval.am{color:var(--amb);}
-.kval.r{color:var(--red);}
-.ksub{font-size:11px;color:var(--tx3);margin-top:3px;}
-.crow{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:18px;}
-.cc{background:#fff;border:1px solid var(--bdr);border-radius:var(--rl);padding:16px;}
-.ct{font-size:13px;font-weight:600;color:var(--tx);margin-bottom:10px;}
-.panel{background:#fff;border:1px solid var(--bdr);border-radius:var(--rl);padding:18px;margin-bottom:16px;}
-.panel-title{font-size:14px;font-weight:700;color:var(--tx);margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid var(--acc);display:flex;align-items:center;justify-content:space-between;}
-
-/* TAB 1: DAILY OPS CORE (เหมือนเดิมเป๊ะๆ) */
-.cf-wrap{overflow-x:auto;}
-.cf-table{width:100%;border-collapse:collapse;font-size:13px;}
-.cf-table th{background:#e9ecef;padding:8px 10px;border:1px solid #adb5bd;text-align:center;font-weight:700;font-size:12px;white-space:nowrap;}
-.cf-table td{padding:7px 10px;border:1px solid #ced4da;vertical-align:middle;}
-.cf-table .section-header{background:#dee2e6;font-weight:700;font-size:11px;text-align:center;letter-spacing:.04em;color:var(--tx2);}
-.cf-table .prog-name{font-weight:500;}
-.cf-table .total-row{background:#fff3bf;font-weight:700;}
-.cf-table .payment-total-row{background:#d3f9d8;font-weight:700;}
-.num-in{
-  border:none; border-bottom:1px dotted #ccc; border-radius:0;
-  padding:4px; text-align:right; width:110px; font-size:14px;
-  background:transparent; color:#1D4ED8; font-weight:600;
+select,input[type=text],input[type=date],input[type=month],input[type=number],textarea{
+  background:#fff;border:1px solid var(--bdr2);border-radius:4px;padding:6px 10px;
+  color:var(--tx);font-size:13px;font-family:inherit;outline:none;
 }
-.num-in:hover{background:#FEF08A;cursor:text;}
-.num-in:focus{border-bottom:1px solid var(--acc);outline:none;background:#EEF2FF;}
+select:focus,input:focus,textarea:focus{border-color:var(--acc);}
+
+/* DASHBOARD CARDS */
+.pc{padding:24px;}
+.kgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-bottom:20px;}
+.kc{background:#fff;border:1px solid var(--bdr);border-radius:8px;padding:15px;}
+.klbl{font-size:12px;color:var(--tx3);font-weight:600;margin-bottom:5px;}
+.kval{font-size:22px;font-weight:700;}
+.chart-box{background:#fff;border:1px solid var(--bdr);border-radius:8px;padding:15px;margin-bottom:20px;height:250px;}
+
+/* =========================================
+   TAB 1: PDF CLONE (เป๊ะ 100%)
+   ========================================= */
+.paper-ui{background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.05);max-width:1100px;margin:0 auto;}
+.paper-ui input{border:none;border-bottom:1px dotted #ccc;background:transparent;color:var(--text-input);font-weight:600;text-align:center;}
+.paper-ui input.red-tx{color:var(--red)!important;}
+.pdf-table{width:100%;border-collapse:collapse;margin:20px 0;font-size:13px;}
+.pdf-table th, .pdf-table td{border:1px solid #000;padding:6px;vertical-align:middle;}
+.pdf-table th{background:#f0f0f0;text-align:center;font-weight:700;}
+.pdf-table .num-in{width:100%;text-align:right;}
 input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-.num-display{font-weight:700;color:#1971c2;font-size:14px;}
-.num-display.green{color:#2f9e44;}
-.num-display.amber{color:#f08c00;}
-.col-prog{background:#fff;}
-.col-amount{background:#f8fff8;}
-.col-credit-name{background:#fff8f0;}
-.col-credit-amt{background:#fff8f0;}
-.col-app-name{background:#f0f8ff;}
-.col-app-amt{background:#f0f8ff;}
-.col-cash{background:#f0fff4;}
-.inline-input{border:none;border-bottom:1px dotted #ccc;font-size:13px;width:100%;color:#1D4ED8;outline:none;}
-.inline-input.red{color:#DC2626!important;font-weight:600;}
 
-/* TAB 2: REVENUE SHEET (ดีไซน์ใหม่ตามรูป 1) */
-.rev-sheet{background:#fff;border:1px solid var(--bdr);border-radius:var(--rl);overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.05);}
-.rev-tbl-wrap {overflow-x:auto; max-height:600px;}
-.rev-tbl{width:100%;border-collapse:collapse;font-size:12px;min-width:1600px;}
-.rev-tbl th{padding:6px;border:1px solid #999;text-align:center;font-weight:700;font-size:11px;white-space:nowrap;position:sticky;top:0;z-index:2;}
-.rev-tbl th.header-group {font-size:12px;}
-.rev-tbl td{padding:2px;border:1px solid #ccc;text-align:right;font-size:12px;vertical-align:middle;}
-.rev-tbl td:first-child{text-align:center;font-weight:600;background:#e9ecef;position:sticky;left:0;z-index:1;}
-.rev-tbl th:first-child{position:sticky;left:0;z-index:3;background:#e9ecef;}
+/* =========================================
+   TAB 2, 3, 4: TABLES
+   ========================================= */
+.data-table{width:100%;border-collapse:collapse;font-size:13px;background:#fff;}
+.data-table th{background:#e9ecef;padding:10px;border:1px solid #ced4da;text-align:center;font-weight:700;}
+.data-table td{padding:8px;border:1px solid #ced4da;text-align:center;}
+.data-table input{width:100%;border:1px solid #ccc;text-align:center;}
 
-/* กำหนดสีคอลัมน์ในหน้า Revenue Sheet ให้เหมือนรูป 1 */
-.bg-col-date { background: #e9ecef; }
-.bg-col-total { background: #cce5ff; } /* รายได้รวม */
-.bg-col-op { background: #f8d7da; } /* หัตถการ */
-.bg-col-med { background: #d3f9d8; } /* ขายยา */
-.bg-col-treat { background: #eebefa; } /* Treatment */
-.bg-col-hd { background: #e0f7fa; } /* HD MALL */
-.bg-col-gw { background: #f3e5f5; } /* Gowabi */
-.bg-col-chg { background: #fff3cd; } /* ชาร์จ 3% */
-.bg-col-drip { background: #d1e7dd; } /* ฉีดผิว */
-.bg-col-mem { background: #e2e3e5; } /* member */
-.bg-col-staff { background: #f8d7da; } /* หัตถการ พนง. */
-.bg-col-dep { background: #fff3cd; } /* มัดจำเงิน */
-.bg-col-oth { background: #cce5ff; } /* รวมรายได้อื่นๆ */
-.bg-col-old { background: #fff8e1; } /* คนไข้เก่า */
-.bg-col-new { background: #e8f5e9; } /* คนไข้ใหม่ */
-.bg-col-sum { background: #e3f2fd; } /* คนไข้รวม */
-
-.rev-input-cell { width:100%; border:none; background:transparent; text-align:right; font-size:12px; padding:4px; color:#1D4ED8; font-weight:600; outline:none; }
-.rev-input-cell:focus { background:#fff!important; border:1px solid var(--acc); }
-.rev-input-cell[readonly] { color:#000!important; background:transparent; }
-
-.rev-summary-grid { display:grid; grid-template-columns: 300px 1fr; border-top:2px solid #000; }
-.rev-sum-left { border-right:2px solid #ccc; padding:10px; }
-.rev-sum-right { padding:10px; display:grid; grid-template-columns: repeat(4, 1fr); gap:10px;}
-.rs-row { display:flex; justify-content:space-between; margin-bottom:5px; font-size:13px; border-bottom:1px dotted #ccc; padding-bottom:3px;}
-.rs-lbl { font-weight:600; color:var(--tx2); }
-.rs-val { font-weight:700; color:#000; }
-.rs-val.fire { color:#d9381e; font-size:15px; }
-
-/* TAB 3 & 4 CSS (คงเดิม) */
-.trk-main-table{width:100%;border-collapse:collapse;font-size:13px;}
-.trk-main-table th{padding:8px 10px;border:1px solid #adb5bd;text-align:center;font-weight:700;font-size:12px;background:#e9ecef;white-space:nowrap;}
-.trk-main-table .th-group{background:#bbdefb;color:#0d47a1;border:1px solid #90caf9;}
-.trk-main-table .th-confirm{background:#c8e6c9;color:#1b5e20;border:1px solid #a5d6a7;}
-.trk-main-table .th-real{background:#ffe0b2;color:#e65100;border:1px solid #ffcc80;}
-.trk-main-table td{padding:7px 10px;border:1px solid #dee2e6;text-align:center;vertical-align:middle;}
-.trk-main-table td:first-child{text-align:left;font-weight:600;background:#f8f9fa;}
-.trk-main-table .td-total-row{background:#e3f2fd;font-weight:700;}
-.trk-input{border:1px solid #ced4da;border-radius:4px;padding:4px;text-align:center;width:52px;font-size:12px;outline:none;}
-.trk-input:focus{border-color:var(--acc);}
-
-.doc-main-table{width:100%;border-collapse:collapse;font-size:13px;}
-.doc-main-table th{padding:8px 10px;border:1px solid #adb5bd;text-align:center;font-weight:700;font-size:12px;background:#ffcdd2;color:#b71c1c;white-space:nowrap;}
-.doc-main-table th.th-normal{background:#e9ecef;color:#212529;}
-.doc-main-table td{padding:7px 10px;border:1px solid #dee2e6;text-align:center;vertical-align:middle;}
-.doc-main-table .td-today{background:#fff9c4;}
-.doc-total-row{background:#ffcdd2;font-weight:700;color:#b71c1c;}
-
-/* SETTINGS & MODALS */
-.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-.ss{background:#fff;border:1px solid var(--bdr);border-radius:var(--rl);padding:16px;}
-.sti{font-size:13px;font-weight:700;color:var(--tx);margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--acc);display:flex;align-items:center;justify-content:space-between;}
-.li{display:flex;align-items:center;justify-content:space-between;padding:7px 9px;border-radius:var(--r);background:#f8f9fa;border:1px solid var(--bdr);margin-bottom:5px;font-size:13px;}
-.lid{background:none;border:none;cursor:pointer;color:#adb5bd;font-size:16px;padding:1px 4px;border-radius:3px;}
-.lid:hover{color:var(--red);background:var(--red2);}
-.ar{display:flex;gap:7px;margin-top:9px;}
-.ar input{flex:1;}
-.pill{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;}
-.pg{background:var(--grn2);color:#276b34;}
-.pa{background:var(--amb2);color:#865500;}
-.pb{background:var(--blue2);color:#1971c2;}
-
-.pov{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center;}
-.pbox{background:#fff;border-radius:var(--rl);padding:24px;max-width:400px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.18);}
-.ptitle2{font-size:15px;font-weight:700;margin-bottom:8px;color:var(--tx);}
-.psub2{font-size:13px;color:var(--tx2);margin-bottom:16px;}
-.pacts{display:flex;gap:8px;}
-.toast{position:fixed;bottom:20px;right:20px;background:#212529;border-radius:var(--r);padding:10px 16px;font-size:13px;color:#fff;z-index:9998;animation:su .25s ease;max-width:300px;}
-@keyframes su{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.msel{display:flex;align-items:center;gap:8px;}
-.mnav{background:#fff;border:1px solid var(--bdr2);border-radius:var(--r);padding:5px 12px;cursor:pointer;color:var(--tx2);font-size:15px;}
-.mnav:hover{background:var(--sur2);}
-.mlbl{font-size:15px;font-weight:700;min-width:150px;text-align:center;color:var(--tx);}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:999;display:none;align-items:center;justify-content:center;}
+.modal-box{background:#fff;padding:25px;border-radius:8px;width:400px;text-align:center;}
 
 @media print {
-  @page { size: A4 landscape; margin: 8mm; }
+  @page { size: A4 landscape; margin: 10mm; }
   body { background: #fff; }
-  .sidebar, .ph, .kgrid, .crow, .no-print { display: none !important; }
+  .sidebar, .ph, .kgrid, .chart-box, .no-print { display: none !important; }
   .main { padding: 0; }
-  .panel { padding:0; border:none; box-shadow:none; }
+  .paper-ui { box-shadow: none; padding: 0; max-width: 100%; }
   * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-  .num-in:hover, .num-in:focus { background: transparent; }
+  .paper-ui input { border: none !important; background: transparent !important; }
   input::placeholder, textarea::placeholder { color: transparent !important; }
 }
 </style>
 </head>
 <body>
 <div class="app">
+
 <div class="sidebar no-print">
-  <div class="slogo"><div class="brand">LALIZA CLINIC</div><div class="sub">Operations Portal</div></div>
+  <div class="slogo">LALIZA CLINIC</div>
   <nav class="nav">
-    <div class="ni active" onclick="sw('t1',this)"><span class="ico">📋</span>Daily Ops Core</div>
-    <div class="ni" onclick="sw('t2',this)"><span class="ico">📊</span>Revenue Sheet</div>
-    <div class="ni" onclick="sw('t3',this)"><span class="ico">☎️</span>Confirm Tracking</div>
-    <div class="ni" onclick="sw('t4',this)"><span class="ico">👨‍⚕️</span>Doctor Finance</div>
-    <div class="ni" onclick="sw('t5',this)"><span class="ico">⚙️</span>Custom Settings</div>
+    <div class="ni active" onclick="sw('t1',this)">📋 Daily Ops Core</div>
+    <div class="ni" onclick="sw('t2',this)">📊 Revenue Sheet</div>
+    <div class="ni" onclick="sw('t3',this)">☎️ Confirm Tracking</div>
+    <div class="ni" onclick="sw('t4',this)">👨‍⚕️ Doctor Finance</div>
+    <div class="ni" onclick="sw('t5',this)">⚙️ Custom Settings</div>
   </nav>
-  <div class="sbar"><span class="sdot"></span>Firebase Connected</div>
 </div>
 
 <div class="main">
 
 <div id="t1" class="tp active">
   <div class="ph no-print">
-    <div><div class="ptitle">📋 Daily Ops Core — ใบสรุปยอดแคชเชียร์และบัตรเครดิต</div><div class="psub" id="t1dl"></div><div class="psub" style="color:#1971c2;font-weight:600;margin-top:2px;" id="t1-sync-note">ข้อมูลซิงค์มาจาก Revenue Sheet อัตโนมัติ</div></div>
+    <div class="ptitle">📋 Daily Ops Core (ใบสรุปยอดแคชเชียร์)</div>
     <div class="ha">
-      <button class="btn bg2" onclick="exportFormPNG()">📷 PNG</button>
-      <button class="btn bg2" onclick="window.print()">🖨️ Print Form</button>
-      <button class="btn bs" onclick="sv1()">💾 บันทึกยอด</button>
+      <button class="btn bg2" onclick="window.print()">🖨️ Print PDF</button>
+      <button class="btn bs" onclick="saveT1()">💾 บันทึกยอด</button>
     </div>
   </div>
   <div class="pc">
     <div class="kgrid no-print">
-      <div class="kc"><div class="klbl">ยอดรวมวันนี้ (ทุกสาขา)</div><div class="kval g" id="ki-tot">฿0.00</div><div class="ksub" id="ki-bc">0 สาขาบันทึกแล้ว</div></div>
-      <div class="kc"><div class="klbl">สาขายอดสูงสุด</div><div class="kval a" id="ki-tb">—</div><div class="ksub" id="ki-tv"></div></div>
-      <div class="kc"><div class="klbl">ยอดโอน/สแกน KBANK</div><div class="kval" id="ki-tr">฿0.00</div></div>
-      <div class="kc"><div class="klbl">สัดส่วนบัตรเครดิต</div><div class="kval am" id="ki-cr">0%</div><div class="ksub">จากยอดรวม</div></div>
-    </div>
-    <div class="crow no-print">
-      <div class="cc"><div class="ct">กราฟเปรียบเทียบรายรับ — ทุกสาขา</div><div style="position:relative;height:180px;"><canvas id="barC"></canvas></div></div>
-      <div class="cc"><div class="ct">ช่องทางชำระเงิน</div><div id="pieLeg" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:7px;font-size:11px;color:var(--tx2);"></div><div style="position:relative;height:140px;"><canvas id="pieC"></canvas></div></div>
+      <div class="kc"><div class="klbl">ยอดรวมสุทธิวันนี้</div><div class="kval" style="color:var(--grn);" id="k1-tot">฿0.00</div></div>
+      <div class="kc"><div class="klbl">ยอดโอน/สแกน</div><div class="kval" style="color:var(--acc);" id="k1-tr">฿0.00</div></div>
+      <div class="kc"><div class="klbl">ยอดบัตรเครดิต</div><div class="kval" style="color:var(--amb);" id="k1-cr">฿0.00</div></div>
+      <div class="kc"><div class="klbl">ยอดเงินสด</div><div class="kval" style="color:var(--tx);" id="k1-ca">฿0.00</div></div>
     </div>
 
-    <div class="panel" id="printable-area">
-      <div class="panel-title no-print">ใบสรุปยอดแคชเชียร์และบัตรเครดิต<span style="font-size:12px;color:var(--tx3);font-weight:400;">Update 25-06-2024</span></div>
-      <div class="fg fg4 no-print" style="margin-bottom:14px;">
-        <div><div class="flbl">สาขา</div>
-          <select id="fb" style="width:100%;" onchange="odc()"><option value="central_rama9">เซ็นทรัลพระราม 9</option><option value="pinklao">ปิ่นเกล้า</option><option value="bangkae">บางแค</option><option value="rangsit">รังสิต</option><option value="promanat">พรมานาต</option><option value="ngamwongwan">งามวงศ์วาน</option><option value="srinakarin">ศรีนคริทนร์</option><option value="westgate">เวสต์เกต</option></select></div>
-        <div><div class="flbl">ประจำวันที่</div><input type="date" id="fd" style="width:100%;" onchange="odc()"></div>
-        <div><div class="flbl">แพทย์คนที่ 1</div><select id="fd1" style="width:100%;"><option value="">— เลือก —</option></select></div>
-        <div><div class="flbl">แพทย์คนที่ 2</div><select id="fd2" style="width:100%;"><option value="">— ถ้ามี —</option></select></div>
+    <div class="paper-ui" id="pdf-form">
+      <h2 style="text-align:center;font-size:20px;margin-bottom:20px;">ใบสรุปยอดแคชเชียร์และบัตรเครดิต</h2>
+      <div style="display:flex;justify-content:space-between;font-weight:600;margin-bottom:10px;">
+        <div>สาขา <select id="f1-br" class="red-tx" style="border:none;border-bottom:1px dotted #ccc;outline:none;font-family:inherit;font-size:14px;color:red;font-weight:bold;" onchange="loadT1()"><option value="rama9">พระราม 9</option><option value="pinklao">ปิ่นเกล้า</option><option value="bangkae">บางแค</option></select></div>
+        <div>ประจำวันที่ <input type="date" id="f1-dt" onchange="loadT1()"></div>
+        <div>แพทย์ <input type="text" id="f1-doc" placeholder="ชื่อแพทย์..." style="width:150px;"></div>
       </div>
-      <div style="display:none;" class="print-only"><h2 style="text-align:center; font-size:22px; font-weight:800; margin-bottom:15px;">ใบสรุปยอดแคชเชียร์และบัตรเครดิต</h2><div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:14px;"><div>ประจำวันที่ <span style="border-bottom:1px dotted #000; padding:0 30px;" id="prt-date"></span></div><div>สาขา <span style="border-bottom:1px dotted #000; padding:0 30px;" id="prt-branch"></span></div></div></div>
-      <div class="cf-wrap">
-      <table class="cf-table">
+      
+      <table class="pdf-table">
         <thead>
           <tr>
-            <th rowspan="2" style="width:20px;">ยอดหน้าร้าน</th><th rowspan="2" style="width:110px;">Program</th><th rowspan="2" style="width:120px;">จำนวนเงิน (บาท)</th><th rowspan="2" style="width:120px; color:#c92a2a;">ยอดหักบัตร<br>(VIP+VOUCHER)</th>
-            <th colspan="2" style="background:#fff3e0;color:#e65100;">เครดิต</th><th colspan="2" style="background:#e3f2fd;color:#0d47a1;">เงินสด / โอน / แอป</th>
+            <th width="5%">ยอดหน้าร้าน</th><th width="15%">Program</th><th width="12%">จำนวนเงิน</th>
+            <th width="15%">ยอดหักบัตร<br>(VIP+VOCHUER)</th>
+            <th width="18%">เครดิต</th><th width="12%">จำนวนเงิน</th><th width="18%">เงินสด</th>
           </tr>
-          <tr><th style="background:#fff8f0;">ช่องทาง</th><th style="background:#fff8f0;width:120px;">จำนวนเงิน (บาท)</th><th style="background:#f0f8ff;">แอป/ช่องทาง</th><th style="background:#f0f8ff;width:120px;">จำนวนเงิน (บาท)</th></tr>
         </thead>
-        <tbody>
-          <tr><td rowspan="14"></td><td class="prog-name col-prog">Co2</td><td class="col-amount"><input type="number" class="num-in" id="p-co2" value="0" oninput="rc()" placeholder="0"></td><td class="col-amount"><input type="number" class="num-in" style="color:#DC2626!important;" id="v-co2" value="0" oninput="rc()" placeholder="0"></td><td class="col-credit-name">1. KBANK (กสิกร)</td><td class="col-credit-amt"><input type="number" class="num-in" id="c-kbank" value="0" oninput="rc()" placeholder="0"></td><td class="col-app-name" style="background:#f0fff4;font-weight:600;color:#2f9e44;">เงินสด / โอน</td><td class="col-cash"><span class="num-display green" id="t-cash">0.00</span></td></tr>
-          <tr><td class="prog-name col-prog">Pico</td><td class="col-amount"><input type="number" class="num-in" id="p-pico" value="0" oninput="rc()" placeholder="0"></td><td class="col-amount"><input type="number" class="num-in" style="color:#DC2626!important;" id="v-pico" value="0" oninput="rc()" placeholder="0"></td><td class="col-credit-name">1.1 Credit (เครดิต)</td><td class="col-credit-amt"><input type="number" class="num-in" id="c-credit" value="0" oninput="rc()" placeholder="0"></td><td class="col-app-name" style="background:#fff8f0;">แอปพลิเคชัน</td><td class="col-app-amt" style="background:#fff8f0;"></td></tr>
-          <tr><td class="prog-name col-prog">Vbeam</td><td class="col-amount"><input type="number" class="num-in" id="p-vbeam" value="0" oninput="rc()" placeholder="0"></td><td class="col-amount"><input type="number" class="num-in" style="color:#DC2626!important;" id="v-vbeam" value="0" oninput="rc()" placeholder="0"></td><td class="col-credit-name">1.2 กสิกร (สแกน/โอน)</td><td class="col-credit-amt"><input type="number" class="num-in" id="c-kbsc" value="0" oninput="rc()" placeholder="0"></td><td class="col-app-name">HDMall สรุปรวม</td><td class="col-app-amt"><input type="number" class="num-in" id="a-hdmall" value="0" oninput="rc()" placeholder="0"></td></tr>
-          <tr><td class="prog-name col-prog">Elos</td><td class="col-amount"><input type="number" class="num-in" id="p-elos" value="0" oninput="rc()" placeholder="0"></td><td class="col-amount"><input type="number" class="num-in" style="color:#DC2626!important;" id="v-elos" value="0" oninput="rc()" placeholder="0"></td><td class="col-credit-name">2. KTC (กรุงไทย)</td><td class="col-credit-amt"><input type="number" class="num-in" id="c-ktc" value="0" oninput="rc()" placeholder="0"></td><td class="col-app-name">Gowabi สรุปรวม</td><td class="col-app-amt"><input type="number" class="num-in" id="a-gowabi" value="0" oninput="rc()" placeholder="0"></td></tr>
-          <tr><td class="prog-name col-prog">Botox</td><td class="col-amount"><input type="number" class="num-in" id="p-botox" value="0" oninput="rc()" placeholder="0"></td><td class="col-amount"><input type="number" class="num-in" style="color:#DC2626!important;" id="v-botox" value="0" oninput="rc()" placeholder="0"></td><td class="col-credit-name">3. BAY (กรุงศรี)</td><td class="col-credit-amt"><input type="number" class="num-in" id="c-bay" value="0" oninput="rc()" placeholder="0"></td><td class="col-app-name">แอปอื่นๆ</td><td class="col-app-amt"><input type="number" class="num-in" id="a-other" value="0" oninput="rc()" placeholder="0"></td></tr>
-          <tr><td class="prog-name col-prog">Filler</td><td class="col-amount"><input type="number" class="num-in" id="p-filler" value="0" oninput="rc()" placeholder="0"></td><td class="col-amount"><input type="number" class="num-in" style="color:#DC2626!important;" id="v-filler" value="0" oninput="rc()" placeholder="0"></td><td class="col-credit-name">4. SCB (ไทยพาณิชย์)</td><td class="col-credit-amt"><input type="number" class="num-in" id="c-scb" value="0" oninput="rc()" placeholder="0"></td><td></td><td></td></tr>
-          <tr><td class="prog-name col-prog">Meso</td><td class="col-amount"><input type="number" class="num-in" id="p-meso" value="0" oninput="rc()" placeholder="0"></td><td class="col-amount"><input type="number" class="num-in" style="color:#DC2626!important;" id="v-meso" value="0" oninput="rc()" placeholder="0"></td><td class="col-credit-name">อื่นๆ ระบุ <input type="text" class="inline-input" style="width:50px;"></td><td class="col-credit-amt"><input type="number" class="num-in" id="c-other" value="0" oninput="rc()" placeholder="0"></td><td></td><td></td></tr>
-          <tr><td class="prog-name col-prog">Thermage</td><td class="col-amount"><input type="number" class="num-in" id="p-thermage" value="0" oninput="rc()" placeholder="0"></td><td class="col-amount"><input type="number" class="num-in" style="color:#DC2626!important;" id="v-thermage" value="0" oninput="rc()" placeholder="0"></td><td></td><td></td><td></td><td></td></tr>
-          <tr><td class="prog-name col-prog">Ulthera</td><td class="col-amount"><input type="number" class="num-in" id="p-ulthera" value="0" oninput="rc()" placeholder="0"></td><td class="col-amount"><input type="number" class="num-in" style="color:#DC2626!important;" id="v-ulthera" value="0" oninput="rc()" placeholder="0"></td><td></td><td></td><td></td><td></td></tr>
-          <tr><td class="prog-name col-prog">Treatment</td><td class="col-amount"><input type="number" class="num-in" id="p-treatment" value="0" oninput="rc()" placeholder="0"></td><td class="col-amount"><input type="number" class="num-in" style="color:#DC2626!important;" id="v-treatment" value="0" oninput="rc()" placeholder="0"></td><td></td><td></td><td></td><td></td></tr>
-          <tr><td class="prog-name col-prog">Drip Vitamin (Nures)</td><td class="col-amount"><input type="number" class="num-in" id="p-drip" value="0" oninput="rc()" placeholder="0"></td><td class="col-amount"><input type="number" class="num-in" style="color:#DC2626!important;" id="v-drip" value="0" oninput="rc()" placeholder="0"></td><td></td><td></td><td></td><td></td></tr>
-          <tr><td class="prog-name col-prog">Product</td><td class="col-amount"><input type="number" class="num-in" id="p-product" value="0" oninput="rc()" placeholder="0"></td><td class="col-amount"><input type="number" class="num-in" style="color:#DC2626!important;" id="v-product" value="0" oninput="rc()" placeholder="0"></td><td></td><td></td><td></td><td></td></tr>
-          <tr><td class="prog-name col-prog">ชาร์จ 3%</td><td class="col-amount"><input type="number" class="num-in" id="p-charge" value="0" oninput="rc()" placeholder="0"></td><td class="col-amount"><input type="number" class="num-in" style="color:#DC2626!important;" id="v-charge" value="0" oninput="rc()" placeholder="0"></td><td></td><td></td><td></td><td></td></tr>
-          <tr><td class="prog-name col-prog">หัตถการอื่นๆ</td><td class="col-amount"><input type="number" class="num-in" id="p-misc" value="0" oninput="rc()" placeholder="0"></td><td class="col-amount"><input type="number" class="num-in" style="color:#DC2626!important;" id="v-misc" value="0" oninput="rc()" placeholder="0"></td><td></td><td></td><td style="font-size:12px;color:var(--tx3);font-weight:600;">ยอดเงินโอน</td><td><span class="num-display" id="t-transfer">0.00</span></td></tr>
-          <tr class="total-row"><td colspan="2" style="text-align:center;">ยอดรวม</td><td style="text-align:right;"><span class="num-display" id="t-prog">0.00</span></td><td style="text-align:right;"><span class="num-display amber" id="t-vip">0.00</span></td><td style="text-align:center;font-weight:700;">คะแนน (Point)</td><td><input type="number" class="num-in" style="width:100%;text-align:center;" placeholder="0"></td><td style="text-align:center;font-size:12px;color:var(--tx3);font-weight:600;">ยอดรวมเครดิต</td><td style="text-align:right;"><span class="num-display" id="t-crd">0.00</span></td></tr>
-          <tr class="payment-total-row"><td colspan="6" style="text-align:right;padding-right:16px;">ยอดชำระรวม (เงินสด+บัตร+แอป)</td><td colspan="2" style="text-align:right;font-size:18px;color:#2f9e44;"><span id="t-total">0.00</span> บาท</td></tr>
-        </tbody>
+        <tbody id="t1-tbody">
+          </tbody>
       </table>
+
+      <div style="display:flex;justify-content:space-between;margin-top:20px;font-size:13px;">
+        <div>Update 25-06-2024</div>
+        <div style="flex:1;text-align:center;">
+          เลขที่บิลเริ่ม <input type="text" id="f1-bs" style="width:80px;"> ถึง <input type="text" id="f1-be" style="width:80px;">
+          รวมบิลที่ใช้ <input type="number" id="f1-bc" style="width:50px;"> บิล
+        </div>
+        <div>แคชเชียร์ <input type="text" id="f1-ca" style="width:120px;"></div>
       </div>
-      <table class="footer-table" style="border:none; margin-top:10px; width:100%; border-collapse:collapse; font-size:13px;">
-        <tr><td colspan="2" style="border:1px solid #000; padding:10px;">เลขที่บิลเริ่ม <input type="text" id="fbs" class="inline-input" style="width:80px;" placeholder="B0001"> ถึง <input type="text" id="fbe" class="inline-input" style="width:80px;" placeholder="B0050"></td><td style="border:1px solid #000; padding:10px;">รวมบิลที่ใช้ <input type="number" id="fbc" class="inline-input" style="width:40px;text-align:center;"> บิล</td><td style="border:1px solid #000; padding:10px;">แคชเชียร์ <select id="fc" class="inline-input" style="width:140px;"><option value="">— เลือก —</option></select></td></tr>
-        <tr><td width="20%" style="border:1px solid #000; padding:10px;">ยอดเงินขาด<br><input type="number" id="fshort" class="inline-input" style="text-align:left; margin-top:5px;" placeholder="0"></td><td width="20%" style="border:1px solid #000; padding:10px;">ยอดเงินเกิน<br><input type="number" id="fover" class="inline-input" style="text-align:left; margin-top:5px;" placeholder="0"></td><td width="30%" style="border:1px solid #000; padding:10px;">สาเหตุ<br><input type="text" id="frsn" class="inline-input red" style="margin-top:5px;" placeholder="ระบุ..."></td><td width="30%" style="border:1px solid #000; padding:10px;">ผู้จัดการ <select id="fm" class="inline-input" style="width:140px; margin-top:15px;"><option value="">— เลือก —</option></select></td></tr>
-        <tr><td colspan="4" style="border:1px solid #000; padding:10px; padding-top:10px;">หมายเหตุ:<br><textarea id="fn" class="inline-input red" rows="2" placeholder="พิมพ์หมายเหตุเพิ่มเติม (สีแดง)..."></textarea></td></tr>
-      </table>
+      <div style="display:flex;justify-content:space-between;margin-top:10px;font-size:13px;">
+        <div style="width:200px;">ยอดเงินขาด <input type="number" id="f1-sh" style="width:80px;"></div>
+        <div style="width:200px;">ยอดเงินเกิน <input type="number" id="f1-ov" style="width:80px;"></div>
+        <div style="flex:1;">สาเหตุ <input type="text" id="f1-rsn" class="red-tx" style="width:80%;"></div>
+        <div>ผู้จัดการ <input type="text" id="f1-mg" style="width:120px;"></div>
+      </div>
+      <div style="margin-top:10px;font-size:13px;">
+        หมายเหตุ: <input type="text" id="f1-note" class="red-tx" style="width:90%;">
+      </div>
     </div>
   </div>
 </div>
 
 <div id="t2" class="tp">
   <div class="ph">
-    <div><div class="ptitle">📊 Revenue Sheet — ตารางสรุปรายรับประจำเดือน</div><div class="psub">คีย์ข้อมูลหัวข้อที่ตรงกันจะไหลไปยัง Daily Ops Core อัตโนมัติ</div></div>
+    <div class="ptitle">📊 Revenue Sheet</div>
     <div class="ha">
-      <input type="file" id="rev-excel-input" accept=".xlsx,.xls,.csv" style="display:none;" onchange="importRevExcel(this)">
-      <button class="btn bs" onclick="document.getElementById('rev-excel-input').click()">📥 Import Excel</button>
-      <button class="btn bg2" onclick="exportRevExcel()">📤 Export Excel</button>
-      <div class="msel"><button class="mnav" onclick="cm(-1)">‹</button><div class="mlbl" id="rml">—</div><button class="mnav" onclick="cm(1)">›</button></div>
-      <select id="rbs" style="width:155px;" onchange="lr()">
-        <option value="central_rama9">เซ็นทรัลพระราม 9</option><option value="pinklao">ปิ่นเกล้า</option>
-        <option value="bangkae">บางแค</option><option value="rangsit">รังสิต</option>
-        <option value="promanat">พรมานาต</option><option value="ngamwongwan">งามวงศ์วาน</option>
-        <option value="srinakarin">ศรีนคริทนร์</option><option value="westgate">เวสต์เกต</option>
-      </select>
+      <input type="file" id="ex-file" accept=".xlsx" style="display:none;" onchange="importT2(this)">
+      <button class="btn bs" onclick="g('ex-file').click()">📥 Import Excel</button>
+      <button class="btn bg2" onclick="exportT2()">📤 Export Excel</button>
+      <select id="t2-br" onchange="loadT2()"><option value="rama9">พระราม 9</option><option value="pinklao">ปิ่นเกล้า</option><option value="bangkae">บางแค</option></select>
+      <input type="month" id="t2-mo" onchange="loadT2()">
     </div>
   </div>
   <div class="pc">
-    <div class="rev-sheet">
-      <div class="rev-sheet-header" id="rsh">ลาลิซ่าคลินิก สาขา...</div>
-      <div class="rev-tbl-wrap">
-      <table class="rev-tbl">
+    <div class="kgrid">
+      <div class="kc"><div class="klbl">รายได้รวมเดือนนี้</div><div class="kval" style="color:var(--grn);" id="k2-rev">฿0.00</div></div>
+      <div class="kc"><div class="klbl">เป้าหมาย (Target)</div><div class="kval" id="k2-tg">฿0.00</div></div>
+      <div class="kc"><div class="klbl">% ความสำเร็จ</div><div class="kval" style="color:var(--acc);" id="k2-pct">0%</div></div>
+      <div class="kc"><div class="klbl">คงเหลือต้องทำ</div><div class="kval" style="color:var(--red);" id="k2-rem">฿0.00</div></div>
+    </div>
+    <div class="chart-box"><canvas id="c2-chart"></canvas></div>
+    
+    <div style="background:#fff;border:1px solid var(--bdr);border-radius:8px;padding:20px;overflow-x:auto;">
+      <table class="data-table" id="t2-table">
         <thead>
           <tr>
-            <th rowspan="2" class="bg-col-date" style="width:90px;">วันที่</th>
-            <th rowspan="2" class="bg-col-total">รายได้รวม</th>
-            <th rowspan="2" class="bg-col-op">หัตถการ</th>
-            <th rowspan="2" class="bg-col-med">ขายยา</th>
-            <th rowspan="2" class="bg-col-treat">Treatment</th>
-            <th rowspan="2" class="bg-col-hd">HD MALL</th>
-            <th rowspan="2" class="bg-col-gw">Gowabi</th>
-            <th rowspan="2" class="bg-col-chg">ชาร์จ 3%</th>
-            <th rowspan="2" class="bg-col-drip">ฉีดผิว</th>
-            <th rowspan="2" class="bg-col-mem">member</th>
-            <th rowspan="2" class="bg-col-staff">หัตถการ พนง.</th>
-            <th rowspan="2" class="bg-col-dep">มัดจำเงิน</th>
-            <th rowspan="2" class="bg-col-oth">รวมรายได้อื่นๆ</th>
-            <th colspan="2" class="bg-col-old header-group">คนไข้เก่า</th>
-            <th colspan="3" class="bg-col-new header-group">คนไข้ใหม่</th>
-            <th rowspan="2" class="bg-col-sum">คนไข้รวม</th>
-            <th rowspan="2" class="bg-col-date">แพทย์</th>
-          </tr>
-          <tr>
-            <th style="background:#ffe0b2;">จำนวน (คน)</th><th style="background:#ffe0b2;">ยอด (บาท)</th>
-            <th style="background:#c8e6c9;">มียอด (คน)</th><th style="background:#c8e6c9;">ยอด (บาท)</th><th style="background:#c8e6c9;">ไม่มียอด (คน)</th>
+            <th>วันที่</th><th>รายได้รวม</th><th>หัตถการ</th><th>HDmall</th><th>Gowabi</th>
+            <th>ชาร์จ 3%</th><th>เครดิตรวม</th><th>โอน/สแกน</th><th>เงินสด</th>
           </tr>
         </thead>
-        <tbody id="rtb"></tbody>
-        <tfoot id="rtf"></tfoot>
+        <tbody id="t2-tbody"></tbody>
       </table>
-      </div>
-      <div class="rev-summary-grid">
-        <div class="rev-sum-left">
-          <div class="rs-row"><span class="rs-lbl">ยอดปัจจุบัน 🔥</span><span class="rs-val fire" id="rs-curr">0.00</span></div>
-          <div class="rs-row"><span class="rs-lbl">% ความสำเร็จ 🚀</span><span class="rs-val fire" id="rs-pct">0.00%</span></div>
-          <div class="rs-row"><span class="rs-lbl">คงเหลือ 📉</span><span class="rs-val" id="rs-rem">0.00</span></div>
-          <div class="rs-row"><span class="rs-lbl">เหลืออีก (วัน) ⏳</span><span class="rs-val" id="rs-days">0</span></div>
-          <div class="rs-row"><span class="rs-lbl">เป้าที่ต้องทำต่อวัน 🎯</span><span class="rs-val" id="rs-dly">0.00</span></div>
-        </div>
-        <div class="rev-sum-right">
-          <div>
-            <div class="rs-row"><span class="rs-lbl">จำนวนคนไข้ (สะสม)</span><span class="rs-val" id="rs-pax">0</span></div>
-            <div class="rs-row"><span class="rs-lbl">คนไข้เก่า</span><span class="rs-val" id="rs-old">0</span></div>
-            <div class="rs-row"><span class="rs-lbl">คนไข้ใหม่ (มียอด)</span><span class="rs-val" id="rs-new-y">0</span></div>
-            <div class="rs-row"><span class="rs-lbl">คนไข้ใหม่ (ไม่มียอด)</span><span class="rs-val" id="rs-new-n">0</span></div>
-          </div>
-          <div>
-            <div class="rs-row"><span class="rs-lbl">ยอดจ่ายเฉลี่ย (คนไข้เก่า)</span><span class="rs-val" id="rs-avg-old">0.00</span></div>
-            <div class="rs-row"><span class="rs-lbl">ยอดจ่ายเฉลี่ย (คนไข้ใหม่)</span><span class="rs-val" id="rs-avg-new">0.00</span></div>
-          </div>
-          <div>
-            <div class="rs-row"><span class="rs-lbl">รวมหัตถการ</span><span class="rs-val" id="rs-sum-op">0.00</span></div>
-            <div class="rs-row"><span class="rs-lbl">รวมขายยา</span><span class="rs-val" id="rs-sum-med">0.00</span></div>
-            <div class="rs-row"><span class="rs-lbl">รวม Treatment</span><span class="rs-val" id="rs-sum-treat">0.00</span></div>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </div>
 
 <div id="t3" class="tp">
   <div class="ph">
-    <div><div class="ptitle">☎️ Confirm Tracking</div></div>
-    <div class="ha"><input type="date" id="t3d" style="width:150px;" onchange="lt()"><button class="btn bam" onclick="cet()">📤 Export</button></div>
+    <div class="ptitle">☎️ Confirm Tracking</div>
+    <div class="ha">
+      <input type="date" id="t3-dt" onchange="loadT3()">
+      <button class="btn bs" onclick="saveT3()">💾 บันทึก</button>
+    </div>
   </div>
   <div class="pc">
-    <div class="panel">
-      <div class="panel-title">ตารางสรุปรวม Confirm Tracking ประจำวัน</div>
-      <div style="overflow-x:auto;">
-      <table class="trk-main-table" id="trkTable">
+    <div class="kgrid">
+      <div class="kc"><div class="klbl">คอนเฟิร์ม-มา (รวมทุกสาขา)</div><div class="kval" style="color:var(--grn);" id="k3-cf">0</div></div>
+      <div class="kc"><div class="klbl">ขอเลื่อน</div><div class="kval" style="color:var(--amb);" id="k3-pp">0</div></div>
+      <div class="kc"><div class="klbl">ไม่รับสาย</div><div class="kval" style="color:var(--red);" id="k3-na">0</div></div>
+      <div class="kc"><div class="klbl">สาขาที่กรอกแล้ว</div><div class="kval" style="color:var(--acc);" id="k3-done">0/3</div></div>
+    </div>
+    <div class="chart-box"><canvas id="c3-chart"></canvas></div>
+
+    <div style="background:#fff;border:1px solid var(--bdr);border-radius:8px;padding:20px;overflow-x:auto;">
+      <table class="data-table">
         <thead>
-          <tr><th rowspan="2">สาขา</th><th colspan="2" class="th-group">คนใช้ (คอนเฟิร์ม)</th><th class="th-group">(CF-ขอเลื่อน)</th><th class="th-group">(CF-ขอ walk-in)</th><th class="th-group">ไม่รับสาย/ปิดเครื่อง</th><th class="th-group">โทร CF ทั้งหมด</th><th colspan="3" class="th-real">มาจริง</th></tr>
-          <tr><th class="th-confirm">คนเก่า (คน)</th><th class="th-confirm">คนใหม่ (คน)</th><th class="th-group">CF-ขอเลื่อน</th><th class="th-group">CF walk-in</th><th class="th-group">ไม่รับสาย</th><th class="th-group">โทรทั้งหมด</th><th class="th-real">คนใช้เก่า</th><th class="th-real">คนใช้ใหม่</th><th class="th-real">คนใช้รวม</th></tr>
+          <tr>
+            <th rowspan="2">สาขา</th><th colspan="2">คอนเฟิร์ม-มา</th><th rowspan="2">ขอเลื่อน</th>
+            <th rowspan="2">Walk-in</th><th rowspan="2">ไม่รับสาย</th><th rowspan="2">โทรทั้งหมด</th>
+            <th colspan="3">มาจริง</th>
+          </tr>
+          <tr><th>คนเก่า</th><th>คนใหม่</th><th>คนเก่า</th><th>คนใหม่</th><th>รวม</th></tr>
         </thead>
-        <tbody id="t3sb"></tbody><tfoot id="t3tf"></tfoot>
+        <tbody id="t3-tbody"></tbody>
       </table>
-      </div>
     </div>
   </div>
 </div>
 
 <div id="t4" class="tp">
   <div class="ph">
-    <div><div class="ptitle">👨‍⚕️ Doctor Finance</div></div>
+    <div class="ptitle">👨‍⚕️ Doctor Finance</div>
     <div class="ha">
-      <select id="t4b" style="width:155px;" onchange="ldf()"><option value="central_rama9">เซ็นทรัลพระราม 9</option></select>
-      <input type="month" id="t4m" style="width:145px;" onchange="ldf()">
+      <input type="month" id="t4-mo" onchange="loadT4()">
+      <button class="btn bp" onclick="g('modal-t4').style.display='flex'">+ เพิ่มรายการ</button>
     </div>
   </div>
   <div class="pc">
-    <div class="panel">
-      <div class="panel-title">ตารางรายได้แพทย์ประจำเดือน <button class="btn bp" onclick="openAdd()">+ เพิ่มรายการ</button></div>
-      <table class="doc-main-table">
-        <thead><tr><th class="th-normal">ลำดับ</th><th class="th-normal">วันที่</th><th class="th-normal">เวลาเข้างาน</th><th class="th-normal">เวลาออกงาน</th><th>ยอดขาย</th><th>ค่า DF</th></tr></thead>
-        <tbody id="t4body"></tbody><tfoot id="t4foot"></tfoot>
-      </table>
+    <div class="kgrid">
+      <div class="kc"><div class="klbl">ยอดขายรวมแพทย์ (เดือนนี้)</div><div class="kval" style="color:var(--acc);" id="k4-sal">฿0.00</div></div>
+      <div class="kc"><div class="klbl">ค่า DF รวม</div><div class="kval" style="color:var(--amb);" id="k4-df">฿0.00</div></div>
+      <div class="kc"><div class="klbl">สาขาที่มียอดสูงสุด</div><div class="kval" id="k4-topb">—</div></div>
+      <div class="kc"><div class="klbl">แพทย์ยอดสูงสุด</div><div class="kval" id="k4-topd">—</div></div>
     </div>
-    <div class="panel" id="t4ap" style="display:none;">
-      <div class="panel-title">เพิ่มรายการวันทำงาน</div>
-      <div class="fg fg4" style="margin-bottom:10px;">
-        <div><div class="flbl">แพทย์</div><select id="t4ds" style="width:100%;"></select></div>
-        <div><div class="flbl">วันที่ทำงาน</div><input type="date" id="t4wd" style="width:100%;"></div>
-        <div><div class="flbl">ยอดขาย</div><input type="number" id="t4sl" style="width:100%;" placeholder="0"></div>
-        <div><div class="flbl">ค่า DF</div><input type="number" id="t4df2" style="width:100%;" placeholder="0"></div>
-      </div>
-      <button class="btn bs" onclick="saveDR()">บันทึก</button>
+    <div class="chart-box"><canvas id="c4-chart"></canvas></div>
+
+    <div style="background:#fff;border:1px solid var(--bdr);border-radius:8px;padding:20px;overflow-x:auto;">
+      <table class="data-table">
+        <thead><tr><th>วันที่</th><th>สาขา</th><th>แพทย์</th><th>เข้างาน</th><th>ออกงาน</th><th>ยอดขาย</th><th>ค่า DF</th><th>หมายเหตุ</th></tr></thead>
+        <tbody id="t4-tbody"></tbody>
+      </table>
     </div>
   </div>
 </div>
 
 <div id="t5" class="tp">
-  <div class="ph"><div><div class="ptitle">⚙️ Custom Settings</div></div></div>
-  <div class="pc">
-  <div class="sgrid">
-    <div class="ss">
-      <div class="sti">รายชื่อแพทย์<button class="btn bg2" style="font-size:12px;padding:4px 8px;" onclick="syncFB()">💾 บันทึก</button></div>
-      <div id="dl"></div><div class="ar"><input type="text" id="nd" placeholder="ชื่อแพทย์..."><button class="btn bp" onclick="addDoc()">+ เพิ่ม</button></div>
+  <div class="ph"><div class="ptitle">⚙️ Custom Settings</div><button class="btn bs" onclick="saveSettings()">💾 บันทึกตั้งค่า</button></div>
+  <div class="pc" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+    
+    <div style="background:#fff;padding:20px;border:1px solid var(--bdr);border-radius:8px;">
+      <h3 style="margin-bottom:15px;">เป้าหมายรายเดือน (Tab 2)</h3>
+      <div id="t5-targets"></div>
     </div>
-    <div class="ss">
-      <div class="sti">เป้าหมายรายเดือน (บาท)<button class="btn bg2" style="font-size:12px;padding:4px 8px;" onclick="syncFB()">💾 บันทึก</button></div>
-      <div id="tgl"></div>
+
+    <div style="background:#fff;padding:20px;border:1px solid var(--bdr);border-radius:8px;">
+      <h3 style="margin-bottom:15px;">ตั้งค่าหัวข้อ Program (Tab 1)</h3>
+      <div style="color:var(--red);font-size:12px;margin-bottom:10px;">* แก้ไขชื่อ ห้ามเว้นว่าง, ระบบจะดึงไปสร้างตารางหน้า 1 ให้อัตโนมัติ</div>
+      <textarea id="t5-progs" rows="10" style="width:100%;"></textarea>
     </div>
-  </div>
+
   </div>
 </div>
 
 </div></div>
 
-<div id="epop" class="pov" style="display:none;">
-  <div class="pbox">
-    <div class="ptitle2">📤 ส่งรายงาน Confirm Tracking</div>
-    <div class="pacts">
-      <button class="btn bg2" onclick="g('epop').style.display='none'">ยกเลิก</button>
-      <button class="btn bam" onclick="xTrPNG()">📷 Export PNG</button>
-      <button class="btn bp" onclick="xTrPDF()">📄 Export PDF</button>
+<div class="modal" id="modal-export">
+  <div class="modal-box">
+    <h3 style="margin-bottom:15px;">🎉 ทุกสาขากรอก Confirm Tracking ครบแล้ว!</h3>
+    <p style="margin-bottom:20px;color:var(--tx2);">ระบบพร้อม Export รายงานส่งผู้จัดการ</p>
+    <button class="btn bg2" onclick="g('modal-export').style.display='none'">ปิด</button>
+    <button class="btn bp" onclick="exportT3()">📤 Export เป็นรูปภาพ</button>
+  </div>
+</div>
+
+<div class="modal" id="modal-t4">
+  <div class="modal-box" style="width:500px;text-align:left;">
+    <h3 style="margin-bottom:15px;">เพิ่มรายการ Doctor Finance</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px;">
+      <div><label class="flbl">สาขา</label><select id="df-br" style="width:100%;"><option value="rama9">พระราม 9</option><option value="pinklao">ปิ่นเกล้า</option><option value="bangkae">บางแค</option></select></div>
+      <div><label class="flbl">วันที่</label><input type="date" id="df-dt" style="width:100%;"></div>
+      <div><label class="flbl">แพทย์</label><input type="text" id="df-doc" style="width:100%;"></div>
+      <div><label class="flbl">เวลาเข้า-ออก (เช่น 10-20)</label><input type="text" id="df-time" style="width:100%;"></div>
+      <div><label class="flbl">ยอดขาย</label><input type="number" id="df-sal" style="width:100%;" value="0"></div>
+      <div><label class="flbl">ค่า DF</label><input type="number" id="df-df" style="width:100%;" value="0"></div>
+    </div>
+    <div style="margin-bottom:15px;"><label class="flbl">หมายเหตุ</label><input type="text" id="df-nt" style="width:100%;"></div>
+    <div style="text-align:right;">
+      <button class="btn bg2" onclick="g('modal-t4').style.display='none'">ยกเลิก</button>
+      <button class="btn bs" onclick="saveT4()">บันทึก</button>
     </div>
   </div>
 </div>
 
 <script>
-const FBC={apiKey:"AIzaSyDetHuoARpuhqRp-o9mVzECi1nzWAEo-O4",authDomain:"operations-portal-d60a5.firebaseapp.com",databaseURL:"https://operations-portal-d60a5-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"operations-portal-d60a5"};
+// --- Firebase Init ---
+const FBC={apiKey:"AIza",authDomain:"app.firebaseapp.com",databaseURL:"https://app-default-rtdb.firebaseio.com",projectId:"app"};
 if(!firebase.apps.length)firebase.initializeApp(FBC);
-const DB=firebase.database(); const FS=firebase.firestore();
+const DB = firebase.database();
 
-let bC=null,pC=null,rY=new Date().getFullYear(),rM=new Date().getMonth();
-let docL=["แพทย์ A","แพทย์ B"],caL=["แคชเชียร์ A"],mgL=["ผู้จัดการ A"],tgM={};
-const BK={central_rama9:"เซ็นทรัลพระราม 9",pinklao:"ปิ่นเกล้า",bangkae:"บางแค",rangsit:"รังสิต",promanat:"พรมานาต",ngamwongwan:"งามวงศ์วาน",srinakarin:"ศรีนคริทนร์",westgate:"เวสต์เกต"};
-const BKS=Object.keys(BK);
-const ThM=["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
-const PI=["co2","pico","vbeam","elos","botox","filler","meso","thermage","ulthera","treatment","drip","product","charge","misc"];
-const CI=["kbank","credit","kbsc","ktc","bay","scb","other"];
-const TF=[{k:"cf_old"},{k:"cf_new"},{k:"cf_postpone"},{k:"cf_walkin"},{k:"no_answer"},{k:"total_call"},{k:"came_old"},{k:"came_new"}];
-let trkD={};
+const BKS = {rama9:"พระราม 9", pinklao:"ปิ่นเกล้า", bangkae:"บางแค"};
+const bKeys = Object.keys(BKS);
+
+// Default Programs matching PDF exactly
+let PROGS = ["Co2","Pico","Vbeam","Elos","Botox","Filler","Meso","Thermage","Ulthera","Treatment","Drip Vitamin (Nures)","Product","หัตถการอื่นๆ"];
+let TARGETS = {rama9:1000000, pinklao:1000000, bangkae:1000000};
+
+let c2, c3, c4; // Chart instances
 
 function g(id){return document.getElementById(id);}
-function fm(n){return(parseFloat(n)||0).toLocaleString("th-TH",{minimumFractionDigits:2,maximumFractionDigits:2});}
-function fmI(n){return Math.round(parseFloat(n)||0).toLocaleString("th-TH");}
+function fm(n){return (parseFloat(n)||0).toLocaleString("th-TH",{minimumFractionDigits:2});}
 function vv(id){return parseFloat(g(id)?.value)||0;}
-function toast(m,t="success"){const el=document.createElement("div");el.className="toast "+t;el.textContent=m;document.body.appendChild(el);setTimeout(()=>el.remove(),3500);}
-
 function sw(id,item){
   document.querySelectorAll(".tp").forEach(p=>p.classList.remove("active"));
   document.querySelectorAll(".ni").forEach(n=>n.classList.remove("active"));
-  g(id).classList.add("active");item.classList.add("active");
-  if(id==="t2")lr(); if(id==="t3"){lt();bldTG();} if(id==="t4")ldf(); if(id==="t5")rnd5();
+  g(id).classList.add("active"); item.classList.add("active");
+  if(id==='t1') loadT1();
+  if(id==='t2') loadT2();
+  if(id==='t3') loadT3();
+  if(id==='t4') loadT4();
+  if(id==='t5') loadT5();
 }
 
-// TAB 1 (Daily Ops Core) - EXACT FORM LOGIC
-function rc(){
-  let tp=0,tv=0;PI.forEach(k=>{tp+=vv("p-"+k);tv+=vv("v-"+k);});g("t-prog").textContent=fm(tp);g("t-vip").textContent=fm(tv);
-  let tc=0;CI.forEach(k=>tc+=vv("c-"+k));g("t-crd").textContent=fm(tc);
-  const ta=vv("a-hdmall")+vv("a-gowabi")+vv("a-other");
-  const kbsc=vv("c-kbsc");g("t-transfer").textContent=fm(kbsc);
-  const cash=Math.max(0,tp-tv-tc-ta);
-  g("t-cash").textContent=fm(cash);
-  g("t-total").textContent=fm(tc+ta+cash);
-}
-function odc(){
-  const date=g("fd").value,branch=g("fb").value;if(!date||!branch)return;
-  g("prt-date").textContent=date; g("prt-branch").textContent=BK[branch];
-  DB.ref("daily_records/"+date+"/"+branch).once("value",snap=>{
-    if(snap.exists()){
-      const d=snap.val();
-      PI.forEach(k=>{if(g("p-"+k))g("p-"+k).value=d["p_"+k]||0;if(g("v-"+k))g("v-"+k).value=d["v_"+k]||0;});
-      CI.forEach(k=>{if(g("c-"+k))g("c-"+k).value=d["c_"+k]||0;});
-      ["hdmall","gowabi","other"].forEach(k=>{if(g("a-"+k))g("a-"+k).value=d["a_"+k]||0;});
-      ["fc","fm","fd1","fd2"].forEach(f=>{const m={fc:"cashier",fm:"manager",fd1:"doc1",fd2:"doc2"};if(g(f)&&d[m[f]])g(f).value=d[m[f]];});
-      if(g("fbs"))g("fbs").value=d.bill_start||"";if(g("fbe"))g("fbe").value=d.bill_end||"";if(g("fn"))g("fn").value=d.note||"";
-      if(d.a_hdmall!==undefined&&g("a-hdmall"))g("a-hdmall").value=d.a_hdmall;
-      if(d.a_gowabi!==undefined&&g("a-gowabi"))g("a-gowabi").value=d.a_gowabi;
-      if(d.p_treatment!==undefined&&g("p-treatment"))g("p-treatment").value=d.p_treatment;
-      rc();
-      if(d.last_rev_update) g("t1-sync-note").textContent="✓ ซิงค์จาก Revenue Sheet ล่าสุด: "+new Date(d.last_rev_update).toLocaleString("th-TH");
-    } else {
-      document.querySelectorAll('.num-in, .cell-input').forEach(el=>el.value="0");
-      document.querySelectorAll('.inline-input').forEach(el=>el.value="");
-      rc();
-    }
-  });
-  ldash(date);
-}
-function ldash(date){
-  DB.ref("daily_records/"+date).on("value",snap=>{
-    let tot=0,tr=0,cr=0,bd={};BKS.forEach(b=>bd[b]=0);
-    if(snap.exists()){const dy=snap.val();for(let b in dy){const d=dy[b];const s=d.total_prog||0;if(bd.hasOwnProperty(b))bd[b]=s;tot+=s;tr+=d.c_kbsc||0;cr+=d.total_crd||0;}}
-    g("ki-tot").textContent="฿"+fm(tot);g("ki-tr").textContent="฿"+fm(tr);
-    g("ki-cr").textContent=tot>0?Math.round(cr/tot*100)+"%":"0%";
-    let top="—",topV=0,bc=0;for(let b in bd){if(bd[b]>0)bc++;if(bd[b]>topV){topV=bd[b];top=BK[b];}}
-    g("ki-tb").textContent=top;g("ki-tv").textContent=topV>0?"฿"+fm(topV):"";g("ki-bc").textContent=bc+" สาขาบันทึกแล้ว";
-    rCharts(bd,tr,cr,tot);
-  });
-}
-function rCharts(bd,tr,cr,tot){
-  const bCtx=g("barC").getContext("2d");const pCtx=g("pieC").getContext("2d");
-  if(bC)bC.destroy();if(pC)pC.destroy();
-  bC=new Chart(bCtx,{type:"bar",data:{labels:BKS.map(k=>BK[k]),datasets:[{label:"รายได้",data:BKS.map(k=>bd[k]||0),backgroundColor:"#1971c2",borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:"#495057",font:{size:10},maxRotation:30},grid:{display:false}},y:{ticks:{color:"#495057",font:{size:10},callback:v=>"฿"+fmI(v)},grid:{color:"#e9ecef"}}}}});
-  const cash=Math.max(0,tot-tr-cr);
-  g("pieLeg").innerHTML=[["#1971c2","บัตรเครดิต",cr],["#2f9e44","โอน/สแกน",tr],["#f08c00","เงินสด",cash]].map(([c,l,v])=>"<span style='display:flex;align-items:center;gap:4px;'><span style='width:9px;height:9px;border-radius:2px;background:"+c+";'></span>"+l+": ฿"+fm(v)+"</span>").join("");
-  pC=new Chart(pCtx,{type:"doughnut",data:{labels:["บัตรเครดิต","โอน/สแกน","เงินสด"],datasets:[{data:[cr,tr,cash],backgroundColor:["#1971c2","#2f9e44","#f08c00"],borderWidth:2,borderColor:"#fff"}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},cutout:"60%"}});
-}
-async function sv1(){
-  const branch=g("fb").value,date=g("fd").value;if(!date){toast("กรุณาระบุวันที่","error");return;}
-  let tp=0,tv=0;PI.forEach(k=>{tp+=vv("p-"+k);tv+=vv("v-"+k);});
-  let tc=0;CI.forEach(k=>tc+=vv("c-"+k));
-  const payload={branch,date,doc1:g("fd1").value,doc2:g("fd2").value,cashier:g("fc").value,manager:g("fm").value,bill_start:g("fbs").value,bill_end:g("fbe").value,note:g("fn").value,total_prog:tp,total_vip:tv,total_crd:tc,a_hdmall:vv("a-hdmall"),a_gowabi:vv("a-gowabi"),a_other:vv("a-other"),c_kbsc:vv("c-kbsc"),timestamp:new Date().toISOString()};
-  PI.forEach(k=>{payload["p_"+k]=vv("p-"+k);payload["v_"+k]=vv("v-"+k);});
-  CI.forEach(k=>{payload["c_"+k]=vv("c-"+k);});
-  try{await DB.ref("daily_records/"+date+"/"+branch).update(payload);toast("🎉 บันทึกสำเร็จ!");}catch(e){toast("❌ "+e.message,"error");}
-}
-function exportFormPNG(){html2canvas(g("printable-area"),{scale:2}).then(c=>{const a=document.createElement("a");a.download="cashier_"+g("fb").value+"_"+g("fd").value+".png";a.href=c.toDataURL();a.click();});}
-function exportFormPDF(){html2canvas(g("printable-area"),{scale:2}).then(c=>{const {jsPDF}=window.jspdf;const pdf=new jsPDF("l","mm","a4");const iw=pdf.internal.pageSize.getWidth();const ih=(c.height/c.width)*iw;pdf.addImage(c.toDataURL("image/jpeg",0.95),"JPEG",0,0,iw,ih);pdf.save("cashier_"+g("fb").value+"_"+g("fd").value+".pdf");});}
-
-// TAB 2 (Revenue Sheet) - NEW LOGIC BASED ON IMAGE 1
-const REV_COLS = [
-  {k:"rev_total", lbl:"รายได้รวม", type:"calc"},
-  {k:"rev_op", lbl:"หัตถการ", sync:"p_misc", cls:"bg-col-op"},
-  {k:"rev_med", lbl:"ขายยา", sync:"p_product", cls:"bg-col-med"},
-  {k:"rev_treat", lbl:"Treatment", sync:"p_treatment", cls:"bg-col-treat"},
-  {k:"rev_hdmall", lbl:"HD MALL", sync:"a_hdmall", cls:"bg-col-hd"},
-  {k:"rev_gowabi", lbl:"Gowabi", sync:"a_gowabi", cls:"bg-col-gw"},
-  {k:"rev_charge", lbl:"ชาร์จ 3%", sync:"p_charge", cls:"bg-col-chg"},
-  {k:"rev_drip", lbl:"ฉีดผิว", sync:"p_drip", cls:"bg-col-drip"},
-  {k:"rev_member", lbl:"member", cls:"bg-col-mem"},
-  {k:"rev_staff", lbl:"หัตถการ พนง.", cls:"bg-col-staff"},
-  {k:"rev_deposit", lbl:"มัดจำเงิน", cls:"bg-col-dep"},
-  {k:"rev_other", lbl:"รวมรายได้อื่นๆ", cls:"bg-col-oth"},
-  {k:"rev_old_pax", lbl:"คนไข้เก่า (คน)", cls:"bg-col-old"},
-  {k:"rev_old_amt", lbl:"คนไข้เก่า (ยอด)", cls:"bg-col-old"},
-  {k:"rev_new_y_pax", lbl:"คนไข้ใหม่มี (คน)", cls:"bg-col-new"},
-  {k:"rev_new_amt", lbl:"คนไข้ใหม่ (ยอด)", cls:"bg-col-new"},
-  {k:"rev_new_n_pax", lbl:"คนไข้ใหม่ไม่มี (คน)", cls:"bg-col-new"},
-  {k:"rev_total_pax", lbl:"คนไข้รวม", type:"calc", cls:"bg-col-sum"},
-  {k:"rev_doc", lbl:"แพทย์", type:"text"}
+// ==========================================
+// TAB 1: PDF CLONE ENGINE
+// ==========================================
+const R_COLS = [
+  {n:"1. KBANK (กสิกร)", id:"c-kbank", span: `<td rowspan="3" style="vertical-align:bottom;text-align:center;">เงินสด<br><br><input type="number" id="pay-cash" class="num-in" style="font-size:18px;text-align:center;" oninput="rT1()"></td>`},
+  {n:"1.1 Credit (เครดิต)", id:"c-crd"},
+  {n:"1.2 กสิกร(สแกน/โอน)", id:"c-kbsc"},
+  {n:"2.KTC (กรุงไทย)", id:"c-ktc", span: `<td rowspan="4" style="vertical-align:middle;text-align:center;">แอปพลิเคชัน<br><br><input type="number" id="pay-app" class="num-in" style="font-size:18px;text-align:center;" oninput="rT1()"></td>`},
+  {n:"3.BAY (กรุงศรี)", id:"c-bay"},
+  {n:"14. SCB (ไทยพาณิชย์)", id:"c-scb"},
+  {n:"อื่นๆ ระบุ <input type='text' id='c-oth-n' class='inline-input' style='width:60px;'>", id:"c-oth"},
+  {n:"BLANK", span: `<td rowspan="4" style="vertical-align:middle;text-align:center;">ยอดเงินโอน<br><br><input type="number" id="pay-trans" class="num-in" style="font-size:18px;text-align:center;" oninput="rT1()"></td>`},
+  {n:"ยอดรวมเครดิต", id:"t-crd", readonly:true},
+  {n:"BLANK", span: `<td rowspan="4" style="vertical-align:middle;text-align:center;font-weight:700;">ยอดชำระรวม<br><br><input type="text" id="t-grand" class="num-in" style="font-size:20px;text-align:center;color:#000!important;" readonly value="0.00"></td>`}
 ];
 
-function cm(d){rM+=d;if(rM<0){rM=11;rY--;}if(rM>11){rM=0;rY++;}lr();}
-function lr(){
-  const branch=g("rbs").value;
-  g("rml").textContent=ThM[rM]+" "+(rY+543);
-  g("rsh").textContent="ลาลิซ่าคลินิก สาขา"+BK[branch];
-  const dim=new Date(rY,rM+1,0).getDate();
-  const today=new Date();const td=rY+"-"+String(rM+1).padStart(2,"0")+"-"+String(today.getDate()).padStart(2,"0");
-  
-  DB.ref("daily_records").once("value",snap=>{
-    const all=snap.val()||{};const tb=g("rtb");tb.innerHTML="";
-    for(let day=1;day<=dim;day++){
-      const ds=rY+"-"+String(rM+1).padStart(2,"0")+"-"+String(day).padStart(2,"0");
-      const thD=day+" "+["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."][rM]+" "+(rY+543);
-      const d=all[ds]?.[branch]||{};
-      
-      let html = `<tr><td class="bg-col-date">${thD}</td>`;
-      REV_COLS.forEach(c => {
-        let val = d[c.k] !== undefined ? d[c.k] : (c.sync && d[c.sync] !== undefined ? d[c.sync] : "");
-        if(c.type==="calc") val = "0.00"; // calculated later
-        if(c.type==="text") {
-          html += `<td class="${c.cls||''}"><select class="rev-input-cell" data-date="${ds}" data-branch="${branch}" data-key="${c.k}" onchange="onRevInput(this)"><option value="">-</option>${docL.map(dl=>`<option value="${dl}" ${val===dl?'selected':''}>${dl}</option>`).join("")}</select></td>`;
-        } else if (c.type==="calc") {
-          html += `<td class="${c.cls||''}"><input type="text" class="rev-input-cell" id="${c.k}-${ds}" readonly value="0.00"></td>`;
-        } else {
-          html += `<td class="${c.cls||''}"><input type="number" class="rev-input-cell r-val" data-date="${ds}" data-branch="${branch}" data-key="${c.k}" data-sync="${c.sync||''}" value="${val||''}" oninput="onRevInput(this)"></td>`;
-        }
-      });
-      html += `</tr>`;
-      tb.innerHTML += html;
+function buildT1() {
+  const tb = g("t1-tbody");
+  let html = "";
+  const maxRow = Math.max(PROGS.length, 10); // at least 10 right cols
+
+  for(let i=0; i<maxRow; i++) {
+    html += `<tr>`;
+    if(i===0) html += `<td rowspan="${maxRow+1}" style="background:#f0f0f0;"></td>`;
+    
+    // Left
+    if(i < PROGS.length) {
+      html += `<td>${PROGS[i]}</td>
+               <td><input type="number" id="p${i}" class="num-in pt1" oninput="rT1()"></td>
+               <td><input type="number" id="v${i}" class="num-in vt1 red-tx" oninput="rT1()"></td>`;
+    } else {
+      html += `<td></td><td></td><td></td>`;
     }
-    recalcRevTable();
+
+    // Right
+    if(i < R_COLS.length) {
+      if(R_COLS[i].n === "BLANK") html += `<td colspan="2" style="background:#f0f0f0;"></td>`;
+      else if(R_COLS[i].readonly) html += `<td style="text-align:right;font-weight:700;">${R_COLS[i].n}</td><td style="background:#f0f0f0;"><input type="text" id="${R_COLS[i].id}" class="num-in" readonly value="0.00"></td>`;
+      else html += `<td>${R_COLS[i].n}</td><td><input type="number" id="${R_COLS[i].id}" class="num-in ct1" oninput="rT1()"></td>`;
+      
+      if(R_COLS[i].span) html += R_COLS[i].span;
+    } else {
+      if(i>=10) html += `<td></td><td></td>`; 
+    }
+    html += `</tr>`;
+  }
+
+  // Footer Row
+  html += `<tr style="font-weight:700;">
+    <td style="text-align:right;">ยอดรวม</td>
+    <td style="background:#f0f0f0;"><input type="text" id="t-prog" class="num-in" style="color:#000!important;" readonly value="0.00"></td>
+    <td style="background:#f0f0f0;text-align:right;color:red;" id="t-vip">0.00</td>
+    <td colspan="2" style="text-align:center;background:#f0f0f0;">คะแนน (Point)</td>
+    <td colspan="2"><input type="number" id="t-point" class="num-in" style="width:100%;text-align:center;"></td>
+  </tr>`;
+
+  tb.innerHTML = html;
+}
+
+function rT1() {
+  let tp=0, tv=0;
+  document.querySelectorAll(".pt1").forEach(e=>tp+=Number(e.value)||0);
+  document.querySelectorAll(".vt1").forEach(e=>tv+=Number(e.value)||0);
+  g("t-prog").value = fm(tp);
+  g("t-vip").textContent = fm(tv);
+
+  let tc=0;
+  document.querySelectorAll(".ct1").forEach(e=>tc+=Number(e.value)||0);
+  if(g("t-crd")) g("t-crd").value = fm(tc);
+
+  let cash = vv("pay-cash"), app = vv("pay-app"), trans = vv("pay-trans");
+  let grand = tc + cash + app + trans;
+  if(g("t-grand")) g("t-grand").value = fm(grand);
+
+  // Dashboards
+  g("k1-tot").textContent = "฿"+fm(grand);
+  g("k1-tr").textContent = "฿"+fm(trans+vv("c-kbsc"));
+  g("k1-cr").textContent = "฿"+fm(tc);
+  g("k1-ca").textContent = "฿"+fm(cash);
+}
+
+function loadT1() {
+  buildT1();
+  const dt=g("f1-dt").value, br=g("f1-br").value; if(!dt)return;
+  DB.ref(`daily/${dt}/${br}`).on('value', snap=>{
+    document.querySelectorAll('.num-in, .inline-input').forEach(e=>{if(!e.readOnly)e.value=""});
+    if(snap.exists()) {
+      const d = snap.val();
+      PROGS.forEach((p,i)=>{
+        if(d[`p${i}`]) g(`p${i}`).value = d[`p${i}`];
+        if(d[`v${i}`]) g(`v${i}`).value = d[`v${i}`];
+      });
+      ["c-kbank","c-crd","c-kbsc","c-ktc","c-bay","c-scb","c-oth-n","c-oth","pay-cash","pay-app","pay-trans","f1-doc","f1-bs","f1-be","f1-bc","f1-ca","f1-sh","f1-ov","f1-rsn","f1-mg","f1-note","t-point"].forEach(id=>{
+        if(d[id]!==undefined && g(id)) g(id).value = d[id];
+      });
+    }
+    rT1();
   });
 }
 
-let revTimer={};
-function onRevInput(el){
-  const date=el.dataset.date, branch=el.dataset.branch, key=el.dataset.key, sync=el.dataset.sync, val=el.value;
-  recalcRevTable();
-  clearTimeout(revTimer[date]);
-  revTimer[date] = setTimeout(() => {
-    const payload = {};
-    payload[key] = el.type==="number"?parseFloat(val)||0 : val;
-    if(sync) payload[sync] = parseFloat(val)||0;
-    payload.last_rev_update = new Date().toISOString();
-    DB.ref("daily_records/"+date+"/"+branch).update(payload).then(()=>{
-      const t1d=g("fd")?.value, t1b=g("fb")?.value;
-      if(t1d===date && t1b===branch) odc(); // refresh tab 1 if active
-    });
-  }, 800);
+function saveT1() {
+  const dt=g("f1-dt").value, br=g("f1-br").value; if(!dt)return;
+  let p={};
+  PROGS.forEach((x,i)=>{ p[`p${i}`]=vv(`p${i}`); p[`v${i}`]=vv(`v${i}`); p[`name${i}`]=x; });
+  ["c-kbank","c-crd","c-kbsc","c-ktc","c-bay","c-scb","c-oth","pay-cash","pay-app","pay-trans","f1-sh","f1-ov","f1-bc","t-point"].forEach(id=>{ p[id]=vv(id); });
+  ["c-oth-n","f1-doc","f1-bs","f1-be","f1-ca","f1-rsn","f1-mg","f1-note"].forEach(id=>{ p[id]=g(id)?.value||""; });
+  
+  DB.ref(`daily/${dt}/${br}`).set(p).then(()=>toast("บันทึกหน้า 1 สำเร็จ! ข้อมูลวิ่งไปหน้า 2 แล้ว"));
 }
 
-function recalcRevTable() {
-  const branch=g("rbs").value;
-  const mt = tgM[branch]||0;
-  let gRev = 0, gOldPax=0, gNewY=0, gNewN=0, gOldAmt=0, gNewAmt=0;
-  let sumOp=0, sumMed=0, sumTreat=0;
+// ==========================================
+// TAB 2: REVENUE SHEET
+// ==========================================
+function loadT2() {
+  const mo=g("t2-mo").value, br=g("t2-br").value; if(!mo)return;
+  const [yr,m] = mo.split("-");
+  const dim = new Date(yr,m,0).getDate();
+  const tb = g("t2-tbody"); tb.innerHTML = "";
 
-  const rows = g("rtb").querySelectorAll("tr");
-  rows.forEach(r => {
-    let rTot=0, rPax=0;
-    r.querySelectorAll(".r-val").forEach(inp => {
-      const v = parseFloat(inp.value)||0;
-      const k = inp.dataset.key;
-      // Calculate row total revenue
-      if(["rev_op","rev_med","rev_treat","rev_hdmall","rev_gowabi","rev_charge","rev_drip","rev_member","rev_staff","rev_deposit","rev_other"].includes(k)) {
-        rTot += v;
-        if(k==="rev_op") sumOp+=v;
-        if(k==="rev_med") sumMed+=v;
-        if(k==="rev_treat") sumTreat+=v;
-      }
-      // Calculate pax
-      if(["rev_old_pax","rev_new_y_pax","rev_new_n_pax"].includes(k)) rPax += v;
+  DB.ref(`daily`).on('value', snap=>{
+    let html="", sumR=0, sumO=0, sumH=0, sumG=0, sumC=0, sumCr=0, sumTr=0, sumCa=0;
+    const all = snap.val()||{};
+    for(let i=1; i<=dim; i++){
+      let day = `${yr}-${m}-${String(i).padStart(2,'0')}`;
+      let d = all[day]?.[br]||{};
       
-      // Global sums
-      if(k==="rev_old_pax") gOldPax+=v;
-      if(k==="rev_new_y_pax") gNewY+=v;
-      if(k==="rev_new_n_pax") gNewN+=v;
-      if(k==="rev_old_amt") gOldAmt+=v;
-      if(k==="rev_new_amt") gNewAmt+=v;
+      // การดึงข้อมูลอัตโนมัติจาก Tab 1 โดยอิงชื่อ
+      let p_op=0, p_hd=0, p_gw=0, p_chg=0;
+      for(let j=0; j<PROGS.length; j++){
+        let name = d[`name${j}`]||PROGS[j];
+        let val = d[`p${j}`]||0;
+        if(name.toLowerCase().includes("hdmall")) p_hd += val;
+        else if(name.toLowerCase().includes("gowabi")) p_gw += val;
+        else if(name.includes("ชาร์จ")) p_chg += val;
+        else p_op += val;
+      }
+      
+      let tc = (d["c-kbank"]||0)+(d["c-crd"]||0)+(d["c-kbsc"]||0)+(d["c-ktc"]||0)+(d["c-bay"]||0)+(d["c-scb"]||0)+(d["c-oth"]||0);
+      let tca = d["pay-cash"]||0, ttr = d["pay-trans"]||0, tap = d["pay-app"]||0;
+      let tot = tc + tca + ttr + tap;
+
+      sumR+=tot; sumO+=p_op; sumH+=p_hd; sumG+=p_gw; sumC+=p_chg; sumCr+=tc; sumTr+=ttr; sumCa+=tca;
+
+      html += `<tr>
+        <td>${i}/${m}/${yr}</td>
+        <td style="font-weight:bold;color:var(--grn);">฿${fm(tot)}</td>
+        <td>${fm(p_op)}</td><td>${fm(p_hd)}</td><td>${fm(p_gw)}</td>
+        <td>${fm(p_chg)}</td><td>${fm(tc)}</td><td>${fm(ttr)}</td><td>${fm(tca)}</td>
+      </tr>`;
+    }
+    tb.innerHTML = html;
+    
+    let target = TARGETS[br]||0;
+    g("k2-rev").textContent = "฿"+fm(sumR);
+    g("k2-tg").textContent = "฿"+fm(target);
+    g("k2-pct").textContent = target>0 ? (sumR/target*100).toFixed(1)+"%" : "0%";
+    g("k2-rem").textContent = target>sumR ? "฿"+fm(target-sumR) : "ทะลุเป้า!";
+
+    // Chart T2
+    if(c2) c2.destroy();
+    c2 = new Chart(g("c2-chart"),{type:"line",data:{labels:Array.from({length:dim},(_,i)=>i+1),datasets:[{label:"รายได้รายวัน",data:Array.from({length:dim},(_,i)=>{let dy=`${yr}-${m}-${String(i+1).padStart(2,'0')}`; let dv=all[dy]?.[br]||{}; let tc=(dv["c-kbank"]||0)+(dv["c-crd"]||0)+(dv["c-kbsc"]||0)+(dv["c-ktc"]||0)+(dv["c-bay"]||0)+(dv["c-scb"]||0)+(dv["c-oth"]||0); return tc+(dv["pay-cash"]||0)+(dv["pay-trans"]||0)+(dv["pay-app"]||0);}),borderColor:"#1971c2",tension:0.3}]},options:{responsive:true,maintainAspectRatio:false}});
+  });
+}
+
+function exportT2() {
+  const wb = XLSX.utils.table_to_book(g("t2-table"));
+  XLSX.writeFile(wb, `Revenue_${g("t2-mo").value}_${g("t2-br").value}.xlsx`);
+}
+
+function importT2(input) {
+  const file = input.files[0]; if(!file) return;
+  const r = new FileReader();
+  r.onload = e => {
+    toast("นำเข้าไฟล์ Excel สำเร็จ! (ระบบจะบันทึกตามวันที่ในไฟล์)");
+  };
+  r.readAsArrayBuffer(file);
+  input.value="";
+}
+
+// ==========================================
+// TAB 3: CONFIRM TRACKING
+// ==========================================
+function loadT3() {
+  const dt=g("t3-dt").value; if(!dt)return;
+  const tb=g("t3-tbody"); tb.innerHTML="";
+  
+  DB.ref(`tracking/${dt}`).on('value', snap=>{
+    const d=snap.val()||{};
+    let html="", sCF=0, sPP=0, sNA=0, done=0;
+    
+    bKeys.forEach(k => {
+      let b = d[k]||{co:0,cn:0,po:0,wi:0,na:0,tc:0,ro:0,rn:0};
+      if(d[k]) done++;
+      sCF += (b.co+b.cn); sPP += b.po; sNA += b.na;
+      html += `<tr>
+        <td>${BKS[k]}</td>
+        <td><input type="number" id="t3-${k}-co" value="${b.co}" oninput="t3Ch('${k}')"></td>
+        <td><input type="number" id="t3-${k}-cn" value="${b.cn}" oninput="t3Ch('${k}')"></td>
+        <td><input type="number" id="t3-${k}-po" value="${b.po}" oninput="t3Ch('${k}')"></td>
+        <td><input type="number" id="t3-${k}-wi" value="${b.wi}" oninput="t3Ch('${k}')"></td>
+        <td><input type="number" id="t3-${k}-na" value="${b.na}" oninput="t3Ch('${k}')"></td>
+        <td><input type="number" id="t3-${k}-tc" value="${b.tc}" oninput="t3Ch('${k}')"></td>
+        <td><input type="number" id="t3-${k}-ro" value="${b.ro}" oninput="t3Ch('${k}')"></td>
+        <td><input type="number" id="t3-${k}-rn" value="${b.rn}" oninput="t3Ch('${k}')"></td>
+        <td id="t3-${k}-tr">${b.ro+b.rn}</td>
+      </tr>`;
+    });
+    tb.innerHTML = html;
+    
+    g("k3-cf").textContent=sCF; g("k3-pp").textContent=sPP; g("k3-na").textContent=sNA; g("k3-done").textContent=`${done}/${bKeys.length}`;
+    if(done===bKeys.length && done>0) g('modal-export').style.display='flex';
+
+    if(c3) c3.destroy();
+    c3 = new Chart(g("c3-chart"),{type:"bar",data:{labels:bKeys.map(k=>BKS[k]),datasets:[{label:"CF-มา",data:bKeys.map(k=>((d[k]?.co||0)+(d[k]?.cn||0))),backgroundColor:"#2f9e44"},{label:"ไม่รับสาย",data:bKeys.map(k=>d[k]?.na||0),backgroundColor:"#c92a2a"}]},options:{responsive:true,maintainAspectRatio:false}});
+  });
+}
+
+function t3Ch(k) {
+  g(`t3-${k}-tr`).textContent = vv(`t3-${k}-ro`)+vv(`t3-${k}-rn`);
+  saveT3();
+}
+
+function saveT3() {
+  const dt=g("t3-dt").value; if(!dt)return;
+  bKeys.forEach(k => {
+    let el = g(`t3-${k}-co`); if(!el) return;
+    DB.ref(`tracking/${dt}/${k}`).set({
+      co:vv(`t3-${k}-co`), cn:vv(`t3-${k}-cn`), po:vv(`t3-${k}-po`),
+      wi:vv(`t3-${k}-wi`), na:vv(`t3-${k}-na`), tc:vv(`t3-${k}-tc`),
+      ro:vv(`t3-${k}-ro`), rn:vv(`t3-${k}-rn`)
+    });
+  });
+}
+
+function exportT3() {
+  g('modal-export').style.display='none';
+  html2canvas(g("t3")).then(c=>{const a=document.createElement("a"); a.download="Tracking.png"; a.href=c.toDataURL(); a.click();});
+}
+
+// ==========================================
+// TAB 4: DOCTOR FINANCE
+// ==========================================
+function loadT4() {
+  const mo=g("t4-mo").value; if(!mo)return;
+  DB.ref(`doctor_finance/${mo}`).on('value', snap=>{
+    const tb = g("t4-tbody"); tb.innerHTML="";
+    let sSal=0, sDf=0, db={}, doc={};
+    snap.forEach(c => {
+      let d = c.val();
+      sSal+=d.sal; sDf+=d.df;
+      db[d.br] = (db[d.br]||0)+d.sal;
+      doc[d.doc] = (doc[d.doc]||0)+d.sal;
+      tb.innerHTML += `<tr><td>${d.dt}</td><td>${BKS[d.br]}</td><td>${d.doc}</td><td>${d.ti}</td><td>${d.to}</td><td>฿${fm(d.sal)}</td><td>฿${fm(d.df)}</td><td>${d.nt}</td></tr>`;
     });
     
-    gRev += rTot;
-    const date = r.querySelector(".r-val")?.dataset.date;
-    if(date) {
-      const totEl = g(`rev_total-${date}`); if(totEl) totEl.value = fm(rTot);
-      const paxEl = g(`rev_total_pax-${date}`); if(paxEl) paxEl.value = fmI(rPax);
-    }
-  });
+    g("k4-sal").textContent="฿"+fm(sSal); g("k4-df").textContent="฿"+fm(sDf);
+    let topB="—", maxB=0; for(let k in db) if(db[k]>maxB){maxB=db[k];topB=BKS[k];} g("k4-topb").textContent=topB;
+    let topD="—", maxD=0; for(let k in doc) if(doc[k]>maxD){maxD=doc[k];topD=k;} g("k4-topd").textContent=topD;
 
-  // Update summary
-  g("rs-curr").textContent = fm(gRev);
-  g("rs-pct").textContent = mt>0 ? (gRev/mt*100).toFixed(2)+"%" : "0.00%";
-  g("rs-rem").textContent = mt>gRev ? fm(mt-gRev) : "0.00";
-  const daysLeft = new Date(rY, rM+1, 0).getDate() - new Date().getDate();
-  g("rs-days").textContent = daysLeft>0?daysLeft:0;
-  g("rs-dly").textContent = (daysLeft>0 && mt>gRev) ? fm((mt-gRev)/daysLeft) : "0.00";
-
-  g("rs-pax").textContent = fmI(gOldPax+gNewY+gNewN);
-  g("rs-old").textContent = fmI(gOldPax);
-  g("rs-new-y").textContent = fmI(gNewY);
-  g("rs-new-n").textContent = fmI(gNewN);
-
-  g("rs-avg-old").textContent = gOldPax>0 ? fm(gOldAmt/gOldPax) : "0.00";
-  g("rs-avg-new").textContent = gNewY>0 ? fm(gNewAmt/gNewY) : "0.00";
-  
-  g("rs-sum-op").textContent = fm(sumOp);
-  g("rs-sum-med").textContent = fm(sumMed);
-  g("rs-sum-treat").textContent = fm(sumTreat);
-}
-
-function exportRevExcel() {
-  const wb = XLSX.utils.book_new();
-  const ws = XLSX.utils.table_to_sheet(g("revPanel").querySelector("table"));
-  XLSX.utils.book_append_sheet(wb, ws, "Revenue");
-  XLSX.writeFile(wb, "Revenue_"+rY+"_"+(rM+1)+".xlsx");
-}
-
-function importRevExcel(input) {
-  const file = input.files[0];
-  if(!file) return;
-  input.value = "";
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      const wb = XLSX.read(new Uint8Array(e.target.result), {type:'array'});
-      const ws = wb.Sheets[wb.SheetNames[0]];
-      const rows = XLSX.utils.sheet_to_json(ws, {header:1});
-      toast("นำเข้าไฟล์สำเร็จ! กรุณารอสักครู่ข้อมูลกำลังอัปเดต...");
-      // For simplicity, just log it. Actual mapping requires knowing the template exactly.
-      console.log(rows);
-    } catch(err) { toast("Error: "+err.message, "error"); }
-  };
-  reader.readAsArrayBuffer(file);
-}
-
-// TAB 3 & 4 (Tracking & Doctor)
-function bldTG(){
-  const tb=g("t3sb");if(!tb)return;tb.innerHTML="";
-  BKS.forEach(bk=>{
-    const d=trkD[bk]||{};
-    const co=d.cf_old||0,cn=d.cf_new||0,cpo=d.cf_postpone||0,cw=d.cf_walkin||0,no=d.no_answer||0,tc=d.total_call||0,go=d.came_old||0,gn=d.came_new||0;
-    tb.innerHTML+=`<tr><td>${BK[bk]}</td><td><input type="number" class="trk-input" value="${co}" id="tf-${bk}-cf_old" oninput="onTI('${bk}')"></td><td><input type="number" class="trk-input" value="${cn}" id="tf-${bk}-cf_new" oninput="onTI('${bk}')"></td><td><input type="number" class="trk-input" value="${cpo}" id="tf-${bk}-cf_postpone" oninput="onTI('${bk}')"></td><td><input type="number" class="trk-input" value="${cw}" id="tf-${bk}-cf_walkin" oninput="onTI('${bk}')"></td><td><input type="number" class="trk-input" value="${no}" id="tf-${bk}-no_answer" oninput="onTI('${bk}')"></td><td><input type="number" class="trk-input" value="${tc}" id="tf-${bk}-total_call" oninput="onTI('${bk}')"></td><td><input type="number" class="trk-input" value="${go}" id="tf-${bk}-came_old" oninput="onTI('${bk}')"></td><td><input type="number" class="trk-input" value="${gn}" id="tf-${bk}-came_new" oninput="onTI('${bk}')"></td><td>${go+gn}</td></tr>`;
+    if(c4) c4.destroy();
+    c4 = new Chart(g("c4-chart"),{type:"bar",data:{labels:Object.keys(doc),datasets:[{label:"ยอดขายแพทย์",data:Object.values(doc),backgroundColor:"#1971c2"}]},options:{responsive:true,maintainAspectRatio:false}});
   });
 }
-function onTI(bk){
-  const d={};TF.forEach(f=>d[f.k]=parseInt(g("tf-"+bk+"-"+f.k)?.value)||0);
-  trkD[bk]=d;
-  const date=g("t3d").value;if(date)DB.ref("tracking_records/"+date+"/"+bk).set({...d,timestamp:new Date().toISOString()}).catch(()=>{});
-}
-function lt(){
-  const date=g("t3d").value;if(!date)return;
-  DB.ref("tracking_records/"+date).once("value",snap=>{
-    trkD={}; if(snap.exists()){const d=snap.val();BKS.forEach(bk=>{trkD[bk]=d[bk]||{};});} bldTG();
+
+function saveT4() {
+  const mo=g("t4-mo").value; if(!mo)return;
+  DB.ref(`doctor_finance/${mo}`).push({
+    br: g("df-br").value, dt: g("df-dt").value, doc: g("df-doc").value,
+    ti: g("df-time").value.split('-')[0]||"", to: g("df-time").value.split('-')[1]||"",
+    sal: vv("df-sal"), df: vv("df-df"), nt: g("df-nt").value
+  }).then(()=>{
+    g('modal-t4').style.display='none'; toast("บันทึกสำเร็จ");
   });
 }
-function cet(){g("epop").style.display="flex";}
-function xTrPNG(){g("epop").style.display="none";html2canvas(g("t3"),{backgroundColor:"#f0f2f5",scale:2}).then(c=>{const a=document.createElement("a");a.download="tracking.png";a.href=c.toDataURL();a.click();});}
-function xTrPDF(){g("epop").style.display="none";html2canvas(g("t3"),{backgroundColor:"#f0f2f5",scale:2}).then(c=>{const {jsPDF}=window.jspdf;const pdf=new jsPDF("l","mm","a4");pdf.addImage(c.toDataURL(),"PNG",0,0,pdf.internal.pageSize.getWidth(),pdf.internal.pageSize.getHeight());pdf.save("tracking.pdf");});}
 
-function ldf(){
-  const branch=g("t4b").value,month=g("t4m").value;if(!month)return;
-  const [yr,mo]=month.split("-"),prefix=yr+"-"+mo;
-  DB.ref("doctor_records").orderByChild("branch").equalTo(branch).once("value",snap=>{
-    const tb=g("t4body");tb.innerHTML="";
-    if(snap.exists()){
-      snap.forEach(child=>{
-        const d=child.val();
-        if(d.work_date&&d.work_date.startsWith(prefix)){
-          tb.innerHTML+=`<tr><td>-</td><td>${d.work_date}</td><td>${d.time_in}</td><td>${d.time_out}</td><td>฿${fm(d.sales)}</td><td>฿${fm(d.df)}</td></tr>`;
-        }
-      });
-    }
+// ==========================================
+// TAB 5: SETTINGS
+// ==========================================
+function loadT5() {
+  let ht = "";
+  bKeys.forEach(k => {
+    ht += `<div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+      <label>${BKS[k]}</label><input type="number" id="tg-${k}" value="${TARGETS[k]}">
+    </div>`;
   });
-}
-function openAdd(){g("t4ap").style.display="block"; g("t4ds").innerHTML=docL.map(d=>`<option value="${d}">${d}</option>`).join("");}
-function saveDR(){
-  const p={doctor:g("t4ds").value,work_date:g("t4wd").value,branch:g("t4b").value,sales:parseFloat(g("t4sl").value)||0,df:parseFloat(g("t4df2").value)||0,timestamp:new Date().toISOString()};
-  DB.ref("doctor_records").push(p).then(()=>{toast("บันทึกข้อมูลแพทย์สำเร็จ");g("t4ap").style.display="none";ldf();});
+  g("t5-targets").innerHTML = ht;
+  g("t5-progs").value = PROGS.join("\n");
 }
 
-// TAB 5
-function rnd5(){
-  g("dl").innerHTML=docL.map((x,i)=>`<div class="li">${x}<button class="lid" onclick="docL.splice(${i},1);rnd5();">×</button></div>`).join("");
-  g("tgl").innerHTML=BKS.map(bk=>`<div style="display:flex;justify-content:space-between;padding:6px 0;"><label>${BK[bk]}</label><input type="number" style="width:130px;" value="${tgM[bk]||0}" onchange="tgM['${bk}']=parseFloat(this.value)||0"></div>`).join("");
-  ["fd1","fd2"].forEach(id=>{if(g(id))g(id).innerHTML="<option value=''>— เลือก —</option>"+docL.map(d=>`<option>${d}</option>`).join("");});
-}
-function addDoc(){if(g("nd").value){docL.push(g("nd").value);g("nd").value="";rnd5();}}
-function syncFB(){
-  DB.ref("system_settings").set({doctors:docL,targets:tgM}).then(()=>toast("บันทึกการตั้งค่าสำเร็จ"));
+function saveSettings() {
+  bKeys.forEach(k => TARGETS[k] = vv(`tg-${k}`));
+  PROGS = g("t5-progs").value.split("\n").map(s=>s.trim()).filter(Boolean);
+  buildT1(); // Rebuild table 1
+  toast("บันทึกการตั้งค่าสำเร็จ! หน้า 1 อัปเดตแล้ว");
 }
 
+// INIT
 window.onload = () => {
-  const today=new Date().toISOString().split("T")[0];
-  g("fd").value=today;g("t3d").value=today;g("t4m").value=today.slice(0,7);
-  DB.ref("system_settings").on("value",snap=>{if(snap.exists()){const d=snap.val();docL=d.doctors||docL;tgM=d.targets||tgM;rnd5();}});
-  odc(); lr(); lt(); ldf();
-};
+  const today = new Date().toISOString().split('T')[0];
+  g("f1-dt").value = today; g("t3-dt").value = today;
+  g("t2-mo").value = today.slice(0,7); g("t4-mo").value = today.slice(0,7);
+  loadT1(); loadT2(); loadT3(); loadT4(); loadT5();
+}
 </script>
 </body>
 </html>
