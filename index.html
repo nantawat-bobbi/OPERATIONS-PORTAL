@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Laliza Clinic — Advanced Operations Portal</title>
+<title>Laliza Clinic — Enterprise Operations Portal</title>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -71,7 +71,7 @@ select:focus,input:focus,textarea:focus{border-color:var(--acc);}
 
 /* TAB 1: REVENUE SHEET */
 .rev-wrap{background:#fff;border:1px solid var(--bdr);border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.05);display:flex;flex-direction:column;}
-.rev-table-container{overflow-x:auto;max-height:600px;border-bottom:2px solid #000;}
+.rev-table-container{overflow-x:auto;max-height:550px;border-bottom:2px solid #000;}
 .rev-tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:1800px;}
 .rev-tbl th{padding:8px 4px;border:1px solid #aaa;text-align:center;font-weight:700;white-space:nowrap;position:sticky;top:0;z-index:2;box-shadow:0 1px 0 #999;}
 .rev-tbl th:first-child{left:0;z-index:3;}
@@ -81,11 +81,9 @@ select:focus,input:focus,textarea:focus{border-color:var(--acc);}
 .bg-date{background:#f3f4f6;} .bg-total{background:#dbeafe;} .bg-op{background:#f8d7da;}
 .bg-med{background:#d1e7dd;} .bg-trt{background:#e2d9f3;} .bg-hd{background:#cff4fc;}
 .bg-gw{background:#f3d0e2;} .bg-chg{background:#fff3cd;} .bg-drp{background:#d1e7dd;}
-.bg-mem{background:#f3f4f6;} .bg-stf{background:#f8d7da;} .bg-dep{background:#fff3cd;}
-.bg-oth{background:#dbeafe;} .bg-old{background:#fff3cd;} .bg-new{background:#d1e7dd;}
-.bg-sum{background:#dbeafe;}
+.bg-mem{background:#f3f4f6;} .bg-old{background:#fff3cd;} .bg-new{background:#d1e7dd;} .bg-sum{background:#dbeafe;}
 
-.r-inp{width:100%;height:32px;border:none;background:transparent;text-align:right;font-size:13px;padding:4px 8px;color:#1D4ED8;font-weight:600;outline:none;cursor:text;}
+.r-inp{width:100%;height:32px;border:none;background:transparent;text-align:right;font-size:15px;font-weight:700;padding:4px 8px;color:#1D4ED8;outline:none;cursor:text;}
 .r-inp:hover{background:rgba(255,255,255,0.4);}
 .r-inp:focus{background:#fff!important;box-shadow:inset 0 0 0 2px var(--acc);}
 .r-inp[readonly]{color:#000!important;cursor:default;background:transparent!important;box-shadow:none;}
@@ -99,7 +97,7 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 
 /* TAB 2: DAILY OPS CORE */
 .paper-ui{background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.05);max-width:1100px;margin:0 auto;}
-.paper-ui input{border:none;border-bottom:1px dotted #ccc;background:transparent;color:#1D4ED8;font-weight:600;text-align:center;width:100%;}
+.paper-ui input{border:none;border-bottom:1px dotted #ccc;background:transparent;color:#1D4ED8;font-weight:700;font-size:15px;text-align:center;width:100%;}
 .paper-ui input.red-tx{color:var(--red)!important;}
 .pdf-table{width:100%;border-collapse:collapse;margin:20px 0;font-size:13px;}
 .pdf-table th, .pdf-table td{border:1px solid #000;padding:6px;vertical-align:middle;}
@@ -111,7 +109,7 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 .mth-table th{background:#e9ecef;padding:10px 4px;border:1px solid #ced4da;text-align:center;font-weight:700;position:sticky;top:0;z-index:2;box-shadow:0 1px 0 #ced4da;white-space:nowrap;}
 .mth-table td{padding:4px;border:1px solid #ced4da;text-align:center;}
 .mth-table td:first-child{background:#f8f9fa;font-weight:bold;position:sticky;left:0;z-index:1;box-shadow:1px 0 0 #ced4da;}
-.mth-inp{width:100%;height:30px;border:1px solid #ccc;text-align:center;border-radius:3px;font-family:inherit;font-size:13px;color:#1D4ED8;font-weight:600;}
+.mth-inp{width:100%;height:30px;border:1px solid #ccc;text-align:center;border-radius:3px;font-family:inherit;font-size:15px;color:#1D4ED8;font-weight:700;}
 .mth-inp:focus{border-color:var(--acc);outline:none;}
 .mth-inp[readonly]{background:transparent;border:none;color:#000!important;}
 
@@ -127,7 +125,6 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
   .paper-ui { box-shadow: none; padding: 0; max-width: 100%; margin:0; }
   * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
   .paper-ui input { border: none !important; background: transparent !important; }
-  input::placeholder, textarea::placeholder { color: transparent !important; }
 }
 </style>
 </head>
@@ -190,7 +187,7 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
         <div style="position:relative; height:300px;"><canvas id="c0-bar"></canvas></div>
       </div>
       <div class="chart-box">
-        <h3 style="margin-bottom:10px;font-size:15px;">🍩 สัดส่วนรายได้ (Service vs Product)</h3>
+        <h3 style="margin-bottom:10px;font-size:15px;">🍩 สัดส่วนช่องทางชำระเงินรวมทุกสาขา</h3>
         <div style="position:relative; height:300px;"><canvas id="c0-pie"></canvas></div>
       </div>
     </div>
@@ -303,9 +300,9 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
       <table class="pdf-table">
         <thead>
           <tr>
-            <th width="10%">ยอดหน้าร้าน</th><th width="15%">Program</th><th width="12%">จำนวนเงิน</th>
-            <th width="15%" style="color:var(--red);">ยอดหักบัตร<br>(VIP+VOCHUER)</th>
-            <th width="18%">เครดิต</th><th width="12%">จำนวนเงิน</th><th width="18%">เงินสด</th>
+            <th width="12%">ยอดหน้าร้าน</th><th width="18%">Program</th><th width="12%">จำนวนเงิน</th>
+            <th width="14%" style="color:var(--red);">ยอดหักบัตร<br>(VIP+VOCHUER)</th>
+            <th width="16%">เครดิต</th><th width="12%">จำนวนเงิน</th><th width="16%">เงินสด</th>
           </tr>
         </thead>
         <tbody id="o-tbody">
@@ -444,9 +441,6 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 </div></div> 
 
 <script>
-// ==========================================
-// FIREBASE CONFIG
-// ==========================================
 const FBC = {
   apiKey: "AIzaSyDetHuoARpuhqRp-o9mVzECi1nzWAEo-O4",
   authDomain: "operations-portal-d60a5.firebaseapp.com",
@@ -475,12 +469,10 @@ injectBranchOptions();
 
 function g(id){return document.getElementById(id);}
 
-// แปลงตัวเลขให้มี , แต่ไม่มีจุด .00 อัตโนมัติ (เก็บค่าทศนิยมจริงไว้ถ้ามี)
+// ตัวเลขมีลูกน้ำ คลีนทศนิยม .00 ออกทั้งหมดตามสั่ง
 function fm(n){
   let num = parseFloat(n) || 0;
-  if (num % 1 !== 0) {
-    return num.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  }
+  if (num % 1 !== 0) return num.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   return num.toLocaleString("th-TH");
 }
 function fmI(n){ return Math.round(parseFloat(n)||0).toLocaleString("th-TH"); }
@@ -528,11 +520,10 @@ function updateSelects() {
 // ==========================================
 function buildT0() {
   const mo = g("d0-mo").value; if(!mo) return;
-  const [yr,m] = mo.split("-");
   
   DB.ref('daily').once('value').then(snap => {
     const all = snap.val()||{};
-    let bRev = {}, bTg = {}, totRev=0, totTg=0, totPax=0, totSvc=0, totMed=0, totTrt=0;
+    let bRev = {}, bTg = {}, totRev=0, totTg=0, totPax=0, tCash=0, tApp=0, tTrans=0, tCrd=0;
     
     bKeys.forEach(k => { bRev[k]=0; bTg[k] = SETTINGS.tgs[k]||0; totTg+=bTg[k]; });
 
@@ -544,8 +535,11 @@ function buildT0() {
             let rTot = (parseFloat(d["r-op"])||0)+(parseFloat(d["r-med"])||0)+(parseFloat(d["r-trt"])||0)+(parseFloat(d["r-hd"])||0)+(parseFloat(d["r-gw"])||0)+(parseFloat(d["r-chg"])||0)+(parseFloat(d["r-drp"])||0)+(parseFloat(d["r-mem"])||0)+(parseFloat(d["r-stf"])||0)+(parseFloat(d["r-dep"])||0)+(parseFloat(d["r-oth"])||0);
             bRev[br] += rTot; totRev += rTot;
             totPax += (parseFloat(d["r-opx"])||0)+(parseFloat(d["r-nyp"])||0)+(parseFloat(d["r-nnp"])||0);
-            totSvc += (parseFloat(d["r-op"])||0)+(parseFloat(d["r-hd"])||0)+(parseFloat(d["r-gw"])||0);
-            totMed += (parseFloat(d["r-med"])||0); totTrt += (parseFloat(d["r-trt"])||0);
+            
+            tCash += parseFloat(d["pay-cash"])||0;
+            tApp += (parseFloat(d["a-hdmall"])||0) + (parseFloat(d["a-gowabi"])||0);
+            tTrans += parseFloat(d["pay-trans"])||0;
+            tCrd += (parseFloat(d["c-kbank"])||0) + (parseFloat(d["c-crd"])||0) + (parseFloat(d["c-kbsc"])||0) + (parseFloat(d["c-ktc"])||0) + (parseFloat(d["c-bay"])||0) + (parseFloat(d["c-scb"])||0) + (parseFloat(d["c-oth"])||0);
           }
         });
       }
@@ -567,7 +561,7 @@ function buildT0() {
     if(c0Pie) c0Pie.destroy();
     c0Pie = new Chart(g("c0-pie"), {
       type: 'doughnut',
-      data: { labels: ['หัตถการรวม', 'ขายยา', 'Treatment'], datasets: [{data:[totSvc, totMed, totTrt], backgroundColor:['#f08c00', '#2f9e44', '#845ef7']}] },
+      data: { labels: ['เงินสด', 'แอปพลิเคชัน', 'เงินโอน คลาวด์', 'บัตรเครดิต'], datasets: [{data:[tCash, tApp, tTrans, tCrd], backgroundColor:['#2f9e44', '#845ef7', '#f08c00', '#1971c2']}] },
       options: {responsive:true, maintainAspectRatio:false}
     });
   });
@@ -603,7 +597,7 @@ function buildT1() {
       let dt = `${yr}-${m}-${String(i).padStart(2,'0')}`;
       ht += `<tr><td class="bg-date">${i}/${m}/${yr}</td><td class="bg-total"><input type="text" class="r-inp row-tot" readonly value="0"></td>`;
       R_COLS.forEach(f => { ht += `<td class="${f.cls}"><input type="number" class="r-inp" data-dt="${dt}" data-id="${f.id}" oninput="calcT1(this)"></td>`; });
-      ht += `<td class="bg-sum"><input type="text" class="r-inp row-pax" style="text-align:center;" readonly value="0"></td><td class="bg-date"><select class="r-inp bg-date" style="text-align:center;cursor:pointer;" data-dt="${dt}" data-id="r-doc" onchange="calcT1(this)"></select></td></tr>`;
+      ht += `<td class="bg-sum"><input type="text" class="r-inp row-pax" style="text-align:center;" readonly value="0"></td><td class="bg-date"><select class="r-inp bg-date" style="text-align:center;" data-dt="${dt}" data-id="r-doc" onchange="calcT1(this)"></select></td></tr>`;
     }
     g("r-tbody").innerHTML = ht; updateSelects(); 
     g("k1-tg").dataset.val = SETTINGS.tgs[br]||0; g("k1-tg").textContent = "฿"+fm(SETTINGS.tgs[br]||0);
@@ -635,7 +629,6 @@ function calcT1(triggerEl) {
   const rows = document.querySelectorAll("#r-tbody tr");
   rows.forEach(row => {
     let q = (id) => parseFloat(row.querySelector(`[data-id="${id}"]`)?.value)||0;
-    
     let rTot = q("r-op")+q("r-med")+q("r-trt")+q("r-hd")+q("r-gw")+q("r-chg")+q("r-drp")+q("r-mem")+q("r-stf")+q("r-dep")+q("r-oth");
     let rPax = q("r-opx")+q("r-nyp")+q("r-nnp");
     
@@ -649,12 +642,10 @@ function calcT1(triggerEl) {
   });
 
   let tg = parseFloat(g("k1-tg").dataset.val)||0;
-  g("k1-rev").textContent = "฿"+fm(gTot); 
-  g("k1-pct").textContent = tg>0 ? +(gTot/tg*100).toFixed(1)+"%" : "0%";
+  g("k1-rev").textContent = "฿"+fm(gTot); g("k1-pct").textContent = tg>0 ? +(gTot/tg*100).toFixed(1)+"%" : "0%";
   g("k1-rem").textContent = tg>gTot ? "฿"+fm(tg-gTot) : "ทะลุเป้า!";
 
-  g("rs-curr").textContent = fm(gTot); 
-  g("rs-pct").textContent = tg>0 ? +(gTot/tg*100).toFixed(1)+"%" : "0%";
+  g("rs-curr").textContent = fm(gTot); g("rs-pct").textContent = tg>0 ? +(gTot/tg*100).toFixed(1)+"%" : "0%";
   g("rs-rem").textContent = tg>gTot ? fm(tg-gTot) : "0";
   let [yr,m] = g("r-mo").value.split("-"); let dim = new Date(yr,m,0).getDate();
   let dL = dim - new Date().getDate(); g("rs-days").textContent = dL>0?dL:0;
@@ -675,6 +666,7 @@ function calcT1(triggerEl) {
     const dt = triggerEl.dataset.dt, br = g("r-br").value, id = triggerEl.dataset.id;
     const val = triggerEl.type==="number"?parseFloat(triggerEl.value)||0 : triggerEl.value;
     let mapped = {[id]:val};
+    // Auto sync mappings
     if(id === "r-op") mapped["p-misc"] = val; if(id === "r-med") mapped["p-product"] = val;
     if(id === "r-trt") mapped["p-treatment"] = val; if(id === "r-hd") mapped["a-hdmall"] = val;
     if(id === "r-gw") mapped["a-gowabi"] = val; if(id === "r-chg") mapped["p-charge"] = val;
@@ -720,49 +712,83 @@ function importT1(input) {
 function exportT1() { const wb = XLSX.utils.table_to_book(g("revTable")); XLSX.writeFile(wb, `Revenue_${g("r-mo").value}_${g("r-br").value}.xlsx`); }
 
 // ==========================================
-// TAB 2: DAILY OPS CORE
+// TAB 2: DAILY OPS CORE (Symmetric Form PDF)
 // ==========================================
-const O_R = [
-  {n:"1. KBANK (กสิกร)", id:"c-kbank"},
-  {n:"1.1 Credit (เครดิต)", id:"c-crd"}, {n:"1.2 กสิกร(สแกน/โอน)", id:"c-kbsc"},
-  {n:"2.KTC (กรุงไทย)", id:"c-ktc"},
-  {n:"3.BAY (กรุงศรี)", id:"c-bay"}, {n:"14. SCB (ไทยพาณิชย์)", id:"c-scb"},
-  {n:"อื่นๆ ระบุ <input type='text' id='c-oth-n' style='border:none;border-bottom:1px dotted #ccc;width:50px;background:transparent;'>", id:"c-oth"},
+const O_CREDITS = [
+  {n:"1. KBANK (กสิกร)", id:"c-kbank"}, {n:"1.1 Credit (เครดิต)", id:"c-crd"}, {n:"1.2 กสิกร(สแกน/โอน)", id:"c-kbsc"},
+  {n:"2.KTC (กรุงไทย)", id:"c-ktc"}, {n:"3.BAY (กรุงศรี)", id:"c-bay"}, {n:"14. SCB (ไทยพาณิชย์)", id:"c-scb"},
+  {n:"อื่นๆ ระบุ <input type='text' id='c-oth-n' style='border:none;border-bottom:1px dotted #bdr;width:40px;background:transparent;'>", id:"c-oth"},
   {n:"ยอดรวมเครดิต", id:"t-crd", ro:true}
 ];
 
 function buildT2() {
-  const tb = g("o-tbody"); let ht = ""; const mx = Math.max(SETTINGS.progs.length, 8);
-  for(let i=0; i<mx; i++) {
-    ht += `<tr>`;
-    if(i===0) ht += `<td rowspan="${mx+1}" style="background:#f0f0f0;vertical-align:top;padding:10px;"><input type="number" id="front-store-val" class="num-in" style="font-size:16px;text-align:center;" placeholder="กรอกยอดหน้าร้าน" oninput="saveT2Quick('front-store-val',this.value)"></td>`;
-    
-    if(i < SETTINGS.progs.length) {
-      let nm = SETTINGS.progs[i].toLowerCase(), pid = `p${i}`;
-      if(nm.includes("hdmall")) pid="a-hdmall"; else if(nm.includes("gowabi")) pid="a-gowabi";
-      else if(nm.includes("product")||nm.includes("ยา")) pid="p-product"; else if(nm.includes("treatment")) pid="p-treatment";
-      else if(nm.includes("ชาร์จ")) pid="p-charge"; else if(nm.includes("drip")||nm.includes("ฉีดผิว")) pid="p-drip";
-      else if(nm.includes("หัตถการอื่นๆ")) pid="p-misc";
-      ht += `<td>${SETTINGS.progs[i]}</td><td style="padding:2px;"><input type="number" id="${pid}" class="num-in o-val" oninput="cT2()"></td><td style="padding:2px;"><input type="number" id="v${i}" class="num-in v-val red-tx" oninput="cT2()"></td>`;
-    } else ht += `<td></td><td></td><td></td>`;
+  const tb = g("o-tbody"); let ht = "";
+  
+  // โครงสร้างฝั่งซ้าย: 13 แถว (รายชื่อปกติ + ชาร์จ 3% + พิมพ์เอง 3 บรรทัด)
+  const leftRows = [
+    {label:"Co2", id:"p0"}, {label:"Pico", id:"p1"}, {label:"Vbeam", id:"p2"}, {label:"Elos", id:"p3"},
+    {label:"Botox", id:"p4"}, {label:"Filler", id:"p5"}, {label:"Meso", id:"p6"}, {label:"Thermage", id:"p7"},
+    {label:"Ulthera", id:"p8"}, {label:"Treatment", id:"p-treatment"}, {label:"Drip Vitamin (Nures)", id:"p-drip"},
+    {label:"Product (ขายยา)", id:"p-product"}, {label:"ชาร์จ 3%", id:"p-charge"}
+  ];
+  // ผสมหัตถการให้พิมพ์เองอีก 3 บรรทัด
+  for(let x=1; x<=3; x++) leftRows.push({custom: true, id: `cust-id-${x}`, labelId: `cust-lbl-${x}`});
 
-    if(i < O_R.length) {
-      if(O_R[i].ro) ht += `<td style="text-align:right;font-weight:700;">${O_R[i].n}</td><td style="background:#f0f0f0;"><input type="text" id="${O_R[i].id}" class="num-in" readonly value="0"></td>`;
-      else ht += `<td>${O_R[i].n}</td><td style="padding:2px;"><input type="number" id="${O_R[i].id}" class="num-in c-val" oninput="cT2()"></td>`;
-      
-      if(i===0) ht += `<td rowspan="2" style="vertical-align:bottom;text-align:center;">เงินสด<br><br><input type="number" id="pay-cash" class="num-in" style="font-size:18px;text-align:center;color:var(--tx)!important;" oninput="cT2()"></td>`;
-      if(i===2) ht += `<td rowspan="3" style="vertical-align:middle;text-align:center;font-size:11px;">แอปพลิเคชัน<br><div style="display:flex;justify-content:space-between;margin-top:5px;align-items:center;">HDmall: <input type="number" id="a-hd-pax" style="width:25px;" placeholder="คน"> <input type="number" id="a-hdmall" class="num-in c-val" style="width:40px;color:var(--tx)!important;" oninput="cT2()" placeholder="ยอด"></div><div style="display:flex;justify-content:space-between;margin-top:2px;align-items:center;">Gowabi: <input type="number" id="a-gw-pax" style="width:25px;" placeholder="คน"> <input type="number" id="a-gowabi" class="num-in c-val" style="width:40px;color:var(--tx)!important;" oninput="cT2()" placeholder="ยอด"></div></td>`;
-      if(i===5) ht += `<td rowspan="2" style="vertical-align:middle;text-align:center;">ยอดเงินโอน<br><br><input type="number" id="pay-trans" class="num-in" style="font-size:18px;text-align:center;color:var(--tx)!important;" oninput="cT2()"></td>`;
-      if(i===7) ht += `<td rowspan="${mx-7}" style="vertical-align:middle;text-align:center;font-weight:700;">ยอดชำระรวม<br><br><input type="text" id="t-grand" class="num-in" style="font-size:20px;text-align:center;color:#000!important;border:1px solid #ccc!important;border-radius:4px;padding:5px;" oninput="saveT2Quick('t-grand',this.value)"></td>`;
-    } else { ht += `<td></td><td></td>`; }
+  const totalRows = leftRows.length; // รวมเป็น 16 แถว
+
+  for(let i=0; i<totalRows; i++) {
+    ht += `<tr>`;
+    
+    // คอลัมน์ที่ 1: ยอดหน้าร้าน (ผสานเซลล์ยาวทั้งตาราง จัดวางกึ่งกลางเป๊ะ)
+    if(i===0) {
+      ht += `<td rowspan="${totalRows + 1}" style="background:#f8f9fa; text-align:center; vertical-align:middle; padding:15px; border-right:2px solid #000;">
+               <div style="font-weight:bold;margin-bottom:10px;color:var(--tx2);">ยอดหน้าร้านรวม</div>
+               <input type="number" id="front-store-val" class="num-in" style="font-size:18px; font-weight:700; text-align:center; width:100%; border:1px solid var(--bdr2); border-radius:4px; padding:8px;" placeholder="กรอกยอด" oninput="saveT2Quick('front-store-val',this.value)">
+             </td>`;
+    }
+
+    // ฝั่งซ้าย: รายการโปรแกรม
+    let r = leftRows[i];
+    if(r.custom) {
+      ht += `<td style="padding:2px;"><input type="text" id="${r.labelId}" style="text-align:left;border:none;font-weight:normal;" placeholder="✏️ พิมพ์หัตถการอื่นๆ" oninput="saveT2Quick('${r.labelId}',this.value)"></td>`;
+      ht += `<td style="padding:2px;"><input type="number" id="${r.id}" class="num-in o-val" oninput="cT2()"></td>`;
+      ht += `<td style="padding:2px;"><input type="number" id="v-cust-${i}" class="num-in v-val red-tx" oninput="cT2()"></td>`;
+    } else {
+      ht += `<td style="font-weight:500;">${r.label}</td>`;
+      ht += `<td style="padding:2px;"><input type="number" id="${r.id}" class="num-in o-val" oninput="cT2()"></td>`;
+      ht += `<td style="padding:2px;"><input type="number" id="v${i}" class="num-in v-val red-tx" oninput="cT2()"></td>`;
+    }
+
+    // ฝั่งขวา: บัตรเครดิต & ช่องเก็บยอดชำระต่างๆ (จัดแบบสมมาตร พอดีบรรทัดฝั่งซ้าย)
+    if(i < O_CREDITS.length) {
+      let c = O_CREDITS[i];
+      if(c.ro) ht += `<td style="text-align:right;font-weight:700;background:#f8f9fa;">${c.n}</td><td style="background:#e9ecef;"><input type="text" id="${c.id}" class="num-in" readonly value="0"></td>`;
+      else ht += `<td style="background:#fff;">${c.n}</td><td style="padding:2px;"><input type="number" id="${c.id}" class="num-in c-val" oninput="cT2()"></td>`;
+    } else {
+      ht += `<td style="background:#f8f9fa;border:none;"></td><td style="background:#f8f9fa;border:none;"></td>`;
+    }
+
+    // แผงกล่องเก็บเงินขวาสุด (ยืดด้วย Rowspan สัดส่วนลงตัวพอดี)
+    if(i===0) ht += `<td rowspan="4" style="vertical-align:middle;text-align:center;background:#fff3cd;font-weight:bold;">เงินสด<br><br><input type="number" id="pay-cash" class="num-in" style="font-size:18px;text-align:center;color:#000!important;" oninput="cT2()"></td>`;
+    if(i===4) {
+      ht += `<td rowspan="6" style="vertical-align:middle;text-align:center;background:#cff4fc;font-size:12px;font-weight:bold;">แอปพลิเคชัน<br>
+        <div style="margin-top:10px;text-align:left;padding:0 5px;">HDmall:<br><input type="number" id="a-hd-pax" style="width:30px;padding:2px;" placeholder="คน"> <input type="number" id="a-hdmall" class="num-in c-val" style="width:65px;padding:2px;" oninput="cT2()" placeholder="ยอด"></div>
+        <div style="margin-top:8px;text-align:left;padding:0 5px;">Gowabi:<br><input type="number" id="a-gw-pax" style="width:30px;padding:2px;" placeholder="คน"> <input type="number" id="a-gowabi" class="num-in c-val" style="width:65px;padding:2px;" oninput="cT2()" placeholder="ยอด"></div>
+        </td>`;
+    }
+    if(i===10) ht += `<td rowspan="3" style="vertical-align:middle;text-align:center;background:#d1e7dd;font-weight:bold;">ยอดเงินโอน<br><br><input type="number" id="pay-trans" class="num-in" style="font-size:18px;text-align:center;color:#000!important;" oninput="cT2()"></td>`;
+    if(i===13) ht += `<td rowspan="${totalRows - 13}" style="vertical-align:middle;text-align:center;background:#dbeafe;font-weight:bold;">ยอดชำระรวม<br><br><input type="text" id="t-grand" class="num-in" style="font-size:22px;color:red!important;text-align:center;font-weight:800;border:1px solid #aaa!important;background:#fff;padding:6px;border-radius:4px;" oninput="saveT2Quick('t-grand',this.value)"></td>`;
+
     ht += `</tr>`;
   }
-  ht += `<tr style="font-weight:700;"><td style="background:#f0f0f0;"><input type="text" id="t-prog" class="num-in" style="color:#000!important;" readonly value="0"></td><td style="background:#f0f0f0;text-align:right;color:red;padding-right:10px;" id="t-vip">0</td><td colspan="2" style="text-align:center;background:#f0f0f0;">คะแนน (Point)</td><td colspan="2" style="padding:2px;"><input type="number" id="t-point" class="num-in" style="width:100%;text-align:center;color:var(--tx)!important;"></td></tr>`;
+
+  // แถวสรุปรวมท้ายตาราง
+  ht += `<tr style="font-weight:700; background:#f1f3f5;"><td style="text-align:right;">ยอดรวม Program</td><td><input type="text" id="t-prog" class="num-in" readonly value="0"></td><td style="color:red;text-align:right;padding-right:10px;" id="t-vip">0</td><td colspan="2" style="text-align:center;">คะแนน (Point)</td><td colspan="2" style="padding:2px;"><input type="number" id="t-point" class="num-in" style="width:100%;text-align:center;"></td></tr>`;
   tb.innerHTML = ht;
   
   const dt=g("o-dt").value, br=g("o-br").value; if(!dt)return;
   DB.ref(`daily/${dt}/${br}`).once('value').then(snap=>{
-    document.querySelectorAll('#t2-content input').forEach(e=>{if(!e.readOnly && e.id!=='t-grand')e.value=""});
+    document.querySelectorAll('#t2-content input').forEach(e=>{if(!e.readOnly && e.id!=='t-grand' && !e.id.includes('cust-lbl'))e.value=""});
     if(snap.exists()) { const d = snap.val(); for(let k in d) if(g(k)) g(k).value = d[k]; }
     cT2(true); updateSelects();
   }).catch(()=>cT2(true));
@@ -786,8 +812,7 @@ function cT2(fromLoad = false) {
 
 let t2Listener = null;
 function loadT2() {
-  buildT2();
-  const dt=g("o-dt").value, br=g("o-br").value; if(!dt)return;
+  buildT2(); const dt=g("o-dt").value, br=g("o-br").value; if(!dt)return;
   if(t2Listener) DB.ref(`daily`).off('value', t2Listener);
   t2Listener = snap => {
     if(snap.exists()) {
@@ -800,8 +825,7 @@ function loadT2() {
 }
 
 function saveT2Quick(id, val) { 
-  const dt=g("o-dt").value, br=g("o-br").value; 
-  let rawVal = val.toString().replace(/,/g, '');
+  const dt=g("o-dt").value, br=g("o-br").value; let rawVal = val.toString().replace(/,/g, '');
   DB.ref(`daily/${dt}/${br}`).update({[id]: parseFloat(rawVal)||rawVal}); 
 }
 
@@ -813,7 +837,6 @@ function saveT2() {
       p[e.id] = (e.type==="number" || !isNaN(rawVal) && rawVal !== "") ? parseFloat(rawVal)||0 : e.value; 
     }
   });
-  SETTINGS.progs.forEach((x,i)=>{ p[`name${i}`] = x; });
   DB.ref(`daily/${dt}/${br}`).update(p).then(()=>toast("บันทึกฟอร์ม PDF ลงฐานข้อมูลสำเร็จ!"));
 }
 
@@ -847,8 +870,7 @@ function buildT3() {
   DB.ref(`tracking_mth/${mo}/${br}`).once('value').then(snap=>{
     const dAll = snap.val()||{};
     for(let i=1; i<=dim; i++){
-      let dt = `${yr}-${m}-${String(i).padStart(2,'0')}`;
-      let d = dAll[dt]||{};
+      let dt = `${yr}-${m}-${String(i).padStart(2,'0')}`; let d = dAll[dt]||{};
       ["tk-co","tk-cn","tk-po","tk-pn","tk-wo","tk-wn","tk-na","tk-tc","tk-ro","tk-rn"].forEach(k => {
         let el = g(`${k}-${dt}`); if(el && document.activeElement !== el) el.value = d[k] || "";
       });
@@ -917,8 +939,7 @@ function buildT4() {
   DB.ref(`docfin_mth/${mo}/${br}`).once('value').then(snap=>{
     const dAll = snap.val()||{};
     for(let i=1; i<=dim; i++){
-      let dt = `${yr}-${m}-${String(i).padStart(2,'0')}`;
-      let d = dAll[dt]||{};
+      let dt = `${yr}-${m}-${String(i).padStart(2,'0')}`; let d = dAll[dt]||{};
       ["df-ti","df-to","df-sl","df-df","df-nt"].forEach(k => {
         let el = g(`${k}-${dt}`); if(el && document.activeElement !== el) el.value = d[k] || "";
       });
@@ -969,26 +990,19 @@ function loadT5() {
   g("s-mg").value = SETTINGS.mgs.join(", ");
   g("s-pr").value = SETTINGS.progs.join("\n");
 }
-
 function saveT5() {
-  bKeys.forEach(k => {
-    let el = g(`tg-${k}`);
-    SETTINGS.tgs[k] = el ? (parseFloat(el.value)||0) : 0;
-  });
+  bKeys.forEach(k => { let el = g(`tg-${k}`); SETTINGS.tgs[k] = el ? (parseFloat(el.value)||0) : 0; });
   SETTINGS.docs = g("s-dr").value.split(",").map(s=>s.trim()).filter(Boolean);
   SETTINGS.cas = g("s-ca").value.split(",").map(s=>s.trim()).filter(Boolean);
   SETTINGS.mgs = g("s-mg").value.split(",").map(s=>s.trim()).filter(Boolean);
   SETTINGS.progs = g("s-pr").value.split("\n").map(s=>s.trim()).filter(Boolean);
   
   DB.ref(`system_settings`).set(SETTINGS).then(()=>{
-    toast("✅ บันทึกการตั้งค่าลงฐานข้อมูลสำเร็จ!");
-    setTimeout(() => location.reload(), 1000); 
-  }).catch(err => toast("❌ Error: " + err.message, "error"));
+    toast("✅ บันทึกการตั้งค่าลงฐานข้อมูลแล้ว!");
+    updateSelects(); curT1=""; buildT1(); buildT2();
+  });
 }
 
-// ==========================================
-// ONLOAD STARTUP
-// ==========================================
 window.onload = () => {
   const today = new Date().toISOString().split('T')[0];
   g("o-dt").value = today;
