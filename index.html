@@ -55,31 +55,43 @@ select:focus,input:focus,textarea:focus{border-color:var(--acc);}
 .klbl{font-size:12px;color:var(--tx3);font-weight:600;margin-bottom:5px;}
 .kval{font-size:22px;font-weight:700;}
 
-/* TAB 1: REVENUE SHEET */
+/* TAB 1: REVENUE SHEET (Excel Theme) */
 .rev-wrap{background:#fff;border:1px solid var(--bdr);border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.05);display:flex;flex-direction:column;}
-.rev-table-container{overflow-x:auto;max-height:65vh;border-bottom:2px solid #000;}
+.rev-table-container{overflow-x:auto;max-height:60vh;border-bottom:2px solid #000;}
 .rev-tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:1800px;}
 .rev-tbl th{padding:8px 4px;border:1px solid #aaa;text-align:center;font-weight:700;white-space:nowrap;position:sticky;top:0;z-index:2;box-shadow:0 1px 0 #999;}
 .rev-tbl th:first-child{left:0;z-index:3;}
-.rev-tbl td{border:1px solid #ccc;padding:2px;position:relative;}
+.rev-tbl td{border:1px solid #ccc;padding:0;position:relative;}
 .rev-tbl td:first-child{text-align:center;font-weight:600;background:#f3f4f6;position:sticky;left:0;z-index:1;box-shadow:1px 0 0 #ccc;}
 
+/* Excel Pastel Colors */
 .bg-date{background:#f3f4f6;} .bg-total{background:#dbeafe;} .bg-op{background:#f8d7da;}
 .bg-med{background:#d1e7dd;} .bg-trt{background:#e2d9f3;} .bg-hd{background:#cff4fc;}
 .bg-gw{background:#f3d0e2;} .bg-chg{background:#fff3cd;} .bg-drp{background:#d1e7dd;}
-.bg-mem{background:#f3f4f6;} .bg-old{background:#fff3cd;} .bg-new{background:#d1e7dd;} .bg-sum{background:#dbeafe;}
+.bg-mem{background:#f3f4f6;} .bg-old{background:#fff3cd;} .bg-new{background:#d1e7dd;}
+.bg-sum{background:#dbeafe;}
 
-.r-inp{width:100%;height:32px;border:1px solid rgba(0,0,0,0.1);background:#fff;text-align:right;font-size:13px;padding:4px 8px;color:#1D4ED8;font-weight:600;outline:none;border-radius:3px;}
-.r-inp:focus{border:2px solid var(--acc);background:#fff!important;}
-.r-inp[readonly]{color:#000!important;background:transparent;border:none;}
+.r-inp{
+  width:100%;height:32px;
+  border:none;background:transparent;
+  text-align:right;font-size:13px;
+  padding:4px 8px;color:#1D4ED8;font-weight:600;
+  outline:none;cursor:text;
+}
+.r-inp:hover{background:rgba(255,255,255,0.4);}
+.r-inp:focus{background:#fff!important;box-shadow:inset 0 0 0 2px var(--acc);}
+.r-inp[readonly]{color:#000!important;cursor:default;background:transparent!important;box-shadow:none;}
 input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 
 .rev-sum-grid{display:grid;grid-template-columns:300px 1fr;background:#f8f9fa;}
 .rev-sum-left{border-right:2px solid #ccc;padding:15px;}
 .rev-sum-right{padding:15px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
 .rs-row{display:flex;justify-content:space-between;margin-bottom:8px;font-size:14px;border-bottom:1px dotted #ccc;padding-bottom:4px;}
+.rs-lbl{font-weight:600;color:var(--tx2);}
+.rs-val{font-weight:700;color:#000;}
+.rs-val.fire{color:#d9381e;font-size:16px;}
 
-/* TAB 2: DAILY OPS CORE (PDF CLONE 100%) */
+/* TAB 2: DAILY OPS CORE */
 .paper-ui{background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.05);max-width:1100px;margin:0 auto;}
 .paper-ui input{border:none;border-bottom:1px dotted #ccc;background:transparent;color:#1D4ED8;font-weight:600;text-align:center;width:100%;}
 .paper-ui input.red-tx{color:var(--red)!important;}
@@ -131,17 +143,17 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 
 <div id="t1" class="tp active">
   <div class="ph no-print">
-    <div class="ptitle">📊 Revenue Sheet <span style="font-size:12px;color:var(--tx3);font-weight:400;margin-left:10px;">คีย์ตารางทั้งเดือน (ข้อมูลเชื่อมโยงไปหน้า Ops Core อัตโนมัติ)</span></div>
+    <div class="ptitle">📊 Revenue Sheet <span style="font-size:12px;color:var(--tx3);font-weight:400;margin-left:10px;">คีย์ข้อมูลลงตารางได้ทันที</span></div>
     <div class="ha">
       <button class="btn bg2" onclick="exportT1()">📤 Export Excel</button>
-      <select id="r-br" onchange="loadT1()"></select>
-      <input type="month" id="r-mo" onchange="loadT1()">
+      <select id="r-br" onchange="buildT1()"></select>
+      <input type="month" id="r-mo" onchange="buildT1()">
     </div>
   </div>
   <div class="pc">
     <div class="kgrid">
       <div class="kc"><div class="klbl">รายได้รวมเดือนนี้</div><div class="kval" style="color:var(--grn);" id="k1-rev">฿0.00</div></div>
-      <div class="kc"><div class="klbl">เป้าหมาย (Target)</div><div class="kval" id="k1-tg">฿0.00</div></div>
+      <div class="kc"><div class="klbl">เป้าหมาย (Target)</div><div class="kval" id="k1-tg" data-val="0">฿0.00</div></div>
       <div class="kc"><div class="klbl">% ความสำเร็จ</div><div class="kval" style="color:var(--acc);" id="k1-pct">0%</div></div>
       <div class="kc"><div class="klbl">คงเหลือต้องทำ</div><div class="kval" style="color:var(--red);" id="k1-rem">฿0.00</div></div>
     </div>
@@ -208,7 +220,7 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 
 <div id="t2" class="tp">
   <div class="ph no-print">
-    <div class="ptitle">📋 Daily Ops Core <span style="font-size:12px;color:var(--tx3);font-weight:400;margin-left:10px;">ใบสรุปยอดแคชเชียร์แบบฟอร์ม PDF (ห้ามเปลี่ยนโครงสร้าง)</span></div>
+    <div class="ptitle">📋 Daily Ops Core <span style="font-size:12px;color:var(--tx3);font-weight:400;margin-left:10px;">ฟอร์ม PDF ล็อกโครงสร้าง</span></div>
     <div class="ha">
       <button class="btn bg2" onclick="window.print()">🖨️ Print Form</button>
       <button class="btn bp" onclick="saveT2()">💾 บันทึกแบบฟอร์ม</button>
@@ -258,10 +270,10 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 
 <div id="t3" class="tp">
   <div class="ph">
-    <div class="ptitle">☎️ Confirm Tracking <span style="font-size:12px;color:var(--tx3);font-weight:400;margin-left:10px;">คีย์ตารางทั้งเดือน (แยกรายสาขา)</span></div>
+    <div class="ptitle">☎️ Confirm Tracking <span style="font-size:12px;color:var(--tx3);font-weight:400;margin-left:10px;">ตารางทั้งเดือน (แยกสาขา)</span></div>
     <div class="ha">
-      <select id="tk-br" onchange="loadT3()"></select>
-      <input type="month" id="tk-mo" onchange="loadT3()">
+      <select id="tk-br" onchange="buildT3()"></select>
+      <input type="month" id="tk-mo" onchange="buildT3()">
     </div>
   </div>
   <div class="pc">
@@ -292,10 +304,10 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 
 <div id="t4" class="tp">
   <div class="ph">
-    <div class="ptitle">👨‍⚕️ Doctor Finance <span style="font-size:12px;color:var(--tx3);font-weight:400;margin-left:10px;">คีย์ตารางทั้งเดือน (แยกรายสาขา)</span></div>
+    <div class="ptitle">👨‍⚕️ Doctor Finance <span style="font-size:12px;color:var(--tx3);font-weight:400;margin-left:10px;">ตารางทั้งเดือน (แยกสาขา)</span></div>
     <div class="ha">
-      <select id="df-br" onchange="loadT4()"></select>
-      <input type="month" id="df-mo" onchange="loadT4()">
+      <select id="df-br" onchange="buildT4()"></select>
+      <input type="month" id="df-mo" onchange="buildT4()">
     </div>
   </div>
   <div class="pc">
@@ -337,7 +349,6 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
     </div>
     <div style="background:#fff;padding:20px;border:1px solid var(--bdr);border-radius:8px;grid-column:1/-1;">
       <h3 style="margin-bottom:10px;border-bottom:2px solid var(--acc);padding-bottom:5px;">ตั้งค่าหัวข้อ Program (หน้า 2)</h3>
-      <div style="color:var(--red);font-size:12px;margin-bottom:10px;">* แก้ไข/เพิ่ม/ลด ชื่อโปรแกรมที่นี่ ระบบจะนำไปสร้างเป็นแถวในหน้า Daily Ops Core อัตโนมัติ</div>
       <textarea id="s-pr" rows="6" style="width:100%;"></textarea>
     </div>
   </div>
@@ -346,7 +357,7 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 </div></div>
 
 <script>
-// Mock Firebase (Replace with your Config)
+// Mock Firebase
 const FBC={apiKey:"AIza",authDomain:"app.firebaseapp.com",databaseURL:"https://app-default-rtdb.firebaseio.com",projectId:"app"};
 if(!firebase.apps.length)firebase.initializeApp(FBC);
 const DB = firebase.database();
@@ -357,8 +368,15 @@ const bKeys = Object.keys(BKS);
 let SETTINGS = {
   progs: ["Co2","Pico","Vbeam","Elos","Botox","Filler","Meso","Thermage","Ulthera","Treatment","Drip Vitamin (Nures)","Product","หัตถการอื่นๆ"],
   tgs: {rama9:1000000, pinklao:1000000, bangkae:1000000, rangsit:1000000, promanat:1000000, ngamwongwan:1000000, srinakarin:1000000, westgate:1000000},
-  docs: ["หมอ A","หมอ B"], cas: ["แคชเชียร์ A"], mgs: ["ผู้จัดการ A"]
+  docs: ["หมอ A"], cas: ["แคชเชียร์ A"], mgs: ["ผู้จัดการ A"]
 };
+
+// Hardcode branches directly on HTML load to prevent empty lists
+function injectBranchOptions() {
+  const opts = bKeys.map(k=>`<option value="${k}">${BKS[k]}</option>`).join("");
+  ["r-br","o-br","tk-br","df-br"].forEach(id=>{ const el = document.getElementById(id); if(el) el.innerHTML=opts; });
+}
+injectBranchOptions();
 
 function g(id){return document.getElementById(id);}
 function fm(n){return (parseFloat(n)||0).toLocaleString("th-TH",{minimumFractionDigits:2,maximumFractionDigits:2});}
@@ -369,154 +387,144 @@ function sw(id,item){
   document.querySelectorAll(".tp").forEach(p=>p.classList.remove("active"));
   document.querySelectorAll(".ni").forEach(n=>n.classList.remove("active"));
   g(id).classList.add("active"); item.classList.add("active");
-  if(id==='t1') loadT1();
-  if(id==='t2') loadT2();
-  if(id==='t3') loadT3();
-  if(id==='t4') loadT4();
+  if(id==='t1') buildT1();
+  if(id==='t2') buildT2();
+  if(id==='t3') buildT3();
+  if(id==='t4') buildT4();
   if(id==='t5') loadT5();
 }
 
-function popSels() {
-  const brOpts = bKeys.map(k=>`<option value="${k}">${BKS[k]}</option>`).join("");
-  ["r-br","o-br","tk-br","df-br"].forEach(id=>{if(g(id))g(id).innerHTML=brOpts;});
-  if(g("o-doc")) g("o-doc").innerHTML="<option value=''>-</option>"+SETTINGS.docs.map(x=>`<option value="${x}">${x}</option>`).join("");
+function updateSelects() {
+  const dOpt = "<option value=''>-</option>"+SETTINGS.docs.map(x=>`<option value="${x}">${x}</option>`).join("");
+  document.querySelectorAll('select[data-id="r-doc"], select[data-id="df-doc"], #o-doc').forEach(el=>el.innerHTML=dOpt);
   if(g("o-ca")) g("o-ca").innerHTML="<option value=''>-</option>"+SETTINGS.cas.map(x=>`<option value="${x}">${x}</option>`).join("");
   if(g("o-mg")) g("o-mg").innerHTML="<option value=''>-</option>"+SETTINGS.mgs.map(x=>`<option value="${x}">${x}</option>`).join("");
 }
 
 // ==========================================
-// TAB 1: REVENUE SHEET (Excel Sync)
+// TAB 1: REVENUE SHEET
 // ==========================================
-const R_F = ["r-op","r-med","r-trt","r-hd","r-gw","r-chg","r-drp","r-mem","r-stf","r-dep","r-oth","r-opx","r-oam","r-nyp","r-nam","r-nnp"];
-let currentT1Key = "";
-let t1Listener = null;
+// Field mapping for Sync to DB
+const R_COLS = [
+  {id:"p-misc", cls:"bg-op"}, {id:"p-product", cls:"bg-med"}, {id:"p-treatment", cls:"bg-trt"},
+  {id:"a-hdmall", cls:"bg-hd"}, {id:"a-gowabi", cls:"bg-gw"}, {id:"p-charge", cls:"bg-chg"},
+  {id:"p-drip", cls:"bg-drp"}, {id:"r-mem", cls:"bg-mem"}, {id:"r-stf", cls:"bg-op"},
+  {id:"r-dep", cls:"bg-chg"}, {id:"r-oth", cls:"bg-total"}, {id:"r-opx", cls:"bg-old"},
+  {id:"r-oam", cls:"bg-old"}, {id:"r-nyp", cls:"bg-new"}, {id:"r-nam", cls:"bg-new"}, {id:"r-nnp", cls:"bg-new"}
+];
 
-function loadT1() {
+let curT1 = "";
+function buildT1() {
   const mo=g("r-mo").value, br=g("r-br").value; if(!mo)return;
   const [yr,m] = mo.split("-"); const dim = new Date(yr,m,0).getDate();
-  const tb = g("r-tbody");
+  const req = mo+"_"+br;
   
-  const reqKey = mo+"_"+br;
-  if(currentT1Key !== reqKey) {
-    currentT1Key = reqKey;
+  // Build Grid Instantly
+  if(curT1 !== req) {
+    curT1 = req;
     let ht = "";
     for(let i=1; i<=dim; i++){
       let dt = `${yr}-${m}-${String(i).padStart(2,'0')}`;
-      let docSel = `<select class="r-inp bg-date" style="text-align:center;cursor:pointer;" id="doc-${dt}" data-dt="${dt}" data-id="r-doc" onchange="svT1(this)"><option value="">-</option>${SETTINGS.docs.map(x=>`<option value="${x}">${x}</option>`).join("")}</select>`;
-      ht += `<tr><td class="bg-date">${i}/${m}/${yr}</td><td class="bg-total"><input type="text" class="r-inp" id="tot-${dt}" value="0.00" readonly></td>`;
-      R_F.forEach(f => {
-        let cls = f.includes('op')?'bg-op':f.includes('med')?'bg-med':f.includes('trt')?'bg-treat':f.includes('hd')?'bg-hd':f.includes('gw')?'bg-gw':f.includes('chg')||f.includes('dep')?'bg-chg':f.includes('drp')?'bg-drip':f.includes('mem')?'bg-mem':f.includes('oth')?'bg-total':f.includes('o')?'bg-old':'bg-new';
-        ht += `<td class="${cls}"><input type="number" class="r-inp" id="${f}-${dt}" data-dt="${dt}" data-id="${f}" oninput="svT1(this)"></td>`;
+      ht += `<tr><td class="bg-date">${i}/${m}/${yr}</td>
+        <td class="bg-total"><input type="text" class="r-inp row-tot" readonly value="0.00"></td>`;
+      R_COLS.forEach(f => {
+        ht += `<td class="${f.cls}"><input type="number" class="r-inp" data-dt="${dt}" data-id="${f.id}" oninput="calcT1(this)"></td>`;
       });
-      ht += `<td class="bg-sum"><input type="text" class="r-inp" id="sum-${dt}" style="text-align:center;" value="0" readonly></td><td class="bg-date">${docSel}</td></tr>`;
+      ht += `<td class="bg-sum"><input type="text" class="r-inp row-pax" style="text-align:center;" readonly value="0"></td>
+        <td class="bg-date"><select class="r-inp bg-date" style="text-align:center;" data-dt="${dt}" data-id="r-doc" onchange="calcT1(this)"></select></td></tr>`;
     }
-    tb.innerHTML = ht;
+    g("r-tbody").innerHTML = ht;
+    updateSelects(); // fill options
+    
+    // Update target
+    g("k1-tg").dataset.val = SETTINGS.tgs[br]||0;
+    g("k1-tg").textContent = "฿"+fm(SETTINGS.tgs[br]||0);
   }
 
-  if(t1Listener) DB.ref(`daily`).off('value', t1Listener);
-  t1Listener = snap => {
+  // Fetch Data to fill inputs
+  DB.ref(`daily`).once('value').then(snap=>{
     const all = snap.val()||{};
-    let gt=0, go=0, gn=0, gop=0, gmed=0, gtrt=0;
-    
     for(let i=1; i<=dim; i++){
       let dt = `${yr}-${m}-${String(i).padStart(2,'0')}`;
       let d = all[dt]?.[br]||{};
       
-      // Auto mapping from T2
-      let p_op=0, p_hd=0, p_gw=0, p_chg=0, p_med=0, p_trt=0, p_drp=0;
-      for(let j=0; j<SETTINGS.progs.length; j++){
-        let nm = (d[`name${j}`]||SETTINGS.progs[j]).toLowerCase();
-        let val = d[`p${j}`]||0;
-        if(nm.includes("hdmall")) p_hd+=val; else if(nm.includes("gowabi")) p_gw+=val;
-        else if(nm.includes("ชาร์จ")) p_chg+=val; else if(nm.includes("product")||nm.includes("ยา")) p_med+=val;
-        else if(nm.includes("treatment")) p_trt+=val; else if(nm.includes("drip")||nm.includes("ฉีดผิว")) p_drp+=val;
-        else p_op+=val;
-      }
-      
-      let rVals = [
-        d["r-op"]!==undefined?d["r-op"]:p_op,
-        d["r-med"]!==undefined?d["r-med"]:p_med,
-        d["r-trt"]!==undefined?d["r-trt"]:p_trt,
-        d["r-hd"]!==undefined?d["r-hd"]:p_hd,
-        d["r-gw"]!==undefined?d["r-gw"]:p_gw,
-        d["r-chg"]!==undefined?d["r-chg"]:p_chg,
-        d["r-drp"]!==undefined?d["r-drp"]:p_drp,
-        d["r-mem"], d["r-stf"], d["r-dep"], d["r-oth"], 
-        d["r-opx"], d["r-oam"], d["r-nyp"], d["r-nam"], d["r-nnp"]
-      ];
-      
-      let tot = 0; for(let j=0; j<=10; j++) tot += (parseFloat(rVals[j])||0);
-      let pTot = (parseFloat(rVals[11])||0) + (parseFloat(rVals[13])||0) + (parseFloat(rVals[15])||0);
-
-      // Fill values if not focused
-      R_F.forEach((f, idx) => {
-        let el = g(`${f}-${dt}`);
-        if(el && document.activeElement !== el) el.value = rVals[idx] || "";
+      // Merge values (if typed in T1 it overrides)
+      R_COLS.forEach(f => {
+        let el = document.querySelector(`input[data-dt="${dt}"][data-id="${f.id}"]`);
+        if(el && document.activeElement !== el) {
+           let val = d[f.id]||"";
+           el.value = val;
+        }
       });
-      
-      let elTot = g(`tot-${dt}`); if(elTot) elTot.value = fm(tot);
-      let elSum = g(`sum-${dt}`); if(elSum) elSum.value = fmI(pTot);
-      let elDoc = g(`doc-${dt}`); if(elDoc && document.activeElement !== elDoc) elDoc.value = d["r-doc"] || "";
-
-      gt+=tot; go+=(parseFloat(rVals[11])||0); gn+=(parseFloat(rVals[13])||0)+(parseFloat(rVals[15])||0);
-      gop+=(parseFloat(rVals[0])||0); gmed+=(parseFloat(rVals[1])||0); gtrt+=(parseFloat(rVals[2])||0);
+      let dSel = document.querySelector(`select[data-dt="${dt}"][data-id="r-doc"]`);
+      if(dSel && document.activeElement !== dSel) dSel.value = d["r-doc"]||"";
     }
-    
-    let tg = SETTINGS.tgs[br]||0;
-    g("k1-rev").textContent = "฿"+fm(gt); g("k1-tg").textContent = "฿"+fm(tg);
-    g("k1-pct").textContent = tg>0 ? (gt/tg*100).toFixed(1)+"%" : "0%";
-    g("k1-rem").textContent = tg>gt ? "฿"+fm(tg-gt) : "ทะลุเป้า!";
-    
-    g("rs-curr").textContent = fm(gt); g("rs-pct").textContent = tg>0 ? (gt/tg*100).toFixed(1)+"%" : "0.00%";
-    g("rs-rem").textContent = tg>gt ? fm(tg-gt) : "0.00";
-    let dLeft = dim - new Date().getDate(); g("rs-days").textContent = dLeft>0?dLeft:0;
-    
-    g("rs-pax").textContent = fmI(go+gn); g("rs-old").textContent = fmI(go); g("rs-new").textContent = fmI(gn);
-    g("rs-sop").textContent = fm(gop); g("rs-smed").textContent = fm(gmed); g("rs-strt").textContent = fm(gtrt);
-  };
-  DB.ref(`daily`).on('value', t1Listener);
+    calcT1(); // Auto calculate everything
+  }).catch(()=>{ calcT1(); });
 }
 
 let tm1={};
-function svT1(el) {
-  const dt=el.dataset.dt, br=g("r-br").value, id=el.dataset.id, val=el.type==="number"?parseFloat(el.value)||0 : el.value;
+function calcT1(triggerEl) {
+  let gTot=0, gOp=0, gMed=0, gTrt=0, gOldP=0, gNewP=0, gOldA=0, gNewA=0;
   
-  // Real-time UI calculation
-  const row = el.closest('tr');
-  if(row) {
-    let inputs = row.querySelectorAll('.r-inp[type="number"]');
-    let rowTot=0, rowPax=0;
-    inputs.forEach((inp, idx) => {
-      let v = parseFloat(inp.value)||0;
-      if(idx <= 10) rowTot += v;
-      if(idx === 11 || idx === 13 || idx === 15) rowPax += v;
-    });
-    row.querySelector('.bg-total input[readonly]').value = fm(rowTot);
-    row.querySelector('.bg-sum input[readonly]').value = fmI(rowPax);
+  const rows = document.querySelectorAll("#r-tbody tr");
+  rows.forEach(row => {
+    let q = (id) => parseFloat(row.querySelector(`[data-id="${id}"]`)?.value)||0;
+    
+    let op=q("p-misc"), med=q("p-product"), trt=q("p-treatment"), hd=q("a-hdmall"), gw=q("a-gowabi");
+    let chg=q("p-charge"), drp=q("p-drip"), mem=q("r-mem"), stf=q("r-stf"), dep=q("r-dep"), oth=q("r-oth");
+    
+    let rTot = op+med+trt+hd+gw+chg+drp+mem+stf+dep+oth;
+    let rPax = q("r-opx")+q("r-nyp")+q("r-nnp");
+    
+    let elTot = row.querySelector('.row-tot'); if(elTot) elTot.value = fm(rTot);
+    let elPax = row.querySelector('.row-pax'); if(elPax) elPax.value = fmI(rPax);
+
+    gTot+=rTot; gOp+=op; gMed+=med; gTrt+=trt;
+    gOldP+=q("r-opx"); gNewP+=(q("r-nyp")+q("r-nnp"));
+    gOldA+=q("r-oam"); gNewA+=q("r-nam");
+  });
+
+  let tg = parseFloat(g("k1-tg").dataset.val)||0;
+  g("k1-rev").textContent = "฿"+fm(gTot); g("k1-pct").textContent = tg>0 ? (gTot/tg*100).toFixed(1)+"%" : "0%";
+  g("k1-rem").textContent = tg>gTot ? "฿"+fm(tg-gTot) : "ทะลุเป้า!";
+
+  g("rs-curr").textContent = fm(gTot); g("rs-pct").textContent = tg>0 ? (gTot/tg*100).toFixed(1)+"%" : "0.00%";
+  g("rs-rem").textContent = tg>gTot ? fm(tg-gTot) : "0.00";
+  let [yr,m] = g("r-mo").value.split("-"); let dim = new Date(yr,m,0).getDate();
+  let dL = dim - new Date().getDate(); g("rs-days").textContent = dL>0?dL:0;
+  
+  g("rs-pax").textContent = fmI(gOldP+gNewP);
+  g("rs-old").textContent = fmI(gOldP);
+  g("rs-new").textContent = fmI(gNewP); // Match image: คนไข้ใหม่ (รวม)
+
+  g("rs-avg-old").textContent = gOldP>0 ? fm(gOldA/gOldP) : "0.00";
+  g("rs-avg-new").textContent = gNewP>0 ? fm(gNewA/gNewP) : "0.00";
+
+  g("rs-sop").textContent = fm(gOp); g("rs-smed").textContent = fm(gMed); g("rs-strt").textContent = fm(gTrt);
+
+  // If triggered by typing, save to Firebase
+  if(triggerEl) {
+    const dt = triggerEl.dataset.dt, br = g("r-br").value, id = triggerEl.dataset.id;
+    const val = triggerEl.type==="number"?parseFloat(triggerEl.value)||0 : triggerEl.value;
+    clearTimeout(tm1[dt]);
+    tm1[dt] = setTimeout(()=>{ DB.ref(`daily/${dt}/${br}`).update({[id]:val}); }, 500);
   }
-
-  // Auto Map logic back to T2 elements if needed
-  let mappedData = {[id]:val, last_updated: new Date().toISOString()};
-  if(id === "r-med") mappedData["p-product"] = val; // example direct mapping
-  if(id === "r-hd") mappedData["a-hdmall"] = val;
-
-  clearTimeout(tm1[dt]);
-  tm1[dt] = setTimeout(()=>{ DB.ref(`daily/${dt}/${br}`).update(mappedData); }, 500);
 }
+
 function exportT1() {
-  const wb = XLSX.utils.table_to_book(g("revTable")); XLSX.writeFile(wb, `Revenue_${g("r-mo").value}_${g("r-br").value}.xlsx`);
+  const wb = XLSX.utils.table_to_book(g("revTable"));
+  XLSX.writeFile(wb, `Revenue_${g("r-mo").value}_${g("r-br").value}.xlsx`);
 }
 
 // ==========================================
-// TAB 2: DAILY OPS CORE (PDF CLONE)
+// TAB 2: DAILY OPS CORE
 // ==========================================
 const O_R = [
   {n:"1. KBANK (กสิกร)", id:"c-kbank", sp:`<td rowspan="3" style="vertical-align:bottom;text-align:center;">เงินสด<br><br><input type="number" id="pay-cash" class="num-in" style="font-size:18px;text-align:center;color:var(--tx)!important;" oninput="cT2()"></td>`},
-  {n:"1.1 Credit (เครดิต)", id:"c-crd"},
-  {n:"1.2 กสิกร(สแกน/โอน)", id:"c-kbsc"},
+  {n:"1.1 Credit (เครดิต)", id:"c-crd"}, {n:"1.2 กสิกร(สแกน/โอน)", id:"c-kbsc"},
   {n:"2.KTC (กรุงไทย)", id:"c-ktc", sp:`<td rowspan="4" style="vertical-align:middle;text-align:center;">แอปพลิเคชัน<br><br><input type="number" id="pay-app" class="num-in" style="font-size:18px;text-align:center;color:var(--tx)!important;" oninput="cT2()"></td>`},
-  {n:"3.BAY (กรุงศรี)", id:"c-bay"},
-  {n:"14. SCB (ไทยพาณิชย์)", id:"c-scb"},
+  {n:"3.BAY (กรุงศรี)", id:"c-bay"}, {n:"14. SCB (ไทยพาณิชย์)", id:"c-scb"},
   {n:"อื่นๆ ระบุ <input type='text' id='c-oth-n' style='border:none;border-bottom:1px dotted #ccc;width:50px;background:transparent;'>", id:"c-oth"},
   {n:"BLANK", sp:`<td rowspan="4" style="vertical-align:middle;text-align:center;">ยอดเงินโอน<br><br><input type="number" id="pay-trans" class="num-in" style="font-size:18px;text-align:center;color:var(--tx)!important;" oninput="cT2()"></td>`},
   {n:"ยอดรวมเครดิต", id:"t-crd", ro:true},
@@ -524,19 +532,17 @@ const O_R = [
 ];
 
 function buildT2() {
-  const tb = g("o-tbody"); let ht = "";
-  const mx = Math.max(SETTINGS.progs.length, 10);
+  const tb = g("o-tbody"); let ht = ""; const mx = Math.max(SETTINGS.progs.length, 10);
   for(let i=0; i<mx; i++) {
     ht += `<tr>`;
     if(i===0) ht += `<td rowspan="${mx+1}" style="background:#f0f0f0;"></td>`;
     
     if(i < SETTINGS.progs.length) {
-      // Map names to specific IDs if matches T1 mappings
-      let pid = `p${i}`;
-      let nm = SETTINGS.progs[i].toLowerCase();
-      if(nm.includes("hdmall")) pid = "a-hdmall";
-      if(nm.includes("gowabi")) pid = "a-gowabi";
-      if(nm.includes("product")||nm.includes("ยา")) pid = "p-product";
+      let nm = SETTINGS.progs[i].toLowerCase(), pid = `p${i}`;
+      if(nm.includes("hdmall")) pid="a-hdmall"; else if(nm.includes("gowabi")) pid="a-gowabi";
+      else if(nm.includes("product")||nm.includes("ยา")) pid="p-product"; else if(nm.includes("treatment")) pid="p-treatment";
+      else if(nm.includes("ชาร์จ")) pid="p-charge"; else if(nm.includes("drip")||nm.includes("ฉีดผิว")) pid="p-drip";
+      else if(nm.includes("หัตถการอื่นๆ")) pid="p-misc";
 
       ht += `<td>${SETTINGS.progs[i]}</td>
              <td style="padding:2px;"><input type="number" id="${pid}" class="num-in o-val" oninput="cT2()"></td>
@@ -553,6 +559,15 @@ function buildT2() {
   }
   ht += `<tr style="font-weight:700;"><td style="text-align:right;">ยอดรวม</td><td style="background:#f0f0f0;"><input type="text" id="t-prog" class="num-in" style="color:#000!important;" readonly value="0.00"></td><td style="background:#f0f0f0;text-align:right;color:red;padding-right:10px;" id="t-vip">0.00</td><td colspan="2" style="text-align:center;background:#f0f0f0;">คะแนน (Point)</td><td colspan="2" style="padding:2px;"><input type="number" id="t-point" class="num-in" style="width:100%;text-align:center;color:var(--tx)!important;"></td></tr>`;
   tb.innerHTML = ht;
+  
+  const dt=g("o-dt").value, br=g("o-br").value; if(!dt)return;
+  DB.ref(`daily/${dt}/${br}`).once('value').then(snap=>{
+    document.querySelectorAll('#t2-content input').forEach(e=>{if(!e.readOnly)e.value=""});
+    if(snap.exists()) {
+      const d = snap.val(); for(let k in d) if(g(k)) g(k).value = d[k];
+    }
+    cT2(); updateSelects();
+  }).catch(()=>cT2());
 }
 
 function cT2() {
@@ -560,31 +575,9 @@ function cT2() {
   document.querySelectorAll(".o-val").forEach(e=>tp+=Number(e.value)||0);
   document.querySelectorAll(".v-val").forEach(e=>tv+=Number(e.value)||0);
   document.querySelectorAll(".c-val").forEach(e=>tc+=Number(e.value)||0);
-  
-  if(g("t-prog")) g("t-prog").value = fm(tp);
-  if(g("t-vip")) g("t-vip").textContent = fm(tv);
+  if(g("t-prog")) g("t-prog").value = fm(tp); if(g("t-vip")) g("t-vip").textContent = fm(tv);
   if(g("t-crd")) g("t-crd").value = fm(tc);
   if(g("t-grand")) g("t-grand").value = fm(tc + vv("pay-cash") + vv("pay-app") + vv("pay-trans"));
-}
-
-let t2Listener = null;
-function loadT2() {
-  buildT2();
-  const dt=g("o-dt").value, br=g("o-br").value; if(!dt)return;
-  
-  if(t2Listener) DB.ref(`daily`).off('value', t2Listener);
-  t2Listener = snap => {
-    document.querySelectorAll('#t2-content input').forEach(e=>{if(!e.readOnly)e.value=""});
-    if(snap.exists()) {
-      const d = snap.child(dt).child(br).val() || {};
-      for(let k in d) if(g(k) && document.activeElement !== g(k)) g(k).value = d[k];
-      
-      // Auto Calculate T2 fields based on T1 mapping
-      // e.g., if "r-op" exists in DB but not directly assigned, we can fill it in the first available o-val
-    }
-    cT2();
-  };
-  DB.ref(`daily`).on('value', t2Listener);
 }
 
 function saveT2() {
@@ -598,20 +591,14 @@ function saveT2() {
 }
 
 // ==========================================
-// TAB 3: CONFIRM TRACKING (Monthly Grid)
+// TAB 3: CONFIRM TRACKING
 // ==========================================
-let currentT3Key = "";
-let t3Listener = null;
-
-function loadT3() {
+let curT3 = "";
+function buildT3() {
   const mo=g("tk-mo").value, br=g("tk-br").value; if(!mo)return;
   const [yr,m] = mo.split("-"); const dim = new Date(yr,m,0).getDate();
-  const tb = g("tk-tbody");
-  
-  const reqKey = mo+"_"+br;
-  if(currentT3Key !== reqKey) {
-    currentT3Key = reqKey;
-    let ht = "";
+  if(curT3 !== mo+"_"+br) {
+    curT3 = mo+"_"+br; let ht = "";
     for(let i=1; i<=dim; i++){
       let dt = `${yr}-${m}-${String(i).padStart(2,'0')}`;
       ht += `<tr><td style="font-weight:bold;background:#f8f9fa;">${i}/${m}/${yr}</td>
@@ -625,93 +612,90 @@ function loadT3() {
         <td><input type="number" class="mth-inp" id="tk-tc-${dt}" data-dt="${dt}" data-id="tk-tc" oninput="svT3(this)"></td>
         <td><input type="number" class="mth-inp" id="tk-ro-${dt}" data-dt="${dt}" data-id="tk-ro" oninput="svT3(this)"></td>
         <td><input type="number" class="mth-inp" id="tk-rn-${dt}" data-dt="${dt}" data-id="tk-rn" oninput="svT3(this)"></td>
-        <td><input type="text" class="mth-inp" id="tk-rt-${dt}" readonly value="0"></td></tr>`;
+        <td><input type="text" class="mth-inp row-tk-tot" readonly value="0"></td></tr>`;
     }
-    tb.innerHTML = ht;
+    g("tk-tbody").innerHTML = ht;
   }
 
-  if(t3Listener) DB.ref(`tracking_mth/${mo}`).off('value', t3Listener);
-  t3Listener = snap => {
-    const all = snap.val()||{};
+  DB.ref(`tracking_mth/${mo}/${br}`).once('value').then(snap=>{
+    const dAll = snap.val()||{};
     for(let i=1; i<=dim; i++){
       let dt = `${yr}-${m}-${String(i).padStart(2,'0')}`;
-      let d = all[br]?.[dt]||{};
+      let d = dAll[dt]||{};
       ["tk-co","tk-cn","tk-po","tk-pn","tk-wo","tk-wn","tk-na","tk-tc","tk-ro","tk-rn"].forEach(k => {
-        let el = g(`${k}-${dt}`);
-        if(el && document.activeElement !== el) el.value = d[k] || "";
+        let el = g(`${k}-${dt}`); if(el) el.value = d[k] || "";
       });
-      let ro = parseFloat(d["tk-ro"])||0; let rn = parseFloat(d["tk-rn"])||0;
-      let elRt = g(`tk-rt-${dt}`); if(elRt) elRt.value = ro+rn;
+      calcT3Row(g(`tk-ro-${dt}`));
     }
-  };
-  DB.ref(`tracking_mth/${mo}`).on('value', t3Listener);
+  }).catch(()=>{});
 }
 
 let tm3={};
 function svT3(el) {
   const dt = el.dataset.dt, br = g("tk-br").value, mo = g("tk-mo").value, id = el.dataset.id, val = parseFloat(el.value)||0;
-  const row = el.closest('tr');
-  if(row) {
-    let ro = parseFloat(row.querySelector(`[id^='tk-ro-']`).value)||0;
-    let rn = parseFloat(row.querySelector(`[id^='tk-rn-']`).value)||0;
-    row.querySelector(`[id^='tk-rt-']`).value = ro+rn;
-  }
+  calcT3Row(el);
   clearTimeout(tm3[dt]);
   tm3[dt] = setTimeout(()=>{ DB.ref(`tracking_mth/${mo}/${br}/${dt}`).update({[id]:val}); }, 500);
 }
+function calcT3Row(el) {
+  if(!el) return;
+  const row = el.closest('tr'); if(row) {
+    let ro = parseFloat(row.querySelector(`[id^='tk-ro-']`).value)||0;
+    let rn = parseFloat(row.querySelector(`[id^='tk-rn-']`).value)||0;
+    row.querySelector('.row-tk-tot').value = ro+rn;
+  }
+}
 
 // ==========================================
-// TAB 4: DOCTOR FINANCE (Monthly Grid)
+// TAB 4: DOCTOR FINANCE
 // ==========================================
-let currentT4Key = "";
-let t4Listener = null;
-
-function loadT4() {
+let curT4 = "";
+function buildT4() {
   const mo=g("df-mo").value, br=g("df-br").value; if(!mo)return;
   const [yr,m] = mo.split("-"); const dim = new Date(yr,m,0).getDate();
-  const tb = g("df-tbody");
-  
-  const reqKey = mo+"_"+br;
-  if(currentT4Key !== reqKey) {
-    currentT4Key = reqKey;
-    let ht = "";
+  if(curT4 !== mo+"_"+br) {
+    curT4 = mo+"_"+br; let ht = "";
     for(let i=1; i<=dim; i++){
       let dt = `${yr}-${m}-${String(i).padStart(2,'0')}`;
-      let docSel = `<select class="mth-inp" id="df-doc-${dt}" data-dt="${dt}" data-id="df-doc" onchange="svT4(this)"><option value="">-</option>${SETTINGS.docs.map(x=>`<option value="${x}">${x}</option>`).join("")}</select>`;
       ht += `<tr><td style="font-weight:bold;background:#f8f9fa;">${i}/${m}/${yr}</td>
-        <td>${docSel}</td>
+        <td><select class="mth-inp" data-dt="${dt}" data-id="df-doc" onchange="svT4(this)"></select></td>
         <td><input type="time" class="mth-inp" id="df-ti-${dt}" data-dt="${dt}" data-id="df-ti" oninput="svT4(this)"></td>
         <td><input type="time" class="mth-inp" id="df-to-${dt}" data-dt="${dt}" data-id="df-to" oninput="svT4(this)"></td>
         <td><input type="number" class="mth-inp" style="background:#dbeafe;" id="df-sl-${dt}" data-dt="${dt}" data-id="df-sl" oninput="svT4(this)"></td>
         <td><input type="number" class="mth-inp" style="background:#fff3cd;" id="df-df-${dt}" data-dt="${dt}" data-id="df-df" oninput="svT4(this)"></td>
         <td><input type="text" class="mth-inp" style="text-align:left;padding-left:10px;" id="df-nt-${dt}" data-dt="${dt}" data-id="df-nt" oninput="svT4(this)"></td></tr>`;
     }
-    tb.innerHTML = ht;
+    g("df-tbody").innerHTML = ht; updateSelects();
   }
-
-  if(t4Listener) DB.ref(`docfin_mth/${mo}`).off('value', t4Listener);
-  t4Listener = snap => {
-    const all = snap.val()||{};
+  
+  DB.ref(`docfin_mth/${mo}/${br}`).once('value').then(snap=>{
+    const dAll = snap.val()||{};
     let sSal=0, sDf=0;
     for(let i=1; i<=dim; i++){
       let dt = `${yr}-${m}-${String(i).padStart(2,'0')}`;
-      let d = all[br]?.[dt]||{};
-      ["df-doc","df-ti","df-to","df-sl","df-df","df-nt"].forEach(k => {
-        let el = g(`${k}-${dt}`);
-        if(el && document.activeElement !== el) el.value = d[k] || "";
+      let d = dAll[dt]||{};
+      ["df-ti","df-to","df-sl","df-df","df-nt"].forEach(k => {
+        let el = g(`${k}-${dt}`); if(el) el.value = d[k] || "";
       });
-      sSal += parseFloat(d["df-sl"])||0;
-      sDf += parseFloat(d["df-df"])||0;
+      let sel = document.querySelector(`select[data-dt="${dt}"][data-id="df-doc"]`);
+      if(sel) sel.value = d["df-doc"]||"";
+      sSal += parseFloat(d["df-sl"])||0; sDf += parseFloat(d["df-df"])||0;
     }
     g("k4-sal").textContent="฿"+fm(sSal); g("k4-df").textContent="฿"+fm(sDf);
-  };
-  DB.ref(`docfin_mth/${mo}`).on('value', t4Listener);
+  }).catch(()=>{});
 }
 
 let tm4={};
 function svT4(el) {
   const dt = el.dataset.dt, br = g("df-br").value, mo = g("df-mo").value, id = el.dataset.id;
   const val = el.type==="number"?parseFloat(el.value)||0 : el.value;
+  
+  // Real-time Sum
+  let sSal=0, sDf=0;
+  document.querySelectorAll("[id^='df-sl-']").forEach(i=>sSal+=parseFloat(i.value)||0);
+  document.querySelectorAll("[id^='df-df-']").forEach(i=>sDf+=parseFloat(i.value)||0);
+  g("k4-sal").textContent="฿"+fm(sSal); g("k4-df").textContent="฿"+fm(sDf);
+
   clearTimeout(tm4[dt]);
   tm4[dt] = setTimeout(()=>{ DB.ref(`docfin_mth/${mo}/${br}/${dt}`).update({[id]:val}); }, 500);
 }
@@ -738,8 +722,7 @@ function saveT5() {
   SETTINGS.progs = g("s-pr").value.split("\n").map(s=>s.trim()).filter(Boolean);
   
   DB.ref(`system_settings`).set(SETTINGS).then(()=>{
-    popSels(); buildT2(); currentT1Key=""; loadT1(); 
-    currentT4Key=""; loadT4(); // refresh doc selectors
+    updateSelects(); curT1=""; buildT1(); curT3=""; buildT3(); curT4=""; buildT4(); buildT2();
     toast("บันทึกการตั้งค่าลงฐานข้อมูลแล้ว!");
   });
 }
@@ -749,7 +732,7 @@ window.onload = () => {
   g("o-dt").value = today;
   g("r-mo").value = today.slice(0,7); g("tk-mo").value = today.slice(0,7); g("df-mo").value = today.slice(0,7);
   
-  DB.ref(`system_settings`).on('value', snap=>{
+  DB.ref(`system_settings`).once('value').then(snap=>{
     if(snap.exists()) {
       const d=snap.val();
       SETTINGS.progs = d.progs||SETTINGS.progs;
@@ -758,8 +741,8 @@ window.onload = () => {
       SETTINGS.cas = d.cas||SETTINGS.cas;
       SETTINGS.mgs = d.mgs||SETTINGS.mgs;
     }
-    popSels(); loadT5(); loadT1(); loadT2(); loadT3(); loadT4();
-  });
+    updateSelects(); loadT5(); buildT1(); buildT2(); buildT3(); buildT4();
+  }).catch(()=>{ updateSelects(); loadT5(); buildT1(); buildT2(); buildT3(); buildT4(); });
 }
 </script>
 </body>
