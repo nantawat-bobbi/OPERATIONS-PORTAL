@@ -97,7 +97,7 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 .rs-row{display:flex;justify-content:space-between;margin-bottom:8px;font-size:14px;border-bottom:1px dotted #ccc;padding-bottom:4px;}
 .rs-lbl{font-weight:600;color:var(--tx2);} .rs-val{font-weight:700;color:#000;} .rs-val.fire{color:#d9381e;font-size:16px;}
 
-/* TAB 2: DAILY OPS CORE (PDF) */
+/* TAB 2: DAILY OPS CORE */
 .paper-ui{background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.05);max-width:1100px;margin:0 auto;}
 .paper-ui input{border:none;border-bottom:1px dotted #ccc;background:transparent;color:#1D4ED8;font-weight:600;text-align:center;width:100%;}
 .paper-ui input.red-tx{color:var(--red)!important;}
@@ -475,16 +475,15 @@ injectBranchOptions();
 
 function g(id){return document.getElementById(id);}
 
-// -----------------------------------------------------
-// ฟังก์ชันแปลงตัวเลข: โชว์ลูกน้ำ (,) แต่เอา .00 อัตโนมัติออก 
-// (ยังคงทศนิยมไว้ถ้าผู้ใช้ตั้งใจพิมพ์มาเอง เช่น .5)
-// -----------------------------------------------------
+// แปลงตัวเลขให้มี , แต่ไม่มีจุด .00 อัตโนมัติ (เก็บค่าทศนิยมจริงไว้ถ้ามี)
 function fm(n){
-  return (parseFloat(n)||0).toLocaleString("th-TH");
+  let num = parseFloat(n) || 0;
+  if (num % 1 !== 0) {
+    return num.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  return num.toLocaleString("th-TH");
 }
-function fmI(n){
-  return Math.round(parseFloat(n)||0).toLocaleString("th-TH");
-}
+function fmI(n){ return Math.round(parseFloat(n)||0).toLocaleString("th-TH"); }
 
 function toast(m, type="success"){
   const el=document.createElement("div"); el.className="toast"; el.style.background = type==="error" ? "#c92a2a" : "#212529";
@@ -542,7 +541,6 @@ function buildT0() {
         bKeys.forEach(br => {
           if(all[dt][br]) {
             let d = all[dt][br];
-            // EXACTLY 11 FIELDS FOR TOTAL REVENUE
             let rTot = (parseFloat(d["r-op"])||0)+(parseFloat(d["r-med"])||0)+(parseFloat(d["r-trt"])||0)+(parseFloat(d["r-hd"])||0)+(parseFloat(d["r-gw"])||0)+(parseFloat(d["r-chg"])||0)+(parseFloat(d["r-drp"])||0)+(parseFloat(d["r-mem"])||0)+(parseFloat(d["r-stf"])||0)+(parseFloat(d["r-dep"])||0)+(parseFloat(d["r-oth"])||0);
             bRev[br] += rTot; totRev += rTot;
             totPax += (parseFloat(d["r-opx"])||0)+(parseFloat(d["r-nyp"])||0)+(parseFloat(d["r-nnp"])||0);
@@ -638,7 +636,6 @@ function calcT1(triggerEl) {
   rows.forEach(row => {
     let q = (id) => parseFloat(row.querySelector(`[data-id="${id}"]`)?.value)||0;
     
-    // EXACTLY 11 FIELDS
     let rTot = q("r-op")+q("r-med")+q("r-trt")+q("r-hd")+q("r-gw")+q("r-chg")+q("r-drp")+q("r-mem")+q("r-stf")+q("r-dep")+q("r-oth");
     let rPax = q("r-opx")+q("r-nyp")+q("r-nnp");
     
@@ -756,7 +753,7 @@ function buildT2() {
       if(i===0) ht += `<td rowspan="2" style="vertical-align:bottom;text-align:center;">เงินสด<br><br><input type="number" id="pay-cash" class="num-in" style="font-size:18px;text-align:center;color:var(--tx)!important;" oninput="cT2()"></td>`;
       if(i===2) ht += `<td rowspan="3" style="vertical-align:middle;text-align:center;font-size:11px;">แอปพลิเคชัน<br><div style="display:flex;justify-content:space-between;margin-top:5px;align-items:center;">HDmall: <input type="number" id="a-hd-pax" style="width:25px;" placeholder="คน"> <input type="number" id="a-hdmall" class="num-in c-val" style="width:40px;color:var(--tx)!important;" oninput="cT2()" placeholder="ยอด"></div><div style="display:flex;justify-content:space-between;margin-top:2px;align-items:center;">Gowabi: <input type="number" id="a-gw-pax" style="width:25px;" placeholder="คน"> <input type="number" id="a-gowabi" class="num-in c-val" style="width:40px;color:var(--tx)!important;" oninput="cT2()" placeholder="ยอด"></div></td>`;
       if(i===5) ht += `<td rowspan="2" style="vertical-align:middle;text-align:center;">ยอดเงินโอน<br><br><input type="number" id="pay-trans" class="num-in" style="font-size:18px;text-align:center;color:var(--tx)!important;" oninput="cT2()"></td>`;
-      if(i===7) ht += `<td rowspan="${mx-7}" style="vertical-align:middle;text-align:center;font-weight:700;">ยอดชำระรวม<br><br><input type="number" id="t-grand" class="num-in" style="font-size:20px;text-align:center;color:#000!important;border:1px solid #ccc!important;border-radius:4px;padding:5px;" oninput="saveT2Quick('t-grand',this.value)"></td>`;
+      if(i===7) ht += `<td rowspan="${mx-7}" style="vertical-align:middle;text-align:center;font-weight:700;">ยอดชำระรวม<br><br><input type="text" id="t-grand" class="num-in" style="font-size:20px;text-align:center;color:#000!important;border:1px solid #ccc!important;border-radius:4px;padding:5px;" oninput="saveT2Quick('t-grand',this.value)"></td>`;
     } else { ht += `<td></td><td></td>`; }
     ht += `</tr>`;
   }
@@ -783,7 +780,7 @@ function cT2(fromLoad = false) {
   let grandInput = g("t-grand");
   if(grandInput) {
     let autoSum = tc + (parseFloat(g("pay-cash")?.value)||0) + (parseFloat(g("pay-trans")?.value)||0);
-    if(fromLoad || document.activeElement !== grandInput) grandInput.value = autoSum;
+    if(fromLoad || document.activeElement !== grandInput) grandInput.value = fm(autoSum);
   }
 }
 
@@ -802,11 +799,20 @@ function loadT2() {
   DB.ref(`daily`).on('value', t2Listener);
 }
 
-function saveT2Quick(id, val) { const dt=g("o-dt").value, br=g("o-br").value; DB.ref(`daily/${dt}/${br}`).update({[id]: parseFloat(val)||val}); }
+function saveT2Quick(id, val) { 
+  const dt=g("o-dt").value, br=g("o-br").value; 
+  let rawVal = val.toString().replace(/,/g, '');
+  DB.ref(`daily/${dt}/${br}`).update({[id]: parseFloat(rawVal)||rawVal}); 
+}
 
 function saveT2() {
   const dt=g("o-dt").value, br=g("o-br").value; if(!dt)return;
-  let p={}; document.querySelectorAll('#t2-content input, #t2-content select').forEach(e=>{ if(e.id && !e.readOnly) p[e.id] = e.type==="number"?parseFloat(e.value)||0 : e.value; });
+  let p={}; document.querySelectorAll('#t2-content input, #t2-content select').forEach(e=>{ 
+    if(e.id && !e.readOnly) {
+      let rawVal = e.value.toString().replace(/,/g, '');
+      p[e.id] = (e.type==="number" || !isNaN(rawVal) && rawVal !== "") ? parseFloat(rawVal)||0 : e.value; 
+    }
+  });
   SETTINGS.progs.forEach((x,i)=>{ p[`name${i}`] = x; });
   DB.ref(`daily/${dt}/${br}`).update(p).then(()=>toast("บันทึกฟอร์ม PDF ลงฐานข้อมูลสำเร็จ!"));
 }
@@ -963,16 +969,21 @@ function loadT5() {
   g("s-mg").value = SETTINGS.mgs.join(", ");
   g("s-pr").value = SETTINGS.progs.join("\n");
 }
+
 function saveT5() {
-  bKeys.forEach(k => SETTINGS.tgs[k] = vv(`tg-${k}`));
+  bKeys.forEach(k => {
+    let el = g(`tg-${k}`);
+    SETTINGS.tgs[k] = el ? (parseFloat(el.value)||0) : 0;
+  });
   SETTINGS.docs = g("s-dr").value.split(",").map(s=>s.trim()).filter(Boolean);
   SETTINGS.cas = g("s-ca").value.split(",").map(s=>s.trim()).filter(Boolean);
   SETTINGS.mgs = g("s-mg").value.split(",").map(s=>s.trim()).filter(Boolean);
   SETTINGS.progs = g("s-pr").value.split("\n").map(s=>s.trim()).filter(Boolean);
   
   DB.ref(`system_settings`).set(SETTINGS).then(()=>{
-    updateSelects(); curT1=""; curT3=""; curT4=""; toast("บันทึกการตั้งค่าลงฐานข้อมูลแล้ว!");
-  });
+    toast("✅ บันทึกการตั้งค่าลงฐานข้อมูลสำเร็จ!");
+    setTimeout(() => location.reload(), 1000); 
+  }).catch(err => toast("❌ Error: " + err.message, "error"));
 }
 
 // ==========================================
