@@ -57,7 +57,7 @@ select:focus,input:focus,textarea:focus{border-color:var(--acc);}
 
 /* TAB 1: REVENUE SHEET (Excel Theme) */
 .rev-wrap{background:#fff;border:1px solid var(--bdr);border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.05);display:flex;flex-direction:column;}
-.rev-table-container{overflow-x:auto;max-height:60vh;border-bottom:2px solid #000;}
+.rev-table-container{overflow-x:auto;max-height:65vh;border-bottom:2px solid #000;}
 .rev-tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:1800px;}
 .rev-tbl th{padding:8px 4px;border:1px solid #aaa;text-align:center;font-weight:700;white-space:nowrap;position:sticky;top:0;z-index:2;box-shadow:0 1px 0 #999;}
 .rev-tbl th:first-child{left:0;z-index:3;}
@@ -68,7 +68,8 @@ select:focus,input:focus,textarea:focus{border-color:var(--acc);}
 .bg-date{background:#f3f4f6;} .bg-total{background:#dbeafe;} .bg-op{background:#f8d7da;}
 .bg-med{background:#d1e7dd;} .bg-trt{background:#e2d9f3;} .bg-hd{background:#cff4fc;}
 .bg-gw{background:#f3d0e2;} .bg-chg{background:#fff3cd;} .bg-drp{background:#d1e7dd;}
-.bg-mem{background:#f3f4f6;} .bg-old{background:#fff3cd;} .bg-new{background:#d1e7dd;}
+.bg-mem{background:#f3f4f6;} .bg-stf{background:#f8d7da;} .bg-dep{background:#fff3cd;}
+.bg-oth{background:#dbeafe;} .bg-old{background:#fff3cd;} .bg-new{background:#d1e7dd;}
 .bg-sum{background:#dbeafe;}
 
 .r-inp{
@@ -91,7 +92,7 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 .rs-val{font-weight:700;color:#000;}
 .rs-val.fire{color:#d9381e;font-size:16px;}
 
-/* TAB 2: DAILY OPS CORE */
+/* TAB 2: DAILY OPS CORE (PDF CLONE 100%) */
 .paper-ui{background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.05);max-width:1100px;margin:0 auto;}
 .paper-ui input{border:none;border-bottom:1px dotted #ccc;background:transparent;color:#1D4ED8;font-weight:600;text-align:center;width:100%;}
 .paper-ui input.red-tx{color:var(--red)!important;}
@@ -143,8 +144,11 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 
 <div id="t1" class="tp active">
   <div class="ph no-print">
-    <div class="ptitle">📊 Revenue Sheet <span style="font-size:12px;color:var(--tx3);font-weight:400;margin-left:10px;">คีย์ข้อมูลลงตารางได้ทันที</span></div>
+    <div class="ptitle">📊 Revenue Sheet <span style="font-size:12px;color:var(--tx3);font-weight:400;margin-left:10px;">คีย์ตารางทั้งเดือน (ข้อมูลเชื่อมโยงไปหน้า Ops Core อัตโนมัติ)</span></div>
     <div class="ha">
+      <button class="btn bg2" onclick="downloadTemplate()">📄 โหลดไฟล์ฟอร์ม Import</button>
+      <input type="file" id="ex-file" accept=".xlsx,.xls,.csv" style="display:none;" onchange="importT1(this)">
+      <button class="btn bs" onclick="g('ex-file').click()">📥 Import Excel</button>
       <button class="btn bg2" onclick="exportT1()">📤 Export Excel</button>
       <select id="r-br" onchange="buildT1()"></select>
       <input type="month" id="r-mo" onchange="buildT1()">
@@ -220,7 +224,7 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 
 <div id="t2" class="tp">
   <div class="ph no-print">
-    <div class="ptitle">📋 Daily Ops Core <span style="font-size:12px;color:var(--tx3);font-weight:400;margin-left:10px;">ฟอร์ม PDF ล็อกโครงสร้าง</span></div>
+    <div class="ptitle">📋 Daily Ops Core <span style="font-size:12px;color:var(--tx3);font-weight:400;margin-left:10px;">ใบสรุปยอดแคชเชียร์แบบฟอร์ม PDF (ห้ามเปลี่ยนโครงสร้าง)</span></div>
     <div class="ha">
       <button class="btn bg2" onclick="window.print()">🖨️ Print Form</button>
       <button class="btn bp" onclick="saveT2()">💾 บันทึกแบบฟอร์ม</button>
@@ -270,7 +274,7 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 
 <div id="t3" class="tp">
   <div class="ph">
-    <div class="ptitle">☎️ Confirm Tracking <span style="font-size:12px;color:var(--tx3);font-weight:400;margin-left:10px;">ตารางทั้งเดือน (แยกสาขา)</span></div>
+    <div class="ptitle">☎️ Confirm Tracking <span style="font-size:12px;color:var(--tx3);font-weight:400;margin-left:10px;">คีย์ตารางทั้งเดือน (แยกรายสาขา)</span></div>
     <div class="ha">
       <select id="tk-br" onchange="buildT3()"></select>
       <input type="month" id="tk-mo" onchange="buildT3()">
@@ -304,7 +308,7 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 
 <div id="t4" class="tp">
   <div class="ph">
-    <div class="ptitle">👨‍⚕️ Doctor Finance <span style="font-size:12px;color:var(--tx3);font-weight:400;margin-left:10px;">ตารางทั้งเดือน (แยกสาขา)</span></div>
+    <div class="ptitle">👨‍⚕️ Doctor Finance <span style="font-size:12px;color:var(--tx3);font-weight:400;margin-left:10px;">คีย์ตารางทั้งเดือน (แยกรายสาขา)</span></div>
     <div class="ha">
       <select id="df-br" onchange="buildT4()"></select>
       <input type="month" id="df-mo" onchange="buildT4()">
@@ -349,6 +353,7 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
     </div>
     <div style="background:#fff;padding:20px;border:1px solid var(--bdr);border-radius:8px;grid-column:1/-1;">
       <h3 style="margin-bottom:10px;border-bottom:2px solid var(--acc);padding-bottom:5px;">ตั้งค่าหัวข้อ Program (หน้า 2)</h3>
+      <div style="color:var(--red);font-size:12px;margin-bottom:10px;">* แก้ไข/เพิ่ม/ลด ชื่อโปรแกรมที่นี่ ระบบจะนำไปสร้างเป็นแถวในหน้า Daily Ops Core อัตโนมัติ</div>
       <textarea id="s-pr" rows="6" style="width:100%;"></textarea>
     </div>
   </div>
@@ -357,7 +362,7 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 </div></div>
 
 <script>
-// Mock Firebase
+// Mock Firebase (Change config to yours)
 const FBC={apiKey:"AIza",authDomain:"app.firebaseapp.com",databaseURL:"https://app-default-rtdb.firebaseio.com",projectId:"app"};
 if(!firebase.apps.length)firebase.initializeApp(FBC);
 const DB = firebase.database();
@@ -371,7 +376,7 @@ let SETTINGS = {
   docs: ["หมอ A"], cas: ["แคชเชียร์ A"], mgs: ["ผู้จัดการ A"]
 };
 
-// Hardcode branches directly on HTML load to prevent empty lists
+// Hardcode branches directly
 function injectBranchOptions() {
   const opts = bKeys.map(k=>`<option value="${k}">${BKS[k]}</option>`).join("");
   ["r-br","o-br","tk-br","df-br"].forEach(id=>{ const el = document.getElementById(id); if(el) el.innerHTML=opts; });
@@ -381,7 +386,7 @@ injectBranchOptions();
 function g(id){return document.getElementById(id);}
 function fm(n){return (parseFloat(n)||0).toLocaleString("th-TH",{minimumFractionDigits:2,maximumFractionDigits:2});}
 function fmI(n){return Math.round(parseFloat(n)||0).toLocaleString("th-TH");}
-function toast(m){const el=document.createElement("div");el.className="toast";el.textContent=m;document.body.appendChild(el);setTimeout(()=>el.remove(),3000);}
+function toast(m){const el=document.createElement("div");el.className="toast";el.textContent=m;document.body.appendChild(el);setTimeout(()=>el.remove(),4000);}
 
 function sw(id,item){
   document.querySelectorAll(".tp").forEach(p=>p.classList.remove("active"));
@@ -404,11 +409,10 @@ function updateSelects() {
 // ==========================================
 // TAB 1: REVENUE SHEET
 // ==========================================
-// Field mapping for Sync to DB
 const R_COLS = [
-  {id:"p-misc", cls:"bg-op"}, {id:"p-product", cls:"bg-med"}, {id:"p-treatment", cls:"bg-trt"},
-  {id:"a-hdmall", cls:"bg-hd"}, {id:"a-gowabi", cls:"bg-gw"}, {id:"p-charge", cls:"bg-chg"},
-  {id:"p-drip", cls:"bg-drp"}, {id:"r-mem", cls:"bg-mem"}, {id:"r-stf", cls:"bg-op"},
+  {id:"r-op", cls:"bg-op"}, {id:"r-med", cls:"bg-med"}, {id:"r-trt", cls:"bg-treat"},
+  {id:"r-hd", cls:"bg-hd"}, {id:"r-gw", cls:"bg-gw"}, {id:"r-chg", cls:"bg-chg"},
+  {id:"r-drp", cls:"bg-drp"}, {id:"r-mem", cls:"bg-mem"}, {id:"r-stf", cls:"bg-op"},
   {id:"r-dep", cls:"bg-chg"}, {id:"r-oth", cls:"bg-total"}, {id:"r-opx", cls:"bg-old"},
   {id:"r-oam", cls:"bg-old"}, {id:"r-nyp", cls:"bg-new"}, {id:"r-nam", cls:"bg-new"}, {id:"r-nnp", cls:"bg-new"}
 ];
@@ -419,7 +423,6 @@ function buildT1() {
   const [yr,m] = mo.split("-"); const dim = new Date(yr,m,0).getDate();
   const req = mo+"_"+br;
   
-  // Build Grid Instantly
   if(curT1 !== req) {
     curT1 = req;
     let ht = "";
@@ -434,32 +437,27 @@ function buildT1() {
         <td class="bg-date"><select class="r-inp bg-date" style="text-align:center;" data-dt="${dt}" data-id="r-doc" onchange="calcT1(this)"></select></td></tr>`;
     }
     g("r-tbody").innerHTML = ht;
-    updateSelects(); // fill options
-    
-    // Update target
+    updateSelects(); 
     g("k1-tg").dataset.val = SETTINGS.tgs[br]||0;
     g("k1-tg").textContent = "฿"+fm(SETTINGS.tgs[br]||0);
   }
 
-  // Fetch Data to fill inputs
   DB.ref(`daily`).once('value').then(snap=>{
     const all = snap.val()||{};
     for(let i=1; i<=dim; i++){
       let dt = `${yr}-${m}-${String(i).padStart(2,'0')}`;
       let d = all[dt]?.[br]||{};
       
-      // Merge values (if typed in T1 it overrides)
       R_COLS.forEach(f => {
         let el = document.querySelector(`input[data-dt="${dt}"][data-id="${f.id}"]`);
         if(el && document.activeElement !== el) {
-           let val = d[f.id]||"";
-           el.value = val;
+           el.value = d[f.id]||"";
         }
       });
       let dSel = document.querySelector(`select[data-dt="${dt}"][data-id="r-doc"]`);
       if(dSel && document.activeElement !== dSel) dSel.value = d["r-doc"]||"";
     }
-    calcT1(); // Auto calculate everything
+    calcT1(); 
   }).catch(()=>{ calcT1(); });
 }
 
@@ -471,8 +469,8 @@ function calcT1(triggerEl) {
   rows.forEach(row => {
     let q = (id) => parseFloat(row.querySelector(`[data-id="${id}"]`)?.value)||0;
     
-    let op=q("p-misc"), med=q("p-product"), trt=q("p-treatment"), hd=q("a-hdmall"), gw=q("a-gowabi");
-    let chg=q("p-charge"), drp=q("p-drip"), mem=q("r-mem"), stf=q("r-stf"), dep=q("r-dep"), oth=q("r-oth");
+    let op=q("r-op"), med=q("r-med"), trt=q("r-trt"), hd=q("r-hd"), gw=q("r-gw");
+    let chg=q("r-chg"), drp=q("r-drp"), mem=q("r-mem"), stf=q("r-stf"), dep=q("r-dep"), oth=q("r-oth");
     
     let rTot = op+med+trt+hd+gw+chg+drp+mem+stf+dep+oth;
     let rPax = q("r-opx")+q("r-nyp")+q("r-nnp");
@@ -496,20 +494,127 @@ function calcT1(triggerEl) {
   
   g("rs-pax").textContent = fmI(gOldP+gNewP);
   g("rs-old").textContent = fmI(gOldP);
-  g("rs-new").textContent = fmI(gNewP); // Match image: คนไข้ใหม่ (รวม)
+  g("rs-new").textContent = fmI(gNewP);
 
   g("rs-avg-old").textContent = gOldP>0 ? fm(gOldA/gOldP) : "0.00";
   g("rs-avg-new").textContent = gNewP>0 ? fm(gNewA/gNewP) : "0.00";
 
   g("rs-sop").textContent = fm(gOp); g("rs-smed").textContent = fm(gMed); g("rs-strt").textContent = fm(gTrt);
 
-  // If triggered by typing, save to Firebase
+  // Sync to Firebase and auto map to Ops Core if triggered
   if(triggerEl) {
     const dt = triggerEl.dataset.dt, br = g("r-br").value, id = triggerEl.dataset.id;
     const val = triggerEl.type==="number"?parseFloat(triggerEl.value)||0 : triggerEl.value;
+    
+    // Auto Map logic to Ops Core names
+    let mapped = {[id]:val};
+    if(id === "r-op") mapped["p-misc"] = val;
+    if(id === "r-med") mapped["p-product"] = val;
+    if(id === "r-trt") mapped["p-treatment"] = val;
+    if(id === "r-hd") mapped["a-hdmall"] = val;
+    if(id === "r-gw") mapped["a-gowabi"] = val;
+    if(id === "r-chg") mapped["p-charge"] = val;
+    if(id === "r-drp") mapped["p-drip"] = val;
+
     clearTimeout(tm1[dt]);
-    tm1[dt] = setTimeout(()=>{ DB.ref(`daily/${dt}/${br}`).update({[id]:val}); }, 500);
+    tm1[dt] = setTimeout(()=>{ DB.ref(`daily/${dt}/${br}`).update(mapped); }, 500);
   }
+}
+
+// Function 1: Generate Excel Template for Import
+function downloadTemplate() {
+  const mo=g("r-mo").value;
+  const [yr,m] = mo.split("-"); const dim = new Date(yr,m,0).getDate();
+  
+  // Headers match exactly the expected order
+  let data = [
+    ["วันที่", "หัตถการ", "ขายยา", "Treatment", "HD MALL", "Gowabi", "ชาร์จ 3%", "ฉีดผิว", "member", "หัตถการ พนง.", "มัดจำเงิน", "รวมรายได้อื่นๆ", "คนไข้เก่า (คน)", "คนไข้เก่า (ยอด)", "คนไข้ใหม่มี (คน)", "คนไข้ใหม่มียอด (บาท)", "คนไข้ใหม่ไม่มี (คน)", "แพทย์"]
+  ];
+  
+  for(let i=1; i<=dim; i++) {
+    data.push([`${i}/${m}/${yr}`, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ""]);
+  }
+  
+  const ws = XLSX.utils.aoa_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Template");
+  XLSX.writeFile(wb, `Template_Import_${mo}.xlsx`);
+}
+
+// Function 2: Import and Batch Upload to Firebase
+function importT1(input) {
+  const f = input.files[0]; if(!f) return;
+  const reader = new FileReader();
+  
+  reader.onload = (e) => {
+    try {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, {type: 'array'});
+      const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+      const json = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+
+      const mo=g("r-mo").value, br=g("r-br").value;
+      const [yr,m] = mo.split("-");
+
+      let updates = {};
+      let importedCount = 0;
+
+      // row 0 is header, iterate from row 1
+      for(let i=1; i<json.length; i++) {
+        let row = json[i];
+        if(!row || row.length === 0) continue;
+        
+        let dayNum = i; // Map row 1 -> day 1
+        let dt = `${yr}-${m}-${String(dayNum).padStart(2,'0')}`;
+
+        let rVals = {
+          "r-op": parseFloat(row[1])||0, "r-med": parseFloat(row[2])||0, "r-trt": parseFloat(row[3])||0,
+          "r-hd": parseFloat(row[4])||0, "r-gw": parseFloat(row[5])||0, "r-chg": parseFloat(row[6])||0,
+          "r-drp": parseFloat(row[7])||0, "r-mem": parseFloat(row[8])||0, "r-stf": parseFloat(row[9])||0,
+          "r-dep": parseFloat(row[10])||0, "r-oth": parseFloat(row[11])||0, "r-opx": parseFloat(row[12])||0,
+          "r-oam": parseFloat(row[13])||0, "r-nyp": parseFloat(row[14])||0, "r-nam": parseFloat(row[15])||0,
+          "r-nnp": parseFloat(row[16])||0
+        };
+        let doc = row[17] || "";
+
+        for(let key in rVals) {
+          let el = g(`${key}-${dt}`);
+          if(el) el.value = rVals[key];
+          updates[`${dt}/${br}/${key}`] = rVals[key];
+          
+          // Auto mapping to Ops Core
+          if(key === "r-op") updates[`${dt}/${br}/p-misc`] = rVals[key];
+          if(key === "r-med") updates[`${dt}/${br}/p-product`] = rVals[key];
+          if(key === "r-trt") updates[`${dt}/${br}/p-treatment`] = rVals[key];
+          if(key === "r-hd") updates[`${dt}/${br}/a-hdmall`] = rVals[key];
+          if(key === "r-gw") updates[`${dt}/${br}/a-gowabi`] = rVals[key];
+          if(key === "r-chg") updates[`${dt}/${br}/p-charge`] = rVals[key];
+          if(key === "r-drp") updates[`${dt}/${br}/p-drip`] = rVals[key];
+        }
+        
+        let elDoc = g(`doc-${dt}`);
+        if(elDoc) {
+          elDoc.value = doc;
+          updates[`${dt}/${br}/r-doc`] = doc;
+        }
+        importedCount++;
+      }
+
+      calcT1();
+
+      // Batch Update to Firebase
+      DB.ref('daily').update(updates).then(() => {
+        toast(`✅ นำเข้าสำเร็จ ${importedCount} วัน และบันทึกลงฐานข้อมูล 100%`);
+      }).catch((error) => {
+        toast(`❌ เกิดข้อผิดพลาดการบันทึก: ${error.message}`);
+      });
+
+    } catch(err) {
+      toast("❌ รูปแบบไฟล์ Excel ไม่ถูกต้อง");
+    }
+  };
+  reader.readAsArrayBuffer(f);
+  input.value=""; 
 }
 
 function exportT1() {
@@ -623,7 +728,7 @@ function buildT3() {
       let dt = `${yr}-${m}-${String(i).padStart(2,'0')}`;
       let d = dAll[dt]||{};
       ["tk-co","tk-cn","tk-po","tk-pn","tk-wo","tk-wn","tk-na","tk-tc","tk-ro","tk-rn"].forEach(k => {
-        let el = g(`${k}-${dt}`); if(el) el.value = d[k] || "";
+        let el = g(`${k}-${dt}`); if(el && document.activeElement !== el) el.value = d[k] || "";
       });
       calcT3Row(g(`tk-ro-${dt}`));
     }
@@ -657,8 +762,9 @@ function buildT4() {
     curT4 = mo+"_"+br; let ht = "";
     for(let i=1; i<=dim; i++){
       let dt = `${yr}-${m}-${String(i).padStart(2,'0')}`;
+      let docSel = `<select class="mth-inp" id="df-doc-${dt}" data-dt="${dt}" data-id="df-doc" onchange="svT4(this)"><option value="">-</option>${SETTINGS.docs.map(x=>`<option value="${x}">${x}</option>`).join("")}</select>`;
       ht += `<tr><td style="font-weight:bold;background:#f8f9fa;">${i}/${m}/${yr}</td>
-        <td><select class="mth-inp" data-dt="${dt}" data-id="df-doc" onchange="svT4(this)"></select></td>
+        <td>${docSel}</td>
         <td><input type="time" class="mth-inp" id="df-ti-${dt}" data-dt="${dt}" data-id="df-ti" oninput="svT4(this)"></td>
         <td><input type="time" class="mth-inp" id="df-to-${dt}" data-dt="${dt}" data-id="df-to" oninput="svT4(this)"></td>
         <td><input type="number" class="mth-inp" style="background:#dbeafe;" id="df-sl-${dt}" data-dt="${dt}" data-id="df-sl" oninput="svT4(this)"></td>
@@ -675,10 +781,10 @@ function buildT4() {
       let dt = `${yr}-${m}-${String(i).padStart(2,'0')}`;
       let d = dAll[dt]||{};
       ["df-ti","df-to","df-sl","df-df","df-nt"].forEach(k => {
-        let el = g(`${k}-${dt}`); if(el) el.value = d[k] || "";
+        let el = g(`${k}-${dt}`); if(el && document.activeElement !== el) el.value = d[k] || "";
       });
-      let sel = document.querySelector(`select[data-dt="${dt}"][data-id="df-doc"]`);
-      if(sel) sel.value = d["df-doc"]||"";
+      let sel = document.querySelector(`select[id="df-doc-${dt}"]`);
+      if(sel && document.activeElement !== sel) sel.value = d["df-doc"]||"";
       sSal += parseFloat(d["df-sl"])||0; sDf += parseFloat(d["df-df"])||0;
     }
     g("k4-sal").textContent="฿"+fm(sSal); g("k4-df").textContent="฿"+fm(sDf);
@@ -690,7 +796,6 @@ function svT4(el) {
   const dt = el.dataset.dt, br = g("df-br").value, mo = g("df-mo").value, id = el.dataset.id;
   const val = el.type==="number"?parseFloat(el.value)||0 : el.value;
   
-  // Real-time Sum
   let sSal=0, sDf=0;
   document.querySelectorAll("[id^='df-sl-']").forEach(i=>sSal+=parseFloat(i.value)||0);
   document.querySelectorAll("[id^='df-df-']").forEach(i=>sDf+=parseFloat(i.value)||0);
