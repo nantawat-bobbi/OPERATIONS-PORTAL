@@ -46,7 +46,7 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--tx);min-height:
 
 /* HEADER & CONTROLS */
 .ph{background:#fff;border-bottom:1px solid var(--bdr);padding:15px 24px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:20;}
-.ptitle{font-size:18px;font-weight:700;color:var(--tx);}
+.ptitle(font-size:18px;font-weight:700;color:var(--tx);}
 .ha{display:flex;gap:8px;}
 .btn{padding:8px 16px;border-radius:6px;border:1px solid transparent;cursor:pointer;font-size:13px;font-family:inherit;font-weight:600;transition:0.2s;display:flex;align-items:center;gap:5px;}
 .bp{background:var(--acc);color:#fff;} .bp:hover{background:var(--acc2);}
@@ -90,7 +90,7 @@ select:disabled{background:#e9ecef;cursor:not-allowed;font-weight:bold;color:var
 .bg-gw{background:#f3d0e2;} .bg-chg{background:#fff3cd;} .bg-drp{background:#d1e7dd;}
 .bg-mem{background:#f3f4f6;} .bg-old{background:#fff3cd;} .bg-new{background:#d1e7dd;} .bg-sum{background:#dbeafe;}
 
-/* FIXED BOX INPUT VISIBILITY: คืนสภาพกล่องคีย์ข้อมูลให้เห็นเด่นชัดด้วยเส้นขอบและพื้นหลังขาว */
+/* STABLE BOX INPUTS: คืนสภาพกล่องคีย์ข้อมูลให้เห็นเด่นชัด พนักงานมองเห็นง่าย กรอบเส้นเทาพื้นผิวขาว */
 .r-inp{width:100%;height:32px;border:1px solid #ced4da !important;background:#ffffff !important;text-align:right;font-size:14px;font-weight:700;padding:4px 8px;color:#1D4ED8;border-radius:4px;outline:none;cursor:text;}
 .r-inp:hover{background:#f1f3f5 !important; border-color:var(--acc) !important;}
 .r-inp:focus{background:#fff3cd !important;box-shadow:inset 0 0 0 1px var(--acc);border-color:var(--acc) !important;}
@@ -410,7 +410,7 @@ select.r-inp { background:#ffffff !important; text-align-last: center; padding:2
 
 <script>
 // ==========================================
-// 1. GLOBAL ENVIRONMENT & DICTIONARIES (Hoisting Secure)
+// 1. GLOBAL LOGIC ENVIRONMENT (Hoisting Protection Matrix)
 // ==========================================
 const USERS = {
   "16698": { role: "admin", br: "all", label: "Admin สูงสุด | ทุกสาขา" },
@@ -472,10 +472,12 @@ const O_CREDITS = [
   {n:"ยอดรวมเครดิต", id:"t-crd", ro:true}
 ];
 
-// Tracking locks & instances variables
+// Structural State Handlers
 let curT1 = ""; let t1Listener = null;
 let curT3 = ""; let curT4 = ""; 
 
+// FIX RUNTIME INTERACTION CRASH: ดึงตัวแปรหน่วงเวลาและตัวแปรจัดการขึ้นแท่นระดับบนสุดร้อยเปอร์เซ็นต์
+let tm1 = {}, tm3 = {}, tm4 = {}; 
 let c0Bar, c0Pie, c0Funnel, c0Doc, c0Track1, c0Track2, c0D1, c0D2;
 let c1Trend, c1BrDonut, c3Donut, c4Bar;
 
@@ -487,7 +489,7 @@ function injectBranchOptions() {
 }
 
 // ==========================================
-// 2. PRIVILEGE CORE SECURITY MANAGER (Fixed Layout Overlap)
+// 2. CORE SECURITY ACCESS MANAGER
 // ==========================================
 function checkLogin() {
   const pass = g("login-pass").value;
@@ -511,10 +513,6 @@ function checkLogin() {
     sw('t1', document.getElementById('ni-t1'));
   }
 }
-
-document.getElementById("login-pass").addEventListener("keypress", function(event) {
-  if (event.key === "Enter") { event.preventDefault(); checkLogin(); }
-});
 
 function sw(id, item) {
   document.querySelectorAll(".tp").forEach(p => p.style.setProperty('display', 'none', 'important'));
@@ -613,60 +611,52 @@ function buildT0() {
 
     const donutTooltipOption = { callbacks: { label: function(ctx) { let total = ctx.dataset.data.reduce((a,b)=>a+b,0); let pct = total > 0 ? ((ctx.raw/total)*100).toFixed(1) : 0; return `${ctx.label}: ฿${fm(ctx.raw)} (${pct}%)`; } } };
 
-    // ISOLATED CHART WRAPPERS (Prevents main calculations thread freeze)
     try {
       if(c0Bar) c0Bar.destroy();
       c0Bar = new Chart(g("c0-bar"), { type:'bar', data:{ labels:bKeys.map(k=>BKS[k]), datasets:[{label:'รายได้จริง', data:bKeys.map(k=>bRev[k]), backgroundColor:'#1971c2'}, {label:'เป้าหมาย', data:bKeys.map(k=>bTg[k]), backgroundColor:'#ced4da'}] }, options:{responsive:true, maintainAspectRatio:false} });
-    } catch(err) { console.warn("Chart Master Performance failed:", err); }
+    } catch(err) { console.warn(err); }
 
     try {
       if(c0Funnel) c0Funnel.destroy();
       c0Funnel = new Chart(g("c0-funnel"), { type:'bar', data:{ labels:['📞 โทรทั้งหมด', '✅ คอนเฟิร์มจะมา', '🏥 มาจริง (Success)'], datasets:[{label:'จำนวนคนไข้', data:[tkCall, tkConf, tkAct], backgroundColor:['#f08c00', '#1971c2', '#2f9e44'], borderRadius:4}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}} });
-    } catch(err) { console.warn("Chart Master Funnel failed:", err); }
+    } catch(err) { console.warn(err); }
 
     try {
       if(c0Pie) c0Pie.destroy();
       c0Pie = new Chart(g("c0-pie"), { type:'doughnut', data:{ labels:['เงินสด', 'แอปพลิเคชัน', 'เงินโอน', 'บัตรเครดิต'], datasets:[{data:[tCash, tApp, tTrans, tCrd], backgroundColor:['#2f9e44', '#845ef7', '#f08c00', '#1971c2']}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{tooltip: donutTooltipOption}} });
-    } catch(err) { console.warn("Chart Master Payments failed:", err); }
+    } catch(err) { console.warn(err); }
 
     try {
       let sortedDocs = Object.keys(docStats).sort((a,b)=>docStats[b]-docStats[a]).slice(0,5);
       if(c0Doc) c0Doc.destroy();
       c0Doc = new Chart(g("c0-doc"), { type:'bar', data:{ labels:sortedDocs, datasets:[{label:'ยอดขายแพทย์รวม (บาท)', data:sortedDocs.map(d=>docStats[d]), backgroundColor:'#e64980', borderRadius:4}] }, options:{responsive:true, maintainAspectRatio:false, indexAxis:'y'} });
-    } catch(err) { console.warn("Chart Master Docs Leaderboard failed:", err); }
+    } catch(err) { console.warn(err); }
 
     try {
       if(c0Track1) c0Track1.destroy();
       c0Track1 = new Chart(g("c0-track1"), { type:'doughnut', data:{ labels:['ขอเลื่อนนัด', 'ไม่รับสาย/ปิดเครื่อง'], datasets:[{data:[tP_PP, tP_NA], backgroundColor:['#f08c00', '#c92a2a']}] }, options:{responsive:true, maintainAspectRatio:false} });
-    } catch(err) { console.warn("Chart Master Tracking Behaviours failed:", err); }
+    } catch(err) { console.warn(err); }
 
     try {
       if(c0Track2) c0Track2.destroy();
       c0Track2 = new Chart(g("c0-track2"), { type:'doughnut', data:{ labels:['คนไข้เก่า', 'คนไข้ใหม่'], datasets:[{data:[tP_Old, tP_New], backgroundColor:['#1971c2', '#20c997']}] }, options:{responsive:true, maintainAspectRatio:false} });
-    } catch(err) { console.warn("Chart Master Patient Type failed:", err); }
+    } catch(err) { console.warn(err); }
 
     try {
       if(c0D1) c0D1.destroy();
       c0D1 = new Chart(g("c0-d1"), { type:'doughnut', data:{ labels:['หัตถการ', 'ขายยา', 'Treatment'], datasets:[{data:[tOp, tMed, tTrt], backgroundColor:['#f08c00', '#2f9e44', '#845ef7']}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{tooltip: donutTooltipOption}} });
-    } catch(err) { console.warn("Chart Master Main Modules failed:", err); }
+    } catch(err) { console.warn(err); }
 
     try {
       if(c0D2) c0D2.destroy();
       c0D2 = new Chart(g("c0-d2"), { type:'doughnut', data:{ labels:['Co2', 'Pico', 'Vbeam'], datasets:[{data:[tCo2, tPico, tVb], backgroundColor:['#1971c2', '#e64980', '#20c997']}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{tooltip: donutTooltipOption}} });
-    } catch(err) { console.warn("Chart Master Procedures failed:", err); }
+    } catch(err) { console.warn(err); }
   });
 }
 
 // ==========================================
 // TAB 1: REVENUE SHEET + BRANCH DASHBOARD
 // ==========================================
-function downloadTemplate() {
-  const mo=g("r-mo").value; const [yr,m] = mo.split("-"); const dim = new Date(yr,m,0).getDate();
-  let data = [["วันที่", "หัตถการ", "ขายยา", "Treatment", "HD MALL", "Gowabi", "ชาร์จ 3%", "ฉีดผิว", "member", "หัตถการ พนง.", "มัดจำเงิน", "รวมรายได้อื่นๆ", "คนไข้เก่า (คน)", "คนไข้เก่า (ยอด)", "คนไข้ใหม่มี (คน)", "คนไข้ใหม่มียอด (บาท)", "คนไข้ใหม่ไม่มี (คน)", "แพทย์"]];
-  for(let i=1; i<=dim; i++) data.push([`${i}/${m}/${yr}`, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ""]);
-  const ws = XLSX.utils.aoa_to_sheet(data); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Template"); XLSX.writeFile(wb, `Template_Import_${mo}.xlsx`);
-}
-
 function buildT1() {
   const mo=g("r-mo").value, br=g("r-br").value; if(!mo)return;
   const [yr,m] = mo.split("-"); const dim = new Date(yr,m,0).getDate();
@@ -735,31 +725,30 @@ function calcT1(triggerEl) {
   g("rs-avg-old").textContent = gOldP>0 ? fm(gOldA/gOldP) : "0"; g("rs-avg-new").textContent = gNewP>0 ? fm(gNewA/gNewP) : "0";
   g("rs-sop").textContent = fm(gOp); g("rs-smed").textContent = fm(gMed); g("rs-strt").textContent = fm(gTrt);
 
-  // INSULATED DASHBOARD CHARTS PROTECTION CATCH (Fixes manual entry freezing calculations)
   try {
     if(c1Trend) c1Trend.destroy();
     c1Trend = new Chart(g("c1-trend"), { type:'line', data:{ labels:Array.from({length:chartData.length},(_,i)=>i+1), datasets:[{label:'ยอดขายรายวัน', data:chartData, borderColor:'#845ef7', tension:0.2, fill:true, backgroundColor:'rgba(132, 94, 247, 0.08)'}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}} });
-  } catch(err) { console.warn("Daily sales trend chart render failed:", err); }
+  } catch(err) { console.warn(err); }
 
   try {
     if(c1BrDonut) c1BrDonut.destroy();
     c1BrDonut = new Chart(g("c1-br-donut"), { type:'doughnut', data:{ labels:['หัตถการ', 'ขายยา', 'Treatment'], datasets:[{data:[gOp, gMed, gTrt], backgroundColor:['#f08c00', '#2f9e44', '#845ef7']}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'right'}}} });
-  } catch(err) { console.warn("Service breakdown chart render failed:", err); }
+  } catch(err) { console.warn(err); }
 
   if(triggerEl) {
     const dt = triggerEl.dataset.dt, br = g("r-br").value, id = triggerEl.dataset.id;
     let rawVal = triggerEl.value.replace(/,/g,''); const val = parseFloat(rawVal)||0;
     let mapped = {[id]:val};
     
-    // AUTOMATIC DATABASE PIPELINE
     if(id === "r-med") mapped["p-product"] = val; if(id === "r-trt") mapped["p-treatment"] = val; 
     if(id === "r-hd") mapped["a-hdmall"] = val; if(id === "r-gw") mapped["a-gowabi"] = val; 
     if(id === "r-chg") mapped["p-charge"] = val; if(id === "r-drp") mapped["p-drip"] = val;
+    
     clearTimeout(tm1[dt]); tm1[dt] = setTimeout(()=>{ DB.ref(`ops_daily/${dt}/${br}`).update(mapped); }, 500);
   }
 }
 
-// STRICT EXCEL IMPORT FIX: แก้ไขคีย์เวิร์ดเทียบสายอักขระให้ถูกต้องเป๊ะ ข้อมูลเปลี่ยนทันใจไหลข้ามหน้าสมบูรณ์
+// INTELLIGENT IMPORT CORRECTION MATRIX: ซ่อมแซมระบบแกะวิเคราะห์วันที่จากคอลัมน์แรก คัดกรองตัวเลขแม่นยำ แจ้งเตือนสถานะสำเร็จ
 function importT1(input) {
   const f = input.files[0]; if(!f) return; const reader = new FileReader();
   reader.onload = (e) => {
@@ -771,25 +760,43 @@ function importT1(input) {
 
       for(let i=1; i<json.length; i++) {
         let row = json[i]; if(!row || row.length === 0) continue;
-        let dt = `${yr}-${m}-${String(i).padStart(2,'0')}`;
+        let dateStr = String(row[0] || "").trim();
+        if(!dateStr || dateStr.includes("วันที่") || dateStr.includes("รวม")) continue; 
+        
+        let dayPart = "";
+        if(dateStr.includes("/")) dayPart = dateStr.split("/")[0].padStart(2, '0');
+        else if(dateStr.includes("-")) dayPart = dateStr.split("-")[2].padStart(2, '0');
+        else {
+          let pNum = parseInt(dateStr);
+          if(!isNaN(pNum) && pNum >= 1 && pNum <= 31) dayPart = String(pNum).padStart(2, '0');
+        }
+        if(!dayPart || dayPart === "NaN") continue;
+        let dt = `${yr}-${m}-${dayPart}`;
+
         let rVals = {"r-op": parseFloat(row[1])||0, "r-med": parseFloat(row[2])||0, "r-trt": parseFloat(row[3])||0, "r-hd": parseFloat(row[4])||0, "r-gw": parseFloat(row[5])||0, "r-chg": parseFloat(row[6])||0, "r-drp": parseFloat(row[7])||0, "r-mem": parseFloat(row[8])||0, "r-stf": parseFloat(row[9])||0, "r-dep": parseFloat(row[10])||0, "r-oth": parseFloat(row[11])||0, "r-opx": parseFloat(row[12])||0, "r-oam": parseFloat(row[13])||0, "r-nyp": parseFloat(row[14])||0, "r-nam": parseFloat(row[15])||0, "r-nnp": parseFloat(row[16])||0};
         
         for(let key in rVals) {
           updates[`${dt}/${br}/${key}`] = rVals[key];
-          if(key === "r-med") updates[`${dt}/${br}/p-product`] = rVals[key];
-          if(key === "r-trt") updates[`${dt}/${br}/p-treatment`] = rVals[key]; 
-          if(key === "r-hd") updates[`${dt}/${br}/a-hdmall`] = rVals[key];
-          if(key === "r-gw") updates[`${dt}/${br}/a-gowabi`] = rVals[key]; 
-          if(key === "r-chg") updates[`${dt}/${br}/p-charge`] = rVals[key];
-          if(key === "r-drp") updates[`${dt}/${br}/p-drip`] = rVals[key];
         }
-        updates[`${dt}/${br}/r-doc`] = row[17] || ""; count++;
+        updates[`${dt}/${br}/p-product`] = rVals["r-med"];
+        updates[`${dt}/${br}/p-treatment`] = rVals["r-trt"];
+        updates[`${dt}/${br}/a-hdmall`] = rVals["r-hd"];
+        updates[`${dt}/${br}/a-gowabi`] = rVals["r-gw"];
+        updates[`${dt}/${br}/p-charge`] = rVals["r-chg"];
+        updates[`${dt}/${br}/p-drip`] = rVals["r-drp"];
+        updates[`${dt}/${br}/r-doc`] = row[17] || "";
+        count++;
       }
-      DB.ref('ops_daily').update(updates).then(() => {
-        toast(`✅ นำเข้าสำเร็จและซิงก์ข้อมูลแล้ว ${count} วัน`);
-        buildT1(); // Force layout rerender values from database listener
-      }).catch(err => toast(err.message, "error"));
-    } catch(err) { toast("❌ รูปแบบไฟล์ไม่ถูกต้อง", "error"); }
+      
+      if(count > 0) {
+        DB.ref('ops_daily').update(updates).then(() => {
+          toast(`📥 นำเข้าไฟล์เรียบร้อย! อัปเดตข้อมูลสาขาสำเร็จ ${count} รายการ`);
+          buildT1();
+        }).catch(err => toast("Firebase Sync Error: " + err.message, "error"));
+      } else {
+        toast("❌ ไม่พบข้อมูลแถววันที่ที่ถูกต้องในไฟล์", "error");
+      }
+    } catch(err) { toast("❌ เกิดข้อผิดพลาดในการประมวลผลไฟล์", "error"); }
   };
   reader.readAsArrayBuffer(f); input.value=""; 
 }
@@ -891,23 +898,18 @@ function buildT2() {
   }).catch(()=>cT2(true));
 }
 
-let t2Listener = null;
-function loadT2() {
-  buildT2(); const dt=g("o-dt").value, br=g("o-br").value; if(!dt)return;
-  if(t2Listener) DB.ref(`ops_daily`).off('value', t2Listener);
-  t2Listener = snap => {
-    if(snap.exists()) {
-      const d = snap.child(dt).child(br).val() || {};
-      for(let k in d) {
-        if(g(k) && document.activeElement !== g(k)) {
-          if(g(k).id.includes('lbl') || g(k).id.includes('rsn') || g(k).id.includes('note')) g(k).value = d[k];
-          else g(k).value = d[k]!=="" ? fm(d[k]) : "";
-        }
-      }
-    }
-    cT2(true);
-  };
-  DB.ref(`ops_daily`).on('value', t2Listener);
+function cT2(fromLoad = false) {
+  let tp=0, tv=0, tc=0;
+  document.querySelectorAll(".o-val").forEach(e=>tp+=parseFloat(e.value.replace(/,/g,''))||0);
+  document.querySelectorAll(".v-val").forEach(e=>tv+=parseFloat(e.value.replace(/,/g,''))||0);
+  document.querySelectorAll(".c-val").forEach(e=>tc+=parseFloat(e.value.replace(/,/g,''))||0);
+  if(g("t-prog")) g("t-prog").value = fm(tp); if(g("t-vip")) g("t-vip").textContent = fm(tv);
+  if(g("t-crd")) g("t-crd").value = fm(tc);
+  let grandInput = g("t-grand");
+  if(grandInput) {
+    let autoSum = tc + (parseFloat(g("pay-cash")?.value.replace(/,/g,''))||0) + (parseFloat(g("pay-trans")?.value.replace(/,/g,''))||0);
+    if(fromLoad || document.activeElement !== grandInput) grandInput.value = fm(autoSum);
+  }
 }
 
 // ==========================================
@@ -948,8 +950,6 @@ function buildT3() {
   }).catch(()=>{});
 }
 
-let tm3={};
-// STRICT COMPLETION SETTER
 function svT3(el) {
   const dt = el.dataset.dt, br = g("tk-br").value, mo = g("tk-mo").value, id = el.dataset.id, val = parseFloat(el.value.replace(/,/g,''))||0;
   calcT3Row(el); drawT3Chart();
@@ -972,11 +972,10 @@ function drawT3Chart() {
   document.querySelectorAll("[id^='tk-pn-']").forEach(i=>pp+=parseFloat(i.value.replace(/,/g,''))||0);
   document.querySelectorAll("[id^='tk-na-']").forEach(i=>na+=parseFloat(i.value.replace(/,/g,''))||0);
   g("k3-cf").textContent=fmI(cf); g("k3-act").textContent=fmI(act); g("k3-pp").textContent=fmI(pp); g("k3-na").textContent=fmI(na);
-  
   try {
     if(c3Donut) c3Donut.destroy();
     c3Donut = new Chart(g("c3-donut"), { type:'doughnut', data:{ labels:['มาจริง', 'ขอเลื่อน', 'ไม่รับสาย'], datasets:[{data:[act, pp, na], backgroundColor:['#2f9e44', '#f08c00', '#c92a2a']}] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:'right'} } } });
-  } catch(err) { console.warn("Tracking donut chart fail safely isolated:", err); }
+  } catch(err) { console.warn(err); }
 }
 
 // ==========================================
@@ -1012,7 +1011,6 @@ function buildT4() {
   }).catch(()=>{});
 }
 
-let tm4={};
 function svT4(el) {
   const dt = el.dataset.dt, br = g("df-br").value, mo = g("df-mo").value, id = el.dataset.id;
   const val = (id === "df-sl" || id === "df-df") ? parseFloat(el.value.replace(/,/g,''))||0 : el.value;
@@ -1029,12 +1027,11 @@ function drawT4Chart() {
     sSal += sl; sDf += df; if(doc && sl>0) docStats[doc] = (docStats[doc]||0) + sl;
   });
   g("k4-sal").textContent="฿"+fm(sSal); g("k4-df").textContent="฿"+fm(sDf);
-  
   try {
     let sortedDocs = Object.keys(docStats).sort((a,b)=>docStats[b]-docStats[a]);
     if(c4Bar) c4Bar.destroy();
     c4Bar = new Chart(g("c4-bar"), { type:'bar', data:{ labels:sortedDocs, datasets:[{label:'ยอดขายแพทย์ (บาท)', data:sortedDocs.map(d=>docStats[d]), backgroundColor:'#1971c2', borderRadius:4}] }, options:{responsive:true, maintainAspectRatio:false, indexAxis:'y'} });
-  } catch(err) { console.warn("Doctor leaderboard chart isolation handling:", err); }
+  } catch(err) { console.warn(err); }
 }
 
 // ==========================================
