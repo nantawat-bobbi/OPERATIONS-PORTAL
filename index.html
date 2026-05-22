@@ -90,7 +90,7 @@ select:disabled{background:#e9ecef;cursor:not-allowed;font-weight:bold;color:var
 .bg-gw{background:#f3d0e2;} .bg-chg{background:#fff3cd;} .bg-drp{background:#d1e7dd;}
 .bg-mem{background:#f3f4f6;} .bg-old{background:#fff3cd;} .bg-new{background:#d1e7dd;} .bg-sum{background:#dbeafe;}
 
-/* INPUT BOX VISIBILITY: ป้องกันกล่องพิมพ์ยอดกลืนหายไปกับหน้าตาราง เพิ่มเส้นขอบและพื้นผิวสีขาว 캐ชเชียร์มองเห็นชัด 100% */
+/* STABLE BOX INPUTS: คืนสภาพกล่องคีย์ข้อมูลให้เห็นเด่นชัด พนักงานมองเห็นง่าย กรอบเส้นเทาพื้นผิวขาว */
 .r-inp{width:100%;height:32px;border:1px solid #ced4da !important;background:#ffffff !important;text-align:right;font-size:14px;font-weight:700;padding:4px 8px;color:#1D4ED8;border-radius:4px;outline:none;cursor:text;}
 .r-inp:hover{background:#f1f3f5 !important; border-color:var(--acc) !important;}
 .r-inp:focus{background:#fff3cd !important;box-shadow:inset 0 0 0 1px var(--acc);border-color:var(--acc) !important;}
@@ -101,7 +101,7 @@ select.r-inp { background:#ffffff !important; text-align-last: center; padding:2
 .rev-sum-left{border-right:2px solid #ccc;padding:15px;background:#f8f9fa;}
 .rev-sum-right{padding:15px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px;background:#fff;}
 .rs-row{display:flex;justify-content:space-between;margin-bottom:8px;font-size:14px;border-bottom:1px dotted #ccc;padding-bottom:4px;}
-.rs-lbl{font-weight:600;color:var(--tx2);} .rs-val{font-weight:700;color:#000;} .rs-val.fire{color:#d9381e;font-size:16px;}
+.rs-lbl{font-weight:600;color:var(--tx2); } .rs-val{font-weight:700;color:#000;} .rs-val.fire{color:#d9381e;font-size:16px;}
 
 /* TAB 2: DAILY OPS CORE */
 .paper-ui{background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.05);max-width:1100px;margin:0 auto;}
@@ -410,83 +410,23 @@ select.r-inp { background:#ffffff !important; text-align-last: center; padding:2
 
 <script>
 // ==========================================
-// 1. GLOBAL ROOT BASE DEFINITIONS (Removes ReferenceErrors & Keeps Scopes Clean)
+// 1. GLOBAL ROOT BASE FUNCTION DEFINITIONS (Hoisting Protection Matrix)
 // ==========================================
 function g(id){ return document.getElementById(id); }
 
-const USERS = {
-  "16698": { role: "admin", br: "all", label: "Admin สูงสุด | ทุกสาขา" },
-  // Cashiers (5 Digits)
-  "64752": { role: "cashier", br: "rama9", label: "Cashier | พระราม 9" },
-  "92165": { role: "cashier", br: "pinklao", label: "Cashier | ปิ่นเกล้า" },
-  "29817": { role: "cashier", br: "bangkae", label: "Cashier | บางแค" },
-  "56034": { role: "cashier", br: "rangsit", label: "Cashier | รังสิต" },
-  "71483": { role: "cashier", br: "promanat", label: "Cashier | พรอมานาด" },
-  "38926": { role: "cashier", br: "ngamwongwan", label: "Cashier | งามวงศ์วาน" },
-  "47291": { role: "cashier", br: "srinakarin", label: "Cashier | ศรีนครินทร์" },
-  "83640": { role: "cashier", br: "westgate", label: "Cashier | เวสต์เกต" },
-  // Managers (6 Digits)
-  "847291": { role: "manager", br: "rama9", label: "Manager | พระราม 9" },
-  "362058": { role: "manager", br: "pinklao", label: "Manager | ปิ่นเกล้า" },
-  "519374": { role: "manager", br: "bangkae", label: "Manager | บางแค" },
-  "728163": { role: "manager", br: "rangsit", label: "Manager | รังสิต" },
-  "945612": { role: "manager", br: "promanat", label: "Manager | พรอมานาด" },
-  "183749": { role: "manager", br: "ngamwongwan", label: "Manager | งามวงศ์วาน" },
-  "637482": { role: "manager", br: "srinakarin", label: "Manager | ศรีนครินทร์" },
-  "291856": { role: "manager", br: "westgate", label: "Manager | เวสต์เกต" }
-};
-let CURRENT_USER = null;
-
-const FBC = {
-  apiKey: "AIzaSyC0P1LGtglA_t1Nc5PyM5uD3MOLnfBZwFM",
-  authDomain: "lalizaclinic-work-schedule.firebaseapp.com",
-  databaseURL: "https://lalizaclinic-work-schedule-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "lalizaclinic-work-schedule",
-  storageBucket: "lalizaclinic-work-schedule.firebasestorage.app",
-  messagingSenderId: "1052920426382",
-  appId: "1:1052920426382:web:e07f91f2e56d0fc7497edf",
-  measurementId: "G-1HHWXV0FW7"
-};
-if(!firebase.apps.length) firebase.initializeApp(FBC);
-const DB = firebase.database();
-
-const BKS = {rama9:"พระราม 9", pinklao:"ปิ่นเกล้า", bangkae:"บางแค", rangsit:"รังสิต", promanat:"พรอมานาด", ngamwongwan:"งามวงศ์วาน", srinakarin:"ศรีนครินทร์", westgate:"เวสต์เกต"};
-const bKeys = Object.keys(BKS);
-
-let SETTINGS = {
-  progs: ["Co2","Pico","Vbeam","Elos","Botox","Filler","Meso","Thermage","Ulthera","Treatment","Drip Vitamin (Nures)","Product","หัตถการอื่นๆ"],
-  tgs: {rama9:1000000, pinklao:1000000, bangkae:1000000, rangsit:1000000, promanat:1000000, ngamwongwan:1000000, srinakarin:1000000, westgate:1000000},
-  docs: ["หมอ A"], cas: ["แคชเชียร์ A"], mgs: ["ผู้จัดการ A"]
-};
-
-const R_COLS = [
-  {id:"r-op", cls:"bg-op"}, {id:"r-med", cls:"bg-med"}, {id:"r-trt", cls:"bg-treat"},
-  {id:"r-hd", cls:"bg-hd"}, {id:"r-gw", cls:"bg-gw"}, {id:"r-chg", cls:"bg-chg"},
-  {id:"r-drp", cls:"bg-drp"}, {id:"r-mem", cls:"bg-mem"}, {id:"r-stf", cls:"bg-op"},
-  {id:"r-dep", cls:"bg-chg"}, {id:"r-oth", cls:"bg-total"}, {id:"r-opx", cls:"bg-old"},
-  {id:"r-oam", cls:"bg-old"}, {id:"r-nyp", cls:"bg-new"}, {id:"r-nam", cls:"bg-new"}, {id:"r-nnp", cls:"bg-new"}
-];
-
-const O_CREDITS = [
-  {n:"1. KBANK (กสิกร)", id:"c-kbank"}, {n:"1.1 Credit (เครดิต)", id:"c-crd"}, {n:"1.2 กสิกร(สแกน/โอน)", id:"c-kbsc"},
-  {n:"2.KTC (กรุงไทย)", id:"c-ktc"}, {n:"3.BAY (กรุงศรี)", id:"c-bay"}, {n:"14. SCB (ไทยพาณิชย์)", id:"c-scb"},
-  {n:"อื่นๆ ระบุ <input type='text' id='c-oth-n' style='border:none;border-bottom:1px dotted #ced4da;width:40px;background:transparent;'>", id:"c-oth"},
-  {n:"ยอดรวมเครดิต", id:"t-crd", ro:true}
-];
-
-let curT1 = ""; let t1Listener = null;
-let curT3 = ""; let curT4 = ""; 
-
-// FIX 2: GLOBAL OBJECT REFERENCE DEBOUNCING TIMERS
+// FIX 2: GLOBAL OBJECT REFERENCE DEBOUNCING TIMERS (Declaring at highest node scope)
 const tm1 = {}; const tm3 = {}; const tm4 = {};
 
-// FIX 1: HIGHLY ROBUST UNIQUE GLOBAL CHART INSTANCES (Absolutely NO duplicate declarations inside middle script)
+// FIX 1: HIGHLY ROBUST UNIQUE GLOBAL CHART INSTANCES (Absolutely NO duplicate let blocks anywhere)
 let c0Bar, c0Pie, c0Funnel, c0Doc, c0Track1, c0Track2, c0D1, c0D2;
 let c1Trend, c1BrDonut, c3Donut, c4Bar;
 
-function injectBranchOptions() {
-  const opts = bKeys.map(k=>`<option value="${k}">${BKS[k]}</option>`).join("");
-  ["r-br","o-br","tk-br","df-br"].forEach(id=>{ const el = g(id); if(el) el.innerHTML=opts; });
+// FIX 3.2: ย้ายฟังก์ชันสร้างโครงฟอร์ม Excel ขึ้นมาจดทะเบียนเป็นสากลสูงสุด แก้อาการปุ่มกดนิ่ง
+function downloadTemplate() {
+  const mo=g("r-mo").value; const [yr,m] = mo.split("-"); const dim = new Date(yr,m,0).getDate();
+  let data = [["วันที่", "หัตถการ", "ขายยา", "Treatment", "HD MALL", "Gowabi", "ชาร์จ 3%", "ฉีดผิว", "member", "หัตถการ พนง.", "มัดจำเงิน", "รวมรายได้อื่นๆ", "คนไข้เก่า (คน)", "คนไข้เก่า (ยอด)", "คนไข้ใหม่มี (คน)", "คนไข้ใหม่มียอด (บาท)", "คนไข้ใหม่ไม่มี (คน)", "แพทย์"]];
+  for(let i=1; i<=dim; i++) data.push([`${i}/${m}/${yr}`, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ""]);
+  const ws = XLSX.utils.aoa_to_sheet(data); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Template"); XLSX.writeFile(wb, `Template_Import_${mo}.xlsx`);
 }
 
 // ==========================================
@@ -508,6 +448,9 @@ function fm(n){
   return num.toLocaleString("th-TH");
 }
 function fmI(n){ return Math.round(parseFloat(n)||0).toLocaleString("th-TH"); }
+
+function formatInput(el) { if(el.value!=="") { let v = parseFloat(el.value.replace(/,/g,''))||0; el.value = fm(v); } }
+function unformatInput(el) { if(el.value!=="") el.value = el.value.replace(/,/g,''); }
 
 // ==========================================
 // 3. SECURITY GATEWAY & PRIVILEGES CONTROLLER
@@ -544,12 +487,30 @@ function sw(id, item) {
   if(id==='t0') buildT0(); if(id==='t1') buildT1(); if(id==='t2') buildT2(); if(id==='t3') buildT3(); if(id==='t4') buildT4(); if(id==='t5') loadT5();
 }
 
-function triggerGoogleSheetSync(pageKey) {
-  toast(`🚀 [Google Sheets Automation Hub] ผูกโครงสร้างโมดูล [${pageKey.toUpperCase()}] สำเร็จพร้อมผูกลิงก์ Web App เรียบร้อยครับบอส`, "success");
+function updateSelects() {
+  const dOpt = "<option value=''>-</option>"+SETTINGS.docs.map(x=>`<option value="${x}">${x}</option>`).join("");
+  document.querySelectorAll('select[data-id="r-doc"], select[data-id="df-doc"], #o-doc').forEach(el=>{let val=el.value; el.innerHTML=dOpt; el.value=val;});
+  if(g("o-ca")) { let v=g("o-ca").value; g("o-ca").innerHTML="<option value=''>-</option>"+SETTINGS.cas.map(x=>`<option value="${x}">${x}</option>`).join(""); g("o-ca").value=v; }
+  if(g("o-mg")) { let v=g("o-mg").value; g("o-mg").innerHTML="<option value=''>-</option>"+SETTINGS.mgs.map(x=>`<option value="${x}">${x}</option>`).join(""); g("o-mg").value=v; }
+}
+
+function toast(m, type="success"){
+  const el=document.createElement("div"); el.className="toast"; el.style.background = type==="error" ? "#c92a2a" : "#212529";
+  el.textContent=m; document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
+}
+
+function expPNG(targetId, filename) {
+  const target = g(targetId); const obg = target.style.background; target.style.background = "#f0f2f5";
+  toast("กำลังประมวลผลรูปภาพ...");
+  html2canvas(target, {scale: 2, backgroundColor: "#f0f2f5"}).then(canvas => {
+    target.style.background = obg;
+    const a = document.createElement("a"); a.download = `${filename}_${new Date().getTime()}.png`;
+    a.href = canvas.toDataURL("image/png"); a.click(); toast("📸 บันทึกรูปภาพสำเร็จ!");
+  });
 }
 
 // ==========================================
-// TAB 0: ADVANCED MASTER DASHBOARD
+// TAB 0: ADVANCED MASTER DASHBOARD MODULES
 // ==========================================
 function buildT0() {
   const mo = g("d0-mo").value; if(!mo) return;
@@ -693,7 +654,7 @@ function buildT0() {
 }
 
 // ==========================================
-// TAB 1: REVENUE SHEET & CALCULATION MODULES
+// TAB 1: REVENUE SHEET + BRANCH DASHBOARD
 // ==========================================
 function buildT1() {
   const mo=g("r-mo").value, br=g("r-br").value; if(!mo)return;
@@ -728,8 +689,19 @@ function buildT1() {
       let dSel = g(`r-doc-${dt}`);
       if(dSel && document.activeElement !== dSel) dSel.value = d["r-doc"]||"";
       
-      calculateRevenueRow(dt);
+      // Seed values in input elements securely without recalculation loop crash
+      let rTot = 0;
+      R_COLS.forEach(f => {
+        if (f.id !== "r-opx" && f.id !== "r-oam" && f.id !== "r-nyp" && f.id !== "r-nam" && f.id !== "r-nnp") {
+          rTot += parseFloat(String(d[f.id]).replace(/,/g, '')) || 0;
+        }
+      });
+      if(g(`sum-${dt}`)) g(`sum-${dt}`).value = fm(rTot);
+      let totalPax = (parseFloat(d["r-opx"])||0) + (parseFloat(d["r-nyp"])||0) + (parseFloat(d["r-nnp"])||0);
+      if(g(`pax-${dt}`)) g(`pax-${dt}`).value = totalPax.toLocaleString("th-TH");
     }
+    // FIX 3.3: เรียกฟังก์ชันรวมแดชบอร์ดเพียง "ครั้งเดียว" นอกลูปแก้อาการเปิดระบบค้างคอย
+    calculateDashboard();
   };
   DB.ref(`ops_daily`).on('value', t1Listener);
 }
@@ -834,7 +806,7 @@ function executeRevenuePipeline(el) {
   tm1[dt] = setTimeout(() => { DB.ref(`ops_daily/${dt}/${br}`).update(mapped); }, 500);
 }
 
-// FIX 3: PRODUCTION SAFE EXCEL INTERPRETATION ENGINE (Closed all unmatching backtick closures properly)
+// FIX 3.1: เพิ่มตัวล้างคอมม่าอัจฉริยะ cleanVal ป้องกันยอดเงินหลักหมื่นหดเหลือหลักสิบตอน Import Excel
 function importT1(input) {
   const f = input.files[0]; if(!f) return;
   const reader = new FileReader();
@@ -850,6 +822,11 @@ function importT1(input) {
       if(!mo || !br) { toast("❌ กรุณาระบุเงื่อนไขเดือนและสาขาก่อนนำเข้า", "error"); return; }
       const [yr, m] = mo.split("-");
       let updates = {}; let count = 0;
+
+      let cleanVal = (v) => {
+        if (v === undefined || v === null) return 0;
+        return parseFloat(String(v).replace(/,/g, '')) || 0;
+      };
 
       rows.forEach(row => {
         const excelDate = row[0]; if (!excelDate) return;
@@ -872,7 +849,14 @@ function importT1(input) {
         const dayKey = String(day).padStart(2, '0');
         const pathPrefix = `${yr}-${m}-${dayKey}`;
 
-        let rVals = {"r-op": parseFloat(row[1])||0, "r-med": parseFloat(row[2])||0, "r-trt": parseFloat(row[3])||0, "r-hd": parseFloat(row[4])||0, "r-gw": parseFloat(row[5])||0, "r-chg": parseFloat(row[6])||0, "r-drp": parseFloat(row[7])||0, "r-mem": parseFloat(row[8])||0, "r-stf": parseFloat(row[9])||0, "r-dep": parseFloat(row[10])||0, "r-oth": parseFloat(row[11])||0, "r-opx": parseFloat(row[12])||0, "r-oam": parseFloat(row[13])||0, "r-nyp": parseFloat(row[14])||0, "r-nam": parseFloat(row[15])||0, "r-nnp": parseFloat(row[16])||0};
+        let rVals = {
+          "r-op": cleanVal(row[1]), "r-med": cleanVal(row[2]), "r-trt": cleanVal(row[3]),
+          "r-hd": cleanVal(row[4]), "r-gw": cleanVal(row[5]), "r-chg": cleanVal(row[6]),
+          "r-drp": cleanVal(row[7]), "r-mem": cleanVal(row[8]), "r-stf": cleanVal(row[9]),
+          "r-dep": cleanVal(row[10]), "r-oth": cleanVal(row[11]), "r-opx": cleanVal(row[12]),
+          "r-oam": cleanVal(row[13]), "r-nyp": cleanVal(row[14]), "r-nam": cleanVal(row[15]),
+          "r-nnp": cleanVal(row[16])
+        };
         
         for(let k in rVals) { updates[`${pathPrefix}/${br}/${k}`] = rVals[k]; }
         updates[`${pathPrefix}/${br}/p-product`] = rVals["r-med"];
@@ -893,12 +877,11 @@ function importT1(input) {
       } else {
         toast("❌ ไม่พบข้อมูลแถวสรุปวันที่ตรงตามเงื่อนไขในไฟล์", "error");
       }
-    } catch(err) { toast("❌ ไม่สามารถถอดรหัสอ่านไฟล์ตาราง Excel นี้ได้", "error"); }
+    } catch(err) { toast("❌ Excel Import Crash: โครงสร้างไฟล์ขัดข้อง", "error"); }
   };
   reader.readAsArrayBuffer(f); input.value = "";
 }
 
-// FIX 2: EXPORT EXTRACTION STRING MUTATION (Resolved split slice issues using string replace)
 function exportT1() {
   let data = [];
   let headers = ["วันที่", "รายได้รวม", "หัตถการ", "ขายยา", "Treatment", "HD MALL", "Gowabi", "ชาร์จ 3%", "ฉีดผิว", "member", "หัตถการ พนง.", "มัดจำเงิน", "รวมรายได้อื่นๆ", "คนไข้เก่า(คน)", "คนไข้เก่า(ยอด)", "คนไข้ใหม่(คน)", "คนไข้ใหม่(ยอด)", "ใหม่ไม่มียอด(คน)", "คนไข้รวม", "แพทย์"];
@@ -993,6 +976,7 @@ function buildT2() {
   }).catch(()=>cT2(true));
 }
 
+let t2Listener = null;
 function loadT2() {
   buildT2(); const dt=g("o-dt").value, br=g("o-br").value; if(!dt)return;
   if(t2Listener) DB.ref(`ops_daily`).off('value', t2Listener);
@@ -1172,7 +1156,7 @@ function saveT5() {
   DB.ref(`ops_system_settings`).set(SETTINGS).then(()=>{ toast("✅ บันทึกการตั้งค่าลงฐานข้อมูลแล้ว!"); setTimeout(() => location.reload(), 1000); });
 }
 
-// FIX 6: DOM CONTENT LIFECYCLE EVENT TRIGGER OVERRIDE (Fully registered after core functions are read)
+// FIX 6: BIND APPLICATION LIFE-CYCLE EVENTS TRRIGERS ON DOM CONTENT LOADED RUNTIME
 window.addEventListener('DOMContentLoaded', () => {
   injectBranchOptions();
   const today = new Date().toISOString().split('T')[0]; 
