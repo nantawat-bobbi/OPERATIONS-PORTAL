@@ -22,6 +22,18 @@
 body{font-family:var(--font-ui);background:var(--bg);color:var(--tx);min-height:100vh;font-size:14px;overflow-x:hidden;}
 .app{display:flex;min-height:100vh;}
 
+/* LOGIN SCREEN */
+#login-screen { position:fixed; inset:0; background:var(--bg); z-index:99999; display:flex; align-items:center; justify-content:center; }
+.login-box { background:#fff; padding:40px; border-radius:12px; box-shadow:0 10px 25px rgba(0,0,0,0.1); width:100%; max-width:400px; text-align:center; }
+.login-box h2 { color:var(--acc); margin-bottom:5px; font-weight:800; letter-spacing:1px; }
+.login-box p { color:var(--tx3); margin-bottom:25px; font-size:13px; }
+.login-input-group { text-align:left; margin-bottom:15px; }
+.login-input-group label { font-size:12px; font-weight:600; color:var(--tx2); }
+.login-input-group select, .login-input-group input { width:100%; padding:10px; margin-top:5px; border-radius:6px; border:1px solid #ced4da; font-family:inherit; font-size:14px; outline:none; }
+.login-input-group select:focus, .login-input-group input:focus { border-color:var(--acc); }
+.btn-login { width:100%; padding:12px; background:var(--acc); color:#fff; border:none; border-radius:6px; font-weight:700; font-size:15px; cursor:pointer; margin-top:10px; transition:0.2s; }
+.btn-login:hover { background:var(--acc2); }
+
 /* SIDEBAR */
 .sidebar{width:220px;background:#1a1d23;border-right:1px solid #2d3139;display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh;}
 .slogo{padding:20px;border-bottom:1px solid #2d3139;color:#fff;font-weight:700;font-size:16px;letter-spacing:1px;}
@@ -110,7 +122,7 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 .mth-inp:focus{border-color:var(--acc);outline:none;}
 .mth-inp[readonly]{background:transparent;border:none;color:#000!important;}
 
-.toast{position:fixed;bottom:20px;right:20px;background:#212529;border-radius:6px;padding:12px 20px;font-size:14px;color:#fff;z-index:9998;box-shadow:0 4px 12px rgba(0,0,0,0.15);}
+.toast{position:fixed;bottom:20px;right:20px;background:#212529;border-radius:6px;padding:12px 20px;font-size:14px;color:#fff;z-index:9998;box-shadow:0 4px 12px rgba(0,0,0,0.15);transition:0.3s;}
 
 @media print {
   @page { size: A4 landscape; margin: 10mm; }
@@ -127,7 +139,26 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 </style>
 </head>
 <body>
-<div class="app">
+
+<div id="login-screen">
+  <div class="login-box">
+    <h2>LALIZA CLINIC</h2>
+    <p>เข้าสู่ระบบ Operations Portal</p>
+    <div class="login-input-group">
+      <label>ชื่อผู้จัดการ (Manager)</label>
+      <select id="login-user">
+        <option value="">กำลังโหลดรายชื่อผู้จัดการ...</option>
+      </select>
+    </div>
+    <div class="login-input-group" style="margin-bottom:25px;">
+      <label>รหัสผ่าน</label>
+      <input type="password" id="login-pass" placeholder="ใส่รหัสผ่าน (ตั้งต้น: 1234)">
+    </div>
+    <button class="btn-login" onclick="checkLogin()">เข้าสู่ระบบ</button>
+  </div>
+</div>
+
+<div class="app" id="main-app" style="display:none;">
 
 <div class="sidebar no-print">
   <div class="slogo">LALIZA CLINIC</div>
@@ -274,7 +305,7 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 
 <div id="t3" class="tp">
   <div class="ph">
-    <div class="ptitle">☎️ Confirm Tracking <span style="font-size:12px;color:var(--tx3);font-weight:400;margin-left:10px;">ตารางทั้งเดือน (แยกรายสาขา)</span></div>
+    <div class="ptitle">☎️ Confirm Tracking</div>
     <div class="ha">
       <select id="tk-br" onchange="buildT3()"></select>
       <input type="month" id="tk-mo" onchange="buildT3()">
@@ -308,7 +339,7 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 
 <div id="t4" class="tp">
   <div class="ph">
-    <div class="ptitle">👨‍⚕️ Doctor Finance <span style="font-size:12px;color:var(--tx3);font-weight:400;margin-left:10px;">ตารางทั้งเดือน (แยกรายสาขา)</span></div>
+    <div class="ptitle">👨‍⚕️ Doctor Finance</div>
     <div class="ha">
       <select id="df-br" onchange="buildT4()"></select>
       <input type="month" id="df-mo" onchange="buildT4()">
@@ -353,17 +384,21 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
     </div>
     <div style="background:#fff;padding:20px;border:1px solid var(--bdr);border-radius:8px;grid-column:1/-1;">
       <h3 style="margin-bottom:10px;border-bottom:2px solid var(--acc);padding-bottom:5px;">ตั้งค่าหัวข้อ Program (หน้า 2)</h3>
-      <div style="color:var(--red);font-size:12px;margin-bottom:10px;">* แก้ไข/เพิ่ม/ลด ชื่อโปรแกรมที่นี่ ระบบจะนำไปสร้างเป็นแถวในหน้า Daily Ops Core อัตโนมัติ</div>
       <textarea id="s-pr" rows="6" style="width:100%;"></textarea>
     </div>
   </div>
 </div>
 
-</div></div>
-
-<script>
-// Mock Firebase (Change config to yours)
-const FBC={apiKey:"AIza",authDomain:"app.firebaseapp.com",databaseURL:"https://app-default-rtdb.firebaseio.com",projectId:"app"};
+</div></div> <script>
+// ==========================================
+// FIREBASE CONFIG (รหัสผ่านของจริงที่ให้มา)
+// ==========================================
+const FBC = {
+  apiKey: "AIzaSyDetHuoARpuhqRp-o9mVzECi1nzWAEo-O4",
+  authDomain: "operations-portal-d60a5.firebaseapp.com",
+  databaseURL: "https://operations-portal-d60a5-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "operations-portal-d60a5"
+};
 if(!firebase.apps.length)firebase.initializeApp(FBC);
 const DB = firebase.database();
 
@@ -376,7 +411,6 @@ let SETTINGS = {
   docs: ["หมอ A"], cas: ["แคชเชียร์ A"], mgs: ["ผู้จัดการ A"]
 };
 
-// Hardcode branches directly
 function injectBranchOptions() {
   const opts = bKeys.map(k=>`<option value="${k}">${BKS[k]}</option>`).join("");
   ["r-br","o-br","tk-br","df-br"].forEach(id=>{ const el = document.getElementById(id); if(el) el.innerHTML=opts; });
@@ -386,8 +420,32 @@ injectBranchOptions();
 function g(id){return document.getElementById(id);}
 function fm(n){return (parseFloat(n)||0).toLocaleString("th-TH",{minimumFractionDigits:2,maximumFractionDigits:2});}
 function fmI(n){return Math.round(parseFloat(n)||0).toLocaleString("th-TH");}
-function toast(m){const el=document.createElement("div");el.className="toast";el.textContent=m;document.body.appendChild(el);setTimeout(()=>el.remove(),4000);}
+function toast(m, type="success"){
+  const el=document.createElement("div");
+  el.className="toast";
+  el.style.background = type==="error" ? "#c92a2a" : "#212529";
+  el.textContent=m;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),4000);
+}
 
+// ==========================================
+// LOGIN SYSTEM
+// ==========================================
+function checkLogin() {
+  const user = g("login-user").value;
+  const pass = g("login-pass").value;
+  if(!user) return toast("กรุณาเลือกชื่อผู้จัดการก่อนครับ", "error");
+  if(pass !== "1234") return toast("รหัสผ่านไม่ถูกต้อง (รหัสเริ่มต้นคือ 1234)", "error");
+  
+  g("login-screen").style.display = "none";
+  g("main-app").style.display = "flex";
+  toast(`ยินดีต้อนรับเข้าสู่ระบบคุณ ${user}`);
+}
+
+// ==========================================
+// NAVIGATION
+// ==========================================
 function sw(id,item){
   document.querySelectorAll(".tp").forEach(p=>p.classList.remove("active"));
   document.querySelectorAll(".ni").forEach(n=>n.classList.remove("active"));
@@ -407,6 +465,11 @@ function updateSelects() {
   });
   if(g("o-ca")) { let v=g("o-ca").value; g("o-ca").innerHTML="<option value=''>-</option>"+SETTINGS.cas.map(x=>`<option value="${x}">${x}</option>`).join(""); g("o-ca").value=v; }
   if(g("o-mg")) { let v=g("o-mg").value; g("o-mg").innerHTML="<option value=''>-</option>"+SETTINGS.mgs.map(x=>`<option value="${x}">${x}</option>`).join(""); g("o-mg").value=v; }
+  
+  // Update Login screen users
+  if(g("login-user")) {
+    g("login-user").innerHTML = "<option value=''>- เลือกผู้จัดการ -</option>" + SETTINGS.mgs.map(x=>`<option value="${x}">${x}</option>`).join("");
+  }
 }
 
 // ==========================================
@@ -508,12 +571,11 @@ function calcT1(triggerEl) {
 
   g("rs-sop").textContent = fm(gOp); g("rs-smed").textContent = fm(gMed); g("rs-strt").textContent = fm(gTrt);
 
-  // Sync to DB
   if(triggerEl) {
     const dt = triggerEl.dataset.dt, br = g("r-br").value, id = triggerEl.dataset.id;
     const val = triggerEl.type==="number"?parseFloat(triggerEl.value)||0 : triggerEl.value;
     
-    // Auto Map logic to Ops Core names
+    // ออโต้แมปชื่อ ให้ไหลเข้า T2 ตรงเป๊ะ
     let mapped = {[id]:val};
     if(id === "r-op") mapped["p-misc"] = val;
     if(id === "r-med") mapped["p-product"] = val;
@@ -528,7 +590,6 @@ function calcT1(triggerEl) {
   }
 }
 
-// Download Excel Template for Import
 function downloadTemplate() {
   const mo=g("r-mo").value;
   const [yr,m] = mo.split("-"); const dim = new Date(yr,m,0).getDate();
@@ -546,7 +607,6 @@ function downloadTemplate() {
   XLSX.writeFile(wb, `Template_Import_${mo}.xlsx`);
 }
 
-// Import Excel File Processing
 function importT1(input) {
   const f = input.files[0]; if(!f) return;
   const reader = new FileReader();
@@ -596,13 +656,13 @@ function importT1(input) {
       }
 
       DB.ref('daily').update(updates).then(() => {
-        toast(`✅ นำเข้าสำเร็จ ${importedCount} วัน และบันทึกลงฐานข้อมูล 100%`);
+        toast(`✅ นำเข้าสำเร็จ ${importedCount} วัน (บันทึกลงคลาวด์แล้ว)`);
       }).catch((error) => {
-        toast(`❌ เกิดข้อผิดพลาดการบันทึก: ${error.message}`);
+        toast(`❌ เกิดข้อผิดพลาดการบันทึก: ${error.message}`, "error");
       });
 
     } catch(err) {
-      toast("❌ รูปแบบไฟล์ Excel ไม่ถูกต้อง");
+      toast("❌ รูปแบบไฟล์ Excel ไม่ถูกต้อง", "error");
     }
   };
   reader.readAsArrayBuffer(f);
@@ -703,7 +763,7 @@ function saveT2() {
     if(e.id && !e.readOnly) p[e.id] = e.type==="number"?parseFloat(e.value)||0 : e.value;
   });
   SETTINGS.progs.forEach((x,i)=>{ p[`name${i}`] = x; });
-  DB.ref(`daily/${dt}/${br}`).update(p).then(()=>toast("บันทึกหน้า 2 สำเร็จ! ข้อมูลจะไหลไปหน้า 1 อัตโนมัติ"));
+  DB.ref(`daily/${dt}/${br}`).update(p).then(()=>toast("บันทึกหน้า 2 ลงฐานข้อมูลสำเร็จ! (ข้อมูลแชร์ไปหน้า 1 อัตโนมัติ)"));
 }
 
 // ==========================================
@@ -844,17 +904,15 @@ function saveT5() {
 }
 
 // ==========================================
-// ONLOAD STARTUP (Fix for First Load Empty Table)
+// ONLOAD STARTUP
 // ==========================================
 window.onload = () => {
   const today = new Date().toISOString().split('T')[0];
   g("o-dt").value = today;
   g("r-mo").value = today.slice(0,7); g("tk-mo").value = today.slice(0,7); g("df-mo").value = today.slice(0,7);
   
-  // Render tables immediately without waiting for Firebase
   buildT1(); buildT2(); buildT3(); buildT4();
   
-  // Fetch Settings in Background and Refresh Selects
   DB.ref(`system_settings`).once('value').then(snap=>{
     if(snap.exists()) {
       const d=snap.val();
@@ -865,7 +923,7 @@ window.onload = () => {
       SETTINGS.mgs = d.mgs||SETTINGS.mgs;
     }
     updateSelects(); loadT5(); 
-    curT1=""; buildT1(); // Rebuild with fetched settings
+    curT1=""; buildT1(); 
   }).catch(()=>{ 
     updateSelects(); loadT5(); 
   });
