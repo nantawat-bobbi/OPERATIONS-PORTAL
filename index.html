@@ -29,8 +29,8 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--tx);min-height:
 .login-box p { color:var(--tx3); margin-bottom:25px; font-size:13px; }
 .login-input-group { text-align:left; margin-bottom:15px; }
 .login-input-group label { font-size:12px; font-weight:600; color:var(--tx2); }
-.login-input-group select, .login-input-group input { width:100%; padding:10px; margin-top:5px; border-radius:6px; border:1px solid #ced4da; font-family:inherit; font-size:14px; outline:none; }
-.login-input-group select:focus, .login-input-group input:focus { border-color:var(--acc); }
+.login-input-group input { width:100%; padding:12px; margin-top:5px; border-radius:6px; border:1px solid #ced4da; font-family:inherit; font-size:16px; text-align:center; font-weight:bold; letter-spacing:2px; outline:none; }
+.login-input-group input:focus { border-color:var(--acc); }
 .btn-login { width:100%; padding:12px; background:var(--acc); color:#fff; border:none; border-radius:6px; font-weight:700; font-size:15px; cursor:pointer; margin-top:10px; transition:0.2s; }
 .btn-login:hover { background:var(--acc2); }
 
@@ -60,6 +60,7 @@ select,input[type=text],input[type=date],input[type=time],input[type=month],inpu
   color:var(--tx);font-size:13px;font-family:inherit;outline:none;
 }
 select:focus,input:focus,textarea:focus{border-color:var(--acc);}
+select:disabled{background:#e9ecef;cursor:not-allowed;font-weight:bold;color:var(--acc);}
 
 /* DASHBOARDS */
 .pc{padding:24px;}
@@ -87,7 +88,6 @@ select:focus,input:focus,textarea:focus{border-color:var(--acc);}
 .r-inp:hover{background:rgba(255,255,255,0.4);}
 .r-inp:focus{background:#fff!important;box-shadow:inset 0 0 0 2px var(--acc);}
 .r-inp[readonly]{color:#000!important;cursor:default;background:transparent!important;box-shadow:none;}
-input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 
 .rev-sum-grid{display:grid;grid-template-columns:300px 1fr;background:#f8f9fa;}
 .rev-sum-left{border-right:2px solid #ccc;padding:15px;}
@@ -133,14 +133,9 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 <div id="login-screen">
   <div class="login-box">
     <h2>LALIZA CLINIC</h2>
-    <p>ระบบปฏิบัติการขั้นสูง (Enterprise Operations)</p>
-    <div class="login-input-group">
-      <label>ชื่อผู้จัดการ (Manager)</label>
-      <select id="login-user"><option value="">กำลังโหลด...</option></select>
-    </div>
+    <p>ระบุรหัสประจำตัวพนักงานเพื่อเข้าสู่ระบบ</p>
     <div class="login-input-group" style="margin-bottom:25px;">
-      <label>รหัสผ่าน</label>
-      <input type="password" id="login-pass" placeholder="รหัสเริ่มต้น: 1234">
+      <input type="password" id="login-pass" placeholder="••••••" autocomplete="new-password">
     </div>
     <button class="btn-login" onclick="checkLogin()">เข้าสู่ระบบ</button>
   </div>
@@ -149,14 +144,14 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 <div class="app" id="main-app" style="display:none;">
 
 <div class="sidebar no-print">
-  <div class="slogo">LALIZA CLINIC</div>
+  <div class="slogo">LALIZA CLINIC<br><span id="nav-user-label" style="font-size:11px;color:#845ef7;font-weight:normal;"></span></div>
   <nav class="nav">
-    <div class="ni active" onclick="sw('t0',this)">👑 Advanced Dashboard</div>
-    <div class="ni" onclick="sw('t1',this)">📊 Revenue Sheet</div>
+    <div class="ni admin-only" onclick="sw('t0',this)">👑 Advanced Dashboard</div>
+    <div class="ni active" onclick="sw('t1',this)">📊 Revenue Sheet</div>
     <div class="ni" onclick="sw('t2',this)">📋 Daily Ops Core</div>
     <div class="ni" onclick="sw('t3',this)">☎️ Confirm Tracking</div>
     <div class="ni" onclick="sw('t4',this)">👨‍⚕️ Doctor Finance</div>
-    <div class="ni" onclick="sw('t5',this)">⚙️ Custom Settings</div>
+    <div class="ni admin-only" onclick="sw('t5',this)">⚙️ Custom Settings</div>
     <div style="margin-top:40px;border-top:1px solid #2d3139;padding-top:10px;">
       <div class="ni" onclick="location.reload()" style="color:#f8d7da;">🔙 ออกจากระบบ</div>
     </div>
@@ -165,7 +160,7 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 
 <div class="main">
 
-<div id="t0" class="tp active">
+<div id="t0" class="tp admin-only">
   <div class="ph no-print">
     <div class="ptitle">👑 Master Dashboard <span style="font-size:12px;color:var(--tx3);font-weight:400;margin-left:10px;">วิเคราะห์เจาะลึกภาพรวมคลินิกทั้งหมด (All Modules)</span></div>
     <div class="ha">
@@ -216,7 +211,7 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
   </div>
 </div>
 
-<div id="t1" class="tp">
+<div id="t1" class="tp active">
   <div class="ph no-print">
     <div class="ptitle">📊 Revenue Sheet</div>
     <div class="ha">
@@ -440,7 +435,7 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
   </div>
 </div>
 
-<div id="t5" class="tp">
+<div id="t5" class="tp admin-only">
   <div class="ph no-print"><div class="ptitle">⚙️ Custom Settings</div><button class="btn bs" onclick="saveT5()">💾 บันทึกการตั้งค่า</button></div>
   <div class="pc" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
     <div style="background:#fff;padding:20px;border:1px solid var(--bdr);border-radius:8px;">
@@ -453,16 +448,64 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
       <div style="margin-bottom:10px;"><div style="font-size:12px;color:var(--tx2);margin-bottom:3px;">แคชเชียร์ (คั่นด้วย ,)</div><textarea id="s-ca" rows="2" style="width:100%;"></textarea></div>
       <div><div style="font-size:12px;color:var(--tx2);margin-bottom:3px;">ผู้จัดการ (คั่นด้วย ,)</div><textarea id="s-mg" rows="2" style="width:100%;"></textarea></div>
     </div>
-    <div style="background:#fff;padding:20px;border:1px solid var(--bdr);border-radius:8px;grid-column:1/-1;">
-      <h3 style="margin-bottom:10px;border-bottom:2px solid var(--acc);padding-bottom:5px;">ตั้งค่าหัวข้อ Program (หน้า 2)</h3>
-      <textarea id="s-pr" rows="6" style="width:100%;"></textarea>
-    </div>
   </div>
 </div>
 
 </div></div> 
 
 <script>
+// ==========================================
+// USER DATABASE (Role-Based Login System)
+// ==========================================
+const USERS = {
+  // Admin Master
+  "16698": { role: "admin", br: "all", label: "Admin สูงสุด" },
+  
+  // พระราม 9 (Rama 9)
+  "928374": { role: "manager", br: "rama9", label: "Admin พระราม 9" },
+  "519374": { role: "manager", br: "rama9", label: "Manager พระราม 9" },
+  "64752": { role: "cashier", br: "rama9", label: "Cashier พระราม 9" },
+  
+  // ปิ่นเกล้า (Pinklao)
+  "562819": { role: "manager", br: "pinklao", label: "Admin ปิ่นเกล้า" },
+  "284615": { role: "manager", br: "pinklao", label: "Manager ปิ่นเกล้า" },
+  "39108": { role: "cashier", br: "pinklao", label: "Cashier ปิ่นเกล้า" },
+  
+  // บางแค (Bangkae)
+  "104756": { role: "manager", br: "bangkae", label: "Admin บางแค" },
+  "937208": { role: "manager", br: "bangkae", label: "Manager บางแค" },
+  "82046": { role: "cashier", br: "bangkae", label: "Cashier บางแค" },
+  
+  // รังสิต (Rangsit)
+  "835921": { role: "manager", br: "rangsit", label: "Admin รังสิต" },
+  "405813": { role: "manager", br: "rangsit", label: "Manager รังสิต" },
+  "15937": { role: "cashier", br: "rangsit", label: "Cashier รังสิต" },
+  
+  // พรอมานาด (Promanat)
+  "472109": { role: "manager", br: "promanat", label: "Admin พรอมานาด" },
+  "618294": { role: "manager", br: "promanat", label: "Manager พรอมานาด" },
+  "58291": { role: "cashier", br: "promanat", label: "Cashier พรอมานาด" },
+  
+  // งามวงศ์วาน (Ngamwongwan)
+  "391847": { role: "manager", br: "ngamwongwan", label: "Admin งามวงศ์วาน" },
+  "374920": { role: "manager", br: "ngamwongwan", label: "Manager งามวงศ์วาน" },
+  "40375": { role: "cashier", br: "ngamwongwan", label: "Cashier งามวงศ์วาน" },
+  
+  // ศรีนครินทร์ (Srinakarin)
+  "629483": { role: "manager", br: "srinakarin", label: "Admin ศรีนครินทร์" },
+  "850136": { role: "manager", br: "srinakarin", label: "Manager ศรีนครินทร์" },
+  "91624": { role: "cashier", br: "srinakarin", label: "Cashier ศรีนครินทร์" },
+  
+  // เวสต์เกต (Westgate)
+  "758392": { role: "manager", br: "westgate", label: "Admin เวสต์เกต" },
+  "293847": { role: "manager", br: "westgate", label: "Manager เวสต์เกต" },
+  "27483": { role: "cashier", br: "westgate", label: "Cashier เวสต์เกต" }
+};
+let CURRENT_USER = null;
+
+// ==========================================
+// FIREBASE CONFIG
+// ==========================================
 const FBC = {
   apiKey: "AIzaSyC0P1LGtglA_t1Nc5PyM5uD3MOLnfBZwFM",
   authDomain: "lalizaclinic-work-schedule.firebaseapp.com",
@@ -476,16 +519,14 @@ const FBC = {
 if(!firebase.apps.length)firebase.initializeApp(FBC);
 const DB = firebase.database();
 
-const BKS = {rama9:"พระราม 9", pinklao:"ปิ่นเกล้า", bangkae:"บางแค", rangsit:"รังสิต", promanat:"พรมานาต", ngamwongwan:"งามวงศ์วาน", srinakarin:"ศรีนครินทร์", westgate:"เวสต์เกต"};
+const BKS = {rama9:"พระราม 9", pinklao:"ปิ่นเกล้า", bangkae:"บางแค", rangsit:"รังสิต", promanat:"พรอมานาด", ngamwongwan:"งามวงศ์วาน", srinakarin:"ศรีนครินทร์", westgate:"เวสต์เกต"};
 const bKeys = Object.keys(BKS);
 
 let SETTINGS = {
-  progs: ["Co2","Pico","Vbeam","Elos","Botox","Filler","Meso","Thermage","Ulthera","Treatment","Drip Vitamin (Nures)","Product","หัตถการอื่นๆ"],
   tgs: {rama9:1000000, pinklao:1000000, bangkae:1000000, rangsit:1000000, promanat:1000000, ngamwongwan:1000000, srinakarin:1000000, westgate:1000000},
   docs: ["หมอ A"], cas: ["แคชเชียร์ A"], mgs: ["ผู้จัดการ A"]
 };
 
-// Global Chart Variables
 let c0Bar, c0Pie, c0Funnel, c0Doc, c0D1, c0D2;
 let c1Trend, c3Donut, c4Bar;
 
@@ -519,18 +560,50 @@ function expPNG(targetId, filename) {
   });
 }
 
+// -----------------------------------------------------
+// LOGIN & PERMISSION LOGIC
+// -----------------------------------------------------
 function checkLogin() {
-  const user = g("login-user").value; const pass = g("login-pass").value;
-  if(!user) return toast("กรุณาเลือกชื่อผู้จัดการก่อนครับ", "error");
-  if(pass !== "1234") return toast("รหัสผ่านไม่ถูกต้อง", "error");
-  g("login-screen").style.display = "none"; g("main-app").style.display = "flex";
-  buildT0(); toast(`ยินดีต้อนรับเข้าสู่ระบบคุณ ${user}`);
+  const pass = g("login-pass").value;
+  if(!USERS[pass]) return toast("รหัสพนักงานไม่ถูกต้อง!", "error");
+  
+  CURRENT_USER = USERS[pass];
+  g("login-screen").style.display = "none"; 
+  g("main-app").style.display = "flex";
+  g("nav-user-label").textContent = `👤 ${CURRENT_USER.label}`;
+
+  // Apply Permissions
+  if(CURRENT_USER.role === "admin") {
+    // Admin sees everything
+    document.querySelectorAll('.admin-only').forEach(el => el.style.display = "flex");
+    sw('t0', document.querySelector('.ni[onclick="sw(\'t0\',this)"]'));
+  } else {
+    // Others: Hide Dashboard (0) and Settings (5)
+    document.querySelectorAll('.admin-only').forEach(el => el.style.display = "none");
+    
+    // Lock Branch Selectors
+    ['r-br','o-br','tk-br','df-br'].forEach(id => {
+      let el = g(id);
+      if(el) {
+        el.value = CURRENT_USER.br;
+        el.disabled = true;
+      }
+    });
+    // Default to Tab 1
+    sw('t1', document.querySelector('.ni[onclick="sw(\'t1\',this)"]'));
+  }
+  toast(`เข้าสู่ระบบสำเร็จ! สวัสดี ${CURRENT_USER.label}`);
 }
+
+// Enable Enter key on login
+document.getElementById("login-pass").addEventListener("keypress", function(event) {
+  if (event.key === "Enter") { event.preventDefault(); checkLogin(); }
+});
 
 function sw(id,item){
   document.querySelectorAll(".tp").forEach(p=>p.classList.remove("active"));
   document.querySelectorAll(".ni").forEach(n=>n.classList.remove("active"));
-  g(id).classList.add("active"); item.classList.add("active");
+  g(id).classList.add("active"); if(item) item.classList.add("active");
   if(id==='t0') buildT0(); if(id==='t1') buildT1(); if(id==='t2') buildT2(); if(id==='t3') buildT3(); if(id==='t4') buildT4(); if(id==='t5') loadT5();
 }
 
@@ -539,7 +612,6 @@ function updateSelects() {
   document.querySelectorAll('select[data-id="r-doc"], select[data-id="df-doc"], #o-doc').forEach(el=>{let val=el.value; el.innerHTML=dOpt; el.value=val;});
   if(g("o-ca")) { let v=g("o-ca").value; g("o-ca").innerHTML="<option value=''>-</option>"+SETTINGS.cas.map(x=>`<option value="${x}">${x}</option>`).join(""); g("o-ca").value=v; }
   if(g("o-mg")) { let v=g("o-mg").value; g("o-mg").innerHTML="<option value=''>-</option>"+SETTINGS.mgs.map(x=>`<option value="${x}">${x}</option>`).join(""); g("o-mg").value=v; }
-  if(g("login-user")) { g("login-user").innerHTML = "<option value=''>- เลือกผู้จัดการ -</option>" + SETTINGS.mgs.map(x=>`<option value="${x}">${x}</option>`).join(""); }
 }
 
 // ==========================================
@@ -554,11 +626,8 @@ function buildT0() {
     DB.ref(`ops_docfin_mth/${mo}`).once('value')
   ]).then(([snapDaily, snapTrack, snapDoc]) => {
     
-    // 1. Process Daily (Revenue & Ops Core)
     const allD = snapDaily.val()||{};
     let bRev={}, bTg={}, totRev=0, totTg=0, totPax=0, tCash=0, tApp=0, tTrans=0, tCrd=0;
-    
-    // For new Donut Charts
     let tOp=0, tMed=0, tTrt=0;
     let tCo2=0, tPico=0, tVb=0;
 
@@ -578,7 +647,6 @@ function buildT0() {
             tTrans += parseFloat(d["pay-trans"])||0;
             tCrd += (parseFloat(d["c-kbank"])||0) + (parseFloat(d["c-crd"])||0) + (parseFloat(d["c-kbsc"])||0) + (parseFloat(d["c-ktc"])||0) + (parseFloat(d["c-bay"])||0) + (parseFloat(d["c-scb"])||0) + (parseFloat(d["c-oth"])||0);
 
-            // New Data Aggregation
             tOp += parseFloat(d["r-op"])||0;
             tMed += parseFloat(d["r-med"])||0;
             tTrt += parseFloat(d["r-trt"])||0;
@@ -591,7 +659,6 @@ function buildT0() {
       }
     }
     
-    // 2. Process Tracking
     let tkCall=0, tkConf=0, tkAct=0;
     snapTrack.forEach(brSnap => {
       brSnap.forEach(dtSnap => {
@@ -602,7 +669,6 @@ function buildT0() {
       });
     });
 
-    // 3. Process Doctors
     let tDf = 0; let docStats = {};
     snapDoc.forEach(brSnap => { 
       brSnap.forEach(dtSnap => { 
@@ -615,11 +681,9 @@ function buildT0() {
       }); 
     });
 
-    // Update KPIs
     g("k0-rev").textContent = "฿"+fm(totRev); g("k0-tg").textContent = "฿"+fm(totTg);
     g("k0-pax").textContent = fmI(totPax)+" คน"; g("k0-df").textContent = "฿"+fm(tDf);
 
-    // Default Tooltip options for Donuts to show percentage
     const donutTooltipOption = {
       callbacks: {
         label: function(ctx) {
@@ -630,7 +694,6 @@ function buildT0() {
       }
     };
 
-    // Chart 1: Bar (Revenue)
     if(c0Bar) c0Bar.destroy();
     c0Bar = new Chart(g("c0-bar"), {
       type: 'bar',
@@ -641,7 +704,6 @@ function buildT0() {
       }, options: {responsive:true, maintainAspectRatio:false}
     });
 
-    // Chart 2: Funnel/Bar (Tracking)
     if(c0Funnel) c0Funnel.destroy();
     c0Funnel = new Chart(g("c0-funnel"), {
       type: 'bar',
@@ -651,7 +713,6 @@ function buildT0() {
       }, options: {responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}}
     });
 
-    // Chart 3: Donut (Payment)
     if(c0Pie) c0Pie.destroy();
     c0Pie = new Chart(g("c0-pie"), {
       type: 'doughnut',
@@ -659,8 +720,7 @@ function buildT0() {
       options: {responsive:true, maintainAspectRatio:false, plugins:{tooltip: donutTooltipOption}}
     });
 
-    // Chart 4: Horizontal Bar (Doctors)
-    let sortedDocs = Object.keys(docStats).sort((a,b)=>docStats[b]-docStats[a]).slice(0,5); // Top 5
+    let sortedDocs = Object.keys(docStats).sort((a,b)=>docStats[b]-docStats[a]).slice(0,5);
     if(c0Doc) c0Doc.destroy();
     c0Doc = new Chart(g("c0-doc"), {
       type: 'bar',
@@ -668,7 +728,6 @@ function buildT0() {
       options: {responsive:true, maintainAspectRatio:false, indexAxis:'y'}
     });
 
-    // Chart 5: NEW Donut (หัตถการ vs ขายยา vs Treatment)
     if(c0D1) c0D1.destroy();
     c0D1 = new Chart(g("c0-d1"), {
       type: 'doughnut',
@@ -676,7 +735,6 @@ function buildT0() {
       options: {responsive:true, maintainAspectRatio:false, plugins:{tooltip: donutTooltipOption}}
     });
 
-    // Chart 6: NEW Donut (Co2 vs Pico vs Vbeam)
     if(c0D2) c0D2.destroy();
     c0D2 = new Chart(g("c0-d2"), {
       type: 'doughnut',
@@ -788,11 +846,14 @@ function calcT1(triggerEl) {
     const val = parseFloat(rawVal)||0;
     
     let mapped = {[id]:val};
-    // Auto sync mappings to T2
-    if(id === "r-op") mapped["p-misc"] = val; if(id === "r-med") mapped["p-product"] = val;
-    if(id === "r-trt") mapped["p-treatment"] = val; if(id === "r-hd") mapped["a-hdmall"] = val;
-    if(id === "r-gw") mapped["a-gowabi"] = val; if(id === "r-chg") mapped["p-charge"] = val;
+    // Sync specifically requested mappings to Tab 2
+    if(id === "r-med") mapped["p-product"] = val;
+    if(id === "r-trt") mapped["p-treatment"] = val; 
+    if(id === "r-hd") mapped["a-hdmall"] = val;
+    if(id === "r-gw") mapped["a-gowabi"] = val; 
+    if(id === "r-chg") mapped["p-charge"] = val;
     if(id === "r-drp") mapped["p-drip"] = val;
+    
     clearTimeout(tm1[dt]); tm1[dt] = setTimeout(()=>{ DB.ref(`ops_daily/${dt}/${br}`).update(mapped); }, 500);
   }
 }
@@ -819,7 +880,7 @@ function importT1(input) {
         let rVals = {"r-op": parseFloat(row[1])||0, "r-med": parseFloat(row[2])||0, "r-trt": parseFloat(row[3])||0, "r-hd": parseFloat(row[4])||0, "r-gw": parseFloat(row[5])||0, "r-chg": parseFloat(row[6])||0, "r-drp": parseFloat(row[7])||0, "r-mem": parseFloat(row[8])||0, "r-stf": parseFloat(row[9])||0, "r-dep": parseFloat(row[10])||0, "r-oth": parseFloat(row[11])||0, "r-opx": parseFloat(row[12])||0, "r-oam": parseFloat(row[13])||0, "r-nyp": parseFloat(row[14])||0, "r-nam": parseFloat(row[15])||0, "r-nnp": parseFloat(row[16])||0};
         for(let key in rVals) {
           updates[`${dt}/${br}/${key}`] = rVals[key];
-          if(key==="r-op") updates[`${dt}/${br}/p-misc`]=rVals[key]; if(key==="r-med") updates[`${dt}/${br}/p-product`]=rVals[key];
+          if(key==="r-med") updates[`${dt}/${br}/p-product`]=rVals[key];
           if(key==="r-trt") updates[`${dt}/${br}/p-treatment`]=rVals[key]; if(key==="r-hd") updates[`${dt}/${br}/a-hdmall`]=rVals[key];
           if(key==="r-gw") updates[`${dt}/${br}/a-gowabi`]=rVals[key]; if(key==="r-chg") updates[`${dt}/${br}/p-charge`]=rVals[key];
           if(key==="r-drp") updates[`${dt}/${br}/p-drip`]=rVals[key];
@@ -858,7 +919,7 @@ function buildT2() {
   for(let i=0; i<totalRows; i++) {
     ht += `<tr>`;
     
-    // Column 1: ยอดหน้าร้าน
+    // Column 1: ยอดหน้าร้าน (Rowspan = 16 rows + 1 total row = 17)
     if(i===0) {
       ht += `<td rowspan="${totalRows + 1}" style="background:#f8f9fa; text-align:center; vertical-align:middle; padding:15px; border-right:2px solid #000;">
                <div style="font-weight:bold;margin-bottom:10px;color:var(--tx2);">ยอดหน้าร้านรวม</div>
@@ -887,7 +948,7 @@ function buildT2() {
       ht += `<td style="background:#f8f9fa;border:none;"></td><td style="background:#f8f9fa;border:none;"></td>`;
     }
 
-    // Right Side Panels
+    // Right Side Panels (Rowspans sum to 16 rows: 4 + 6 + 3 + 3 = 16)
     if(i===0) ht += `<td rowspan="4" style="vertical-align:middle;text-align:center;background:#fff3cd;font-weight:bold;">เงินสด<br><br><input type="text" id="pay-cash" class="num-in" style="font-size:18px;text-align:center;color:#000!important;" oninput="cT2()" onblur="formatInput(this)" onfocus="unformatInput(this)"></td>`;
     if(i===4) {
       ht += `<td rowspan="6" style="vertical-align:middle;text-align:center;background:#cff4fc;font-size:12px;font-weight:bold;">แอปพลิเคชัน<br>
@@ -896,11 +957,12 @@ function buildT2() {
         </td>`;
     }
     if(i===10) ht += `<td rowspan="3" style="vertical-align:middle;text-align:center;background:#d1e7dd;font-weight:bold;">ยอดเงินโอน<br><br><input type="text" id="pay-trans" class="num-in" style="font-size:18px;text-align:center;color:#000!important;" oninput="cT2()" onblur="formatInput(this)" onfocus="unformatInput(this)"></td>`;
-    if(i===13) ht += `<td rowspan="${totalRows - 13}" style="vertical-align:middle;text-align:center;background:#dbeafe;font-weight:bold;">ยอดชำระรวม<br><br><input type="text" id="t-grand" class="num-in" style="font-size:22px;color:red!important;text-align:center;font-weight:800;border:1px solid #aaa!important;background:#fff;padding:6px;border-radius:4px;" oninput="saveT2Quick('t-grand',this.value)" onblur="formatInput(this)" onfocus="unformatInput(this)"></td>`;
+    if(i===13) ht += `<td rowspan="3" style="vertical-align:middle;text-align:center;background:#dbeafe;font-weight:bold;">ยอดชำระรวม<br><br><input type="text" id="t-grand" class="num-in" style="font-size:22px;color:red!important;text-align:center;font-weight:800;border:1px solid #aaa!important;background:#fff;padding:6px;border-radius:4px;" oninput="saveT2Quick('t-grand',this.value)" onblur="formatInput(this)" onfocus="unformatInput(this)"></td>`;
 
     ht += `</tr>`;
   }
 
+  // Row 17 (Total row)
   ht += `<tr style="font-weight:700; background:#f1f3f5;"><td style="text-align:right;">ยอดรวม Program</td><td><input type="text" id="t-prog" class="num-in" readonly value="0"></td><td style="color:red;text-align:right;padding-right:10px;" id="t-vip">0</td><td colspan="2" style="text-align:center;">คะแนน (Point)</td><td colspan="2" style="padding:2px;"><input type="text" id="t-point" class="num-in" style="width:100%;text-align:center;" onblur="formatInput(this)" onfocus="unformatInput(this)"></td></tr>`;
   tb.innerHTML = ht;
   
@@ -1135,14 +1197,12 @@ function loadT5() {
   g("s-dr").value = SETTINGS.docs.join(", ");
   g("s-ca").value = SETTINGS.cas.join(", ");
   g("s-mg").value = SETTINGS.mgs.join(", ");
-  g("s-pr").value = SETTINGS.progs.join("\n");
 }
 function saveT5() {
   bKeys.forEach(k => { let el = g(`tg-${k}`); SETTINGS.tgs[k] = el ? (parseFloat(el.value.replace(/,/g,''))||0) : 0; });
   SETTINGS.docs = g("s-dr").value.split(",").map(s=>s.trim()).filter(Boolean);
   SETTINGS.cas = g("s-ca").value.split(",").map(s=>s.trim()).filter(Boolean);
   SETTINGS.mgs = g("s-mg").value.split(",").map(s=>s.trim()).filter(Boolean);
-  SETTINGS.progs = g("s-pr").value.split("\n").map(s=>s.trim()).filter(Boolean);
   
   DB.ref(`ops_system_settings`).set(SETTINGS).then(()=>{
     toast("✅ บันทึกการตั้งค่าลงฐานข้อมูลแล้ว!");
@@ -1158,7 +1218,7 @@ window.onload = () => {
   DB.ref(`ops_system_settings`).once('value').then(snap=>{
     if(snap.exists()) {
       const d=snap.val();
-      SETTINGS.progs = d.progs||SETTINGS.progs; SETTINGS.tgs = d.tgs||SETTINGS.tgs;
+      SETTINGS.tgs = d.tgs||SETTINGS.tgs;
       SETTINGS.docs = d.docs||SETTINGS.docs; SETTINGS.cas = d.cas||SETTINGS.cas; SETTINGS.mgs = d.mgs||SETTINGS.mgs;
     }
     updateSelects(); loadT5(); 
