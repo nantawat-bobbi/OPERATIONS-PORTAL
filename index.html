@@ -117,9 +117,18 @@ select:focus,input:focus{border-color:var(--acc);}
 .cf-table .prog-name{font-weight:500;}
 .cf-table .total-row{background:#fff3bf;font-weight:700;}
 .cf-table .payment-total-row{background:#d3f9d8;font-weight:700;}
-.num-in{border:1px solid #ced4da;border-radius:4px;padding:5px 8px;text-align:right;width:110px;font-size:13px;background:#fff;}
-.num-in:focus{border-color:var(--acc);outline:none;}
-.num-display{font-weight:600;color:#1971c2;font-size:14px;}
+
+/* แบบที่ต้องการ: ให้ช่องกรอกไม่มีเส้นขอบ ดูเหมือนกระดาษ */
+.num-in{
+  border:none; border-bottom:1px dotted #ccc; border-radius:0;
+  padding:4px; text-align:right; width:110px; font-size:14px;
+  background:transparent; color:#1D4ED8; font-weight:600;
+}
+.num-in:hover{background:#FEF08A;cursor:text;}
+.num-in:focus{border-bottom:1px solid var(--acc);outline:none;background:#EEF2FF;}
+input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+
+.num-display{font-weight:700;color:#1971c2;font-size:14px;}
 .num-display.green{color:#2f9e44;}
 .num-display.amber{color:#f08c00;}
 /* Column color bands like the original */
@@ -133,6 +142,9 @@ select:focus,input:focus{border-color:var(--acc);}
 .bottom-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;}
 .sign-box{border:1px solid var(--bdr2);border-radius:var(--r);padding:12px 14px;background:#fafafa;}
 .sign-label{font-size:11px;color:var(--tx3);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;}
+
+.inline-input{border:none;border-bottom:1px dotted #ccc;font-size:13px;width:100%;color:#1D4ED8;outline:none;}
+.inline-input.red{color:#DC2626!important;font-weight:600;}
 
 /* =========================================
    TAB 2: Revenue Sheet — Google Sheet style
@@ -228,11 +240,38 @@ select:focus,input:focus{border-color:var(--acc);}
 .mnav{background:#fff;border:1px solid var(--bdr2);border-radius:var(--r);padding:5px 12px;cursor:pointer;color:var(--tx2);font-size:15px;}
 .mnav:hover{background:var(--sur2);}
 .mlbl{font-size:15px;font-weight:700;min-width:150px;text-align:center;color:var(--tx);}
+
+/* =========================================
+   IMPORT MODAL CSS
+   ========================================= */
+.import-modal{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:10000;display:flex;align-items:center;justify-content:center;}
+.import-box{background:#fff;border-radius:var(--rl);padding:24px;width:90%;max-width:600px;max-height:85vh;display:flex;flex-direction:column;}
+.import-title{font-size:18px;font-weight:700;margin-bottom:8px;}
+.import-sub{font-size:13px;color:var(--tx2);margin-bottom:16px;}
+#import-preview-area{flex:1;overflow-y:auto;border:1px solid var(--bdr);border-radius:var(--r);margin-bottom:16px;background:#f8f9fa;}
+.import-table{width:100%;border-collapse:collapse;font-size:13px;}
+.import-table th{background:#e9ecef;padding:8px;text-align:left;position:sticky;top:0;}
+.import-table td{padding:8px;border-bottom:1px solid var(--bdr);}
+.import-footer{display:flex;justify-content:flex-end;gap:10px;padding-top:16px;border-top:1px solid var(--bdr);}
+.matched{color:var(--grn);font-weight:600;}
+.unmatched{color:var(--amb);font-weight:600;}
+
+/* PRINT A4 แนวนอน เฉพาะส่วนของ Form (ซ่อน Dashboard) */
+@media print {
+  @page { size: A4 landscape; margin: 8mm; }
+  body { background: #fff; }
+  .sidebar, .ph, .kgrid, .crow, .no-print { display: none !important; }
+  .main { padding: 0; }
+  .panel { padding:0; border:none; box-shadow:none; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  .num-in:hover, .num-in:focus { background: transparent; }
+  input::placeholder, textarea::placeholder { color: transparent !important; }
+}
 </style>
 </head>
 <body>
 <div class="app">
-<div class="sidebar">
+<div class="sidebar no-print">
   <div class="slogo"><div class="brand">LALIZA CLINIC</div><div class="sub">Operations Portal</div></div>
   <nav class="nav">
     <div class="ni active" onclick="sw('t1',this)"><span class="ico">📋</span>Daily Ops Core<span class="nn">1</span></div>
@@ -245,34 +284,33 @@ select:focus,input:focus{border-color:var(--acc);}
 </div>
 <div class="main">
 
-<!-- ===== TAB 1: DAILY OPS CORE ===== -->
 <div id="t1" class="tp active">
-  <div class="ph">
+  <div class="ph no-print">
     <div><div class="ptitle">📋 Daily Ops Core — ใบสรุปยอดแคชเชียร์และบัตรเครดิต</div><div class="psub" id="t1dl"></div><div class="psub" style="color:#1971c2;font-weight:600;margin-top:2px;" id="t1-sync-note">ข้อมูลซิงค์มาจาก Revenue Sheet อัตโนมัติ</div></div>
     <div class="ha">
-      <input type="file" id="excel-import-input" accept=".xlsx,.xls,.csv" style="display:none;" onchange="importExcel(this)">
-      <button class="btn" style="background:#217346;color:#fff;border-color:#1a5c38;" onclick="document.getElementById('excel-import-input').click()">📥 Import Excel</button>
-      <button class="btn bg2" onclick="exportFormPNG()">📷 PNG</button><button class="btn bg2" onclick="exportFormPDF()">📄 PDF</button><span id="t1conn" style="font-size:12px;color:#2f9e44;font-weight:600;">● Connected</span></div>
+      <button class="btn bg2" onclick="exportFormPNG()">📷 PNG</button>
+      <button class="btn bg2" onclick="exportFormPDF()">📄 PDF</button>
+      <button class="btn bg2" onclick="window.print()">🖨️ Print Form</button>
+      <span id="t1conn" style="font-size:12px;color:#2f9e44;font-weight:600;">● Connected</span>
+    </div>
   </div>
   <div class="pc">
-    <!-- KPI Dashboard -->
-    <div class="kgrid">
+    <div class="kgrid no-print">
       <div class="kc"><div class="klbl">ยอดรวมวันนี้ (ทุกสาขา)</div><div class="kval g" id="ki-tot">฿0.00</div><div class="ksub" id="ki-bc">0 สาขาบันทึกแล้ว</div></div>
       <div class="kc"><div class="klbl">สาขายอดสูงสุด</div><div class="kval a" id="ki-tb">—</div><div class="ksub" id="ki-tv"></div></div>
       <div class="kc"><div class="klbl">ยอดโอน/สแกน KBANK</div><div class="kval" id="ki-tr">฿0.00</div></div>
       <div class="kc"><div class="klbl">สัดส่วนบัตรเครดิต</div><div class="kval am" id="ki-cr">0%</div><div class="ksub">จากยอดรวม</div></div>
     </div>
-    <div class="crow">
+    <div class="crow no-print">
       <div class="cc"><div class="ct">กราฟเปรียบเทียบรายรับ — ทุกสาขา</div><div style="position:relative;height:180px;"><canvas id="barC" role="img" aria-label="กราฟรายรับ"></canvas></div></div>
       <div class="cc"><div class="ct">ช่องทางชำระเงิน</div><div id="pieLeg" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:7px;font-size:11px;color:var(--tx2);"></div><div style="position:relative;height:140px;"><canvas id="pieC" role="img" aria-label="ช่องทางชำระ"></canvas></div></div>
     </div>
 
-    <!-- ฟอร์มเลือกสาขา/วันที่/แพทย์ -->
-    <div class="panel">
-      <div class="panel-title">ใบสรุปยอดแคชเชียร์และบัตรเครดิต
+    <div class="panel" id="printable-area">
+      <div class="panel-title no-print">ใบสรุปยอดแคชเชียร์และบัตรเครดิต
         <span style="font-size:12px;color:var(--tx3);font-weight:400;">Update 25-06-2024</span>
       </div>
-      <div class="fg fg4" style="margin-bottom:14px;">
+      <div class="fg fg4 no-print" style="margin-bottom:14px;">
         <div><div class="flbl">สาขา</div>
           <select id="fb" style="width:100%;" onchange="odc()">
             <option value="central_rama9">เซ็นทรัลพระราม 9</option><option value="pinklao">ปิ่นเกล้า</option>
@@ -285,7 +323,14 @@ select:focus,input:focus{border-color:var(--acc);}
         <div><div class="flbl">แพทย์คนที่ 2</div><select id="fd2" style="width:100%;"><option value="">— ถ้ามี —</option></select></div>
       </div>
 
-      <!-- ตารางหลัก — layout ตามใบสรุปต้นฉบับ -->
+      <div style="display:none;" class="print-only">
+        <h2 style="text-align:center; font-size:22px; font-weight:800; margin-bottom:15px;">ใบสรุปยอดแคชเชียร์และบัตรเครดิต</h2>
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:14px;">
+          <div>ประจำวันที่ <span style="border-bottom:1px dotted #000; padding:0 30px;" id="prt-date"></span></div>
+          <div>สาขา <span style="border-bottom:1px dotted #000; padding:0 30px;" id="prt-branch"></span></div>
+        </div>
+      </div>
+
       <div class="cf-wrap">
       <table class="cf-table">
         <thead>
@@ -293,7 +338,7 @@ select:focus,input:focus{border-color:var(--acc);}
             <th rowspan="2" style="width:20px;">ยอดหน้าร้าน</th>
             <th rowspan="2" style="width:110px;">Program</th>
             <th rowspan="2" style="width:120px;">จำนวนเงิน (บาท)</th>
-            <th rowspan="2" style="width:120px;">ยอดหักบัตร<br>(VIP+VOUCHER)</th>
+            <th rowspan="2" style="width:120px; color:#c92a2a;">ยอดหักบัตร<br>(VIP+VOUCHER)</th>
             <th colspan="2" style="background:#fff3e0;color:#e65100;">เครดิต</th>
             <th colspan="2" style="background:#e3f2fd;color:#0d47a1;">เงินสด / โอน / แอป</th>
           </tr>
@@ -305,118 +350,123 @@ select:focus,input:focus{border-color:var(--acc);}
           </tr>
         </thead>
         <tbody>
-          <tr><td class="section-header" colspan="8">◆ Programs หน้าร้าน</td></tr>
           <tr>
-            <td></td><td class="prog-name col-prog">Co2</td>
-            <td class="col-amount"><input type="number" class="num-in" id="p-co2" value="0" oninput="rc()"></td>
-            <td class="col-amount"><input type="number" class="num-in" id="v-co2" value="0" oninput="rc()"></td>
+            <td rowspan="14"></td><td class="prog-name col-prog">Co2</td>
+            <td class="col-amount"><input type="number" class="num-in" id="p-co2" value="0" oninput="rc()" placeholder="0"></td>
+            <td class="col-amount"><input type="number" class="num-in" style="color:#DC2626!important;" id="v-co2" value="0" oninput="rc()" placeholder="0"></td>
             <td class="col-credit-name">1. KBANK (กสิกร)</td>
-            <td class="col-credit-amt"><input type="number" class="num-in" id="c-kbank" value="0" oninput="rc()"></td>
+            <td class="col-credit-amt"><input type="number" class="num-in" id="c-kbank" value="0" oninput="rc()" placeholder="0"></td>
             <td class="col-app-name" style="background:#f0fff4;font-weight:600;color:#2f9e44;">เงินสด / โอน</td>
             <td class="col-cash"><span class="num-display green" id="t-cash">0.00</span></td>
           </tr>
           <tr>
-            <td></td><td class="prog-name col-prog">Pico</td>
-            <td class="col-amount"><input type="number" class="num-in" id="p-pico" value="0" oninput="rc()"></td>
-            <td class="col-amount"><input type="number" class="num-in" id="v-pico" value="0" oninput="rc()"></td>
+            <td class="prog-name col-prog">Pico</td>
+            <td class="col-amount"><input type="number" class="num-in" id="p-pico" value="0" oninput="rc()" placeholder="0"></td>
+            <td class="col-amount"><input type="number" class="num-in" style="color:#DC2626!important;" id="v-pico" value="0" oninput="rc()" placeholder="0"></td>
             <td class="col-credit-name">1.1 Credit (เครดิต)</td>
-            <td class="col-credit-amt"><input type="number" class="num-in" id="c-credit" value="0" oninput="rc()"></td>
+            <td class="col-credit-amt"><input type="number" class="num-in" id="c-credit" value="0" oninput="rc()" placeholder="0"></td>
             <td class="col-app-name" style="background:#fff8f0;">แอปพลิเคชัน</td>
             <td class="col-app-amt" style="background:#fff8f0;"></td>
           </tr>
           <tr>
-            <td></td><td class="prog-name col-prog">Vbeam</td>
-            <td class="col-amount"><input type="number" class="num-in" id="p-vbeam" value="0" oninput="rc()"></td>
-            <td class="col-amount"><input type="number" class="num-in" id="v-vbeam" value="0" oninput="rc()"></td>
+            <td class="prog-name col-prog">Vbeam</td>
+            <td class="col-amount"><input type="number" class="num-in" id="p-vbeam" value="0" oninput="rc()" placeholder="0"></td>
+            <td class="col-amount"><input type="number" class="num-in" style="color:#DC2626!important;" id="v-vbeam" value="0" oninput="rc()" placeholder="0"></td>
             <td class="col-credit-name">1.2 กสิกร (สแกน/โอน)</td>
-            <td class="col-credit-amt"><input type="number" class="num-in" id="c-kbsc" value="0" oninput="rc()"></td>
+            <td class="col-credit-amt"><input type="number" class="num-in" id="c-kbsc" value="0" oninput="rc()" placeholder="0"></td>
             <td class="col-app-name">HDMall สรุปรวม</td>
-            <td class="col-app-amt"><input type="number" class="num-in" id="a-hdmall" value="0" oninput="rc()"></td>
+            <td class="col-app-amt"><input type="number" class="num-in" id="a-hdmall" value="0" oninput="rc()" placeholder="0"></td>
           </tr>
           <tr>
-            <td></td><td class="prog-name col-prog">Elos</td>
-            <td class="col-amount"><input type="number" class="num-in" id="p-elos" value="0" oninput="rc()"></td>
-            <td class="col-amount"><input type="number" class="num-in" id="v-elos" value="0" oninput="rc()"></td>
+            <td class="prog-name col-prog">Elos</td>
+            <td class="col-amount"><input type="number" class="num-in" id="p-elos" value="0" oninput="rc()" placeholder="0"></td>
+            <td class="col-amount"><input type="number" class="num-in" style="color:#DC2626!important;" id="v-elos" value="0" oninput="rc()" placeholder="0"></td>
             <td class="col-credit-name">2. KTC (กรุงไทย)</td>
-            <td class="col-credit-amt"><input type="number" class="num-in" id="c-ktc" value="0" oninput="rc()"></td>
+            <td class="col-credit-amt"><input type="number" class="num-in" id="c-ktc" value="0" oninput="rc()" placeholder="0"></td>
             <td class="col-app-name">Gowabi สรุปรวม</td>
-            <td class="col-app-amt"><input type="number" class="num-in" id="a-gowabi" value="0" oninput="rc()"></td>
+            <td class="col-app-amt"><input type="number" class="num-in" id="a-gowabi" value="0" oninput="rc()" placeholder="0"></td>
           </tr>
           <tr>
-            <td></td><td class="prog-name col-prog">Botox</td>
-            <td class="col-amount"><input type="number" class="num-in" id="p-botox" value="0" oninput="rc()"></td>
-            <td class="col-amount"><input type="number" class="num-in" id="v-botox" value="0" oninput="rc()"></td>
+            <td class="prog-name col-prog">Botox</td>
+            <td class="col-amount"><input type="number" class="num-in" id="p-botox" value="0" oninput="rc()" placeholder="0"></td>
+            <td class="col-amount"><input type="number" class="num-in" style="color:#DC2626!important;" id="v-botox" value="0" oninput="rc()" placeholder="0"></td>
             <td class="col-credit-name">3. BAY (กรุงศรี)</td>
-            <td class="col-credit-amt"><input type="number" class="num-in" id="c-bay" value="0" oninput="rc()"></td>
+            <td class="col-credit-amt"><input type="number" class="num-in" id="c-bay" value="0" oninput="rc()" placeholder="0"></td>
             <td class="col-app-name">แอปอื่นๆ</td>
-            <td class="col-app-amt"><input type="number" class="num-in" id="a-other" value="0" oninput="rc()"></td>
+            <td class="col-app-amt"><input type="number" class="num-in" id="a-other" value="0" oninput="rc()" placeholder="0"></td>
           </tr>
           <tr>
-            <td></td><td class="prog-name col-prog">Filler</td>
-            <td class="col-amount"><input type="number" class="num-in" id="p-filler" value="0" oninput="rc()"></td>
-            <td class="col-amount"><input type="number" class="num-in" id="v-filler" value="0" oninput="rc()"></td>
+            <td class="prog-name col-prog">Filler</td>
+            <td class="col-amount"><input type="number" class="num-in" id="p-filler" value="0" oninput="rc()" placeholder="0"></td>
+            <td class="col-amount"><input type="number" class="num-in" style="color:#DC2626!important;" id="v-filler" value="0" oninput="rc()" placeholder="0"></td>
             <td class="col-credit-name">4. SCB (ไทยพาณิชย์)</td>
-            <td class="col-credit-amt"><input type="number" class="num-in" id="c-scb" value="0" oninput="rc()"></td>
+            <td class="col-credit-amt"><input type="number" class="num-in" id="c-scb" value="0" oninput="rc()" placeholder="0"></td>
             <td></td><td></td>
           </tr>
           <tr>
-            <td></td><td class="prog-name col-prog">Meso</td>
-            <td class="col-amount"><input type="number" class="num-in" id="p-meso" value="0" oninput="rc()"></td>
-            <td class="col-amount"><input type="number" class="num-in" id="v-meso" value="0" oninput="rc()"></td>
-            <td class="col-credit-name">อื่นๆ ระบุ</td>
-            <td class="col-credit-amt"><input type="number" class="num-in" id="c-other" value="0" oninput="rc()"></td>
+            <td class="prog-name col-prog">Meso</td>
+            <td class="col-amount"><input type="number" class="num-in" id="p-meso" value="0" oninput="rc()" placeholder="0"></td>
+            <td class="col-amount"><input type="number" class="num-in" style="color:#DC2626!important;" id="v-meso" value="0" oninput="rc()" placeholder="0"></td>
+            <td class="col-credit-name">อื่นๆ ระบุ <input type="text" class="inline-input" style="width:50px;"></td>
+            <td class="col-credit-amt"><input type="number" class="num-in" id="c-other" value="0" oninput="rc()" placeholder="0"></td>
             <td></td><td></td>
           </tr>
-          <tr><td></td><td class="prog-name col-prog">Thermage</td><td class="col-amount"><input type="number" class="num-in" id="p-thermage" value="0" oninput="rc()"></td><td class="col-amount"><input type="number" class="num-in" id="v-thermage" value="0" oninput="rc()"></td><td></td><td></td><td></td><td></td></tr>
-          <tr><td></td><td class="prog-name col-prog">Ulthera</td><td class="col-amount"><input type="number" class="num-in" id="p-ulthera" value="0" oninput="rc()"></td><td class="col-amount"><input type="number" class="num-in" id="v-ulthera" value="0" oninput="rc()"></td><td></td><td></td><td></td><td></td></tr>
-          <tr><td></td><td class="prog-name col-prog">Treatment</td><td class="col-amount"><input type="number" class="num-in" id="p-treatment" value="0" oninput="rc()"></td><td class="col-amount"><input type="number" class="num-in" id="v-treatment" value="0" oninput="rc()"></td><td></td><td></td><td></td><td></td></tr>
-          <tr><td></td><td class="prog-name col-prog">Drip Vitamin (Nures)</td><td class="col-amount"><input type="number" class="num-in" id="p-drip" value="0" oninput="rc()"></td><td class="col-amount"><input type="number" class="num-in" id="v-drip" value="0" oninput="rc()"></td><td></td><td></td><td></td><td></td></tr>
-          <tr><td></td><td class="prog-name col-prog">Product</td><td class="col-amount"><input type="number" class="num-in" id="p-product" value="0" oninput="rc()"></td><td class="col-amount"><input type="number" class="num-in" id="v-product" value="0" oninput="rc()"></td><td></td><td></td><td></td><td></td></tr>
-          <tr><td></td><td class="prog-name col-prog">หัตถการอื่นๆ</td><td class="col-amount"><input type="number" class="num-in" id="p-misc" value="0" oninput="rc()"></td><td class="col-amount"><input type="number" class="num-in" id="v-misc" value="0" oninput="rc()"></td><td></td><td></td><td style="font-size:12px;color:var(--tx3);">ยอดเงินโอน</td><td><span class="num-display" id="t-transfer">0.00</span></td></tr>
+          <tr><td class="prog-name col-prog">Thermage</td><td class="col-amount"><input type="number" class="num-in" id="p-thermage" value="0" oninput="rc()" placeholder="0"></td><td class="col-amount"><input type="number" class="num-in" style="color:#DC2626!important;" id="v-thermage" value="0" oninput="rc()" placeholder="0"></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td class="prog-name col-prog">Ulthera</td><td class="col-amount"><input type="number" class="num-in" id="p-ulthera" value="0" oninput="rc()" placeholder="0"></td><td class="col-amount"><input type="number" class="num-in" style="color:#DC2626!important;" id="v-ulthera" value="0" oninput="rc()" placeholder="0"></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td class="prog-name col-prog">Treatment</td><td class="col-amount"><input type="number" class="num-in" id="p-treatment" value="0" oninput="rc()" placeholder="0"></td><td class="col-amount"><input type="number" class="num-in" style="color:#DC2626!important;" id="v-treatment" value="0" oninput="rc()" placeholder="0"></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td class="prog-name col-prog">Drip Vitamin (Nures)</td><td class="col-amount"><input type="number" class="num-in" id="p-drip" value="0" oninput="rc()" placeholder="0"></td><td class="col-amount"><input type="number" class="num-in" style="color:#DC2626!important;" id="v-drip" value="0" oninput="rc()" placeholder="0"></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td class="prog-name col-prog">Product</td><td class="col-amount"><input type="number" class="num-in" id="p-product" value="0" oninput="rc()" placeholder="0"></td><td class="col-amount"><input type="number" class="num-in" style="color:#DC2626!important;" id="v-product" value="0" oninput="rc()" placeholder="0"></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td class="prog-name col-prog">ชาร์จ 3%</td><td class="col-amount"><input type="number" class="num-in" id="p-charge" value="0" oninput="rc()" placeholder="0"></td><td class="col-amount"><input type="number" class="num-in" style="color:#DC2626!important;" id="v-charge" value="0" oninput="rc()" placeholder="0"></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td class="prog-name col-prog">หัตถการอื่นๆ</td><td class="col-amount"><input type="number" class="num-in" id="p-misc" value="0" oninput="rc()" placeholder="0"></td><td class="col-amount"><input type="number" class="num-in" style="color:#DC2626!important;" id="v-misc" value="0" oninput="rc()" placeholder="0"></td><td></td><td></td><td style="font-size:12px;color:var(--tx3);font-weight:600;">ยอดเงินโอน</td><td><span class="num-display" id="t-transfer">0.00</span></td></tr>
           <tr class="total-row">
             <td colspan="2" style="text-align:center;">ยอดรวม</td>
             <td style="text-align:right;"><span class="num-display" id="t-prog">0.00</span></td>
             <td style="text-align:right;"><span class="num-display amber" id="t-vip">0.00</span></td>
             <td style="text-align:center;font-weight:700;">คะแนน (Point)</td>
-            <td></td>
-            <td style="text-align:center;font-size:12px;color:var(--tx3);">ยอดรวมเครดิต</td>
+            <td><input type="number" class="num-in" style="width:100%;text-align:center;" placeholder="0"></td>
+            <td style="text-align:center;font-size:12px;color:var(--tx3);font-weight:600;">ยอดรวมเครดิต</td>
             <td style="text-align:right;"><span class="num-display" id="t-crd">0.00</span></td>
           </tr>
           <tr class="payment-total-row">
             <td colspan="6" style="text-align:right;padding-right:16px;">ยอดชำระรวม (เงินสด+บัตร+แอป)</td>
-            <td colspan="2" style="text-align:right;font-size:16px;color:#2f9e44;"><span id="t-total">0.00</span> บาท</td>
+            <td colspan="2" style="text-align:right;font-size:18px;color:#2f9e44;"><span id="t-total">0.00</span> บาท</td>
           </tr>
         </tbody>
       </table>
       </div>
 
-      <!-- Bottom: bill range + cashier + manager -->
-      <div style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-        <div style="border:1px solid var(--bdr2);border-radius:var(--r);padding:12px;">
-          <div style="font-size:12px;font-weight:700;margin-bottom:8px;">ข้อมูลบิล</div>
-          <div class="fg fg2" style="gap:8px;">
-            <div><div class="flbl">เลขบิลเริ่มต้น</div><input type="text" id="fbs" style="width:100%;" placeholder="B0001"></div>
-            <div><div class="flbl">เลขบิลสิ้นสุด / รวม</div><input type="text" id="fbe" style="width:100%;" placeholder="B0050"></div>
-          </div>
-          <div style="margin-top:8px;"><div class="flbl">ยอดเงินขาด / เงินเกิน / สาเหตุ</div><input type="text" id="fshort" style="width:100%;" placeholder="ระบุถ้ามี..."></div>
-          <div style="margin-top:8px;"><div class="flbl">หมายเหตุ</div><input type="text" id="fn" style="width:100%;" placeholder="หมายเหตุเพิ่มเติม..."></div>
-        </div>
-        <div style="border:1px solid var(--bdr2);border-radius:var(--r);padding:12px;">
-          <div style="font-size:12px;font-weight:700;margin-bottom:8px;">ลายเซ็นรับรอง</div>
-          <div style="margin-bottom:10px;"><div class="flbl">แคชเชียร์ผู้ส่งยอด</div><select id="fc" style="width:100%;"><option value="">— เลือก —</option></select></div>
-          <div><div class="flbl">ผู้จัดการเซ็นรับรอง</div><select id="fm" style="width:100%;"><option value="">— เลือก —</option></select></div>
-        </div>
-      </div>
-      <button class="btn bs bfull" style="margin-top:14px;" onclick="sv1()">💾 บันทึกยอดลงคลาวด์ — กระจายทุกหน้าอัตโนมัติ</button>
+      <table class="footer-table" style="border:none; margin-top:10px;">
+        <tr>
+          <td colspan="2" style="border:none;">
+            เลขที่บิลเริ่ม <input type="text" id="fbs" class="inline-input" style="width:80px;" placeholder="B0001"> 
+            ถึง <input type="text" id="fbe" class="inline-input" style="width:80px;" placeholder="B0050">
+          </td>
+          <td style="border:none;">รวมบิลที่ใช้ <input type="number" id="fbc" class="inline-input" style="width:40px;text-align:center;"> บิล</td>
+          <td style="border:none;">แคชเชียร์ <select id="fc" class="inline-input" style="width:140px;"><option value="">— เลือก —</option></select></td>
+        </tr>
+        <tr>
+          <td width="20%" style="border:none;">ยอดเงินขาด<br><input type="number" id="fshort" class="inline-input" style="text-align:left; margin-top:5px;" placeholder="0"></td>
+          <td width="20%" style="border:none;">ยอดเงินเกิน<br><input type="number" id="fover" class="inline-input" style="text-align:left; margin-top:5px;" placeholder="0"></td>
+          <td width="30%" style="border:none;">สาเหตุ<br><input type="text" id="frsn" class="inline-input red" style="margin-top:5px;" placeholder="ระบุ..."></td>
+          <td width="30%" style="border:none;">ผู้จัดการ <select id="fm" class="inline-input" style="width:140px; margin-top:15px;"><option value="">— เลือก —</option></select></td>
+        </tr>
+        <tr>
+          <td colspan="4" style="border:none; padding-top:10px;">หมายเหตุ:<br><textarea id="fn" class="inline-input red" rows="2" placeholder="พิมพ์หมายเหตุเพิ่มเติม (สีแดง)..."></textarea></td>
+        </tr>
+      </table>
+
+      <button class="btn bs bfull no-print" style="margin-top:20px;" onclick="sv1()">💾 บันทึกยอดลงคลาวด์ — กระจายทุกหน้าอัตโนมัติ</button>
     </div>
   </div>
 </div>
 
-<!-- ===== TAB 2: REVENUE SHEET ===== -->
 <div id="t2" class="tp">
   <div class="ph">
     <div><div class="ptitle">📊 Revenue Sheet — ตารางสรุปรายรับประจำเดือน</div><div class="psub">กรอกข้อมูลที่นี่ก่อน — ข้อมูลจะไหลไปยัง Daily Ops Core อัตโนมัติ</div></div>
     <div class="ha">
+      <input type="file" id="excel-import-input" accept=".xlsx,.xls,.csv" style="display:none;" onchange="importExcel(this)">
+      <button class="btn" style="background:#217346;color:#fff;border-color:#1a5c38;" onclick="document.getElementById('excel-import-input').click()">📥 Import Excel</button>
+
       <div class="msel"><button class="mnav" onclick="cm(-1)">‹</button><div class="mlbl" id="rml">—</div><button class="mnav" onclick="cm(1)">›</button></div>
       <select id="rbs" style="width:155px;" onchange="lr()">
         <option value="central_rama9">เซ็นทรัลพระราม 9</option><option value="pinklao">ปิ่นเกล้า</option>
@@ -470,7 +520,6 @@ select:focus,input:focus{border-color:var(--acc);}
   </div>
 </div>
 
-<!-- ===== TAB 3: CONFIRM TRACKING ===== -->
 <div id="t3" class="tp">
   <div class="ph">
     <div><div class="ptitle">☎️ Confirm Tracking — รวมสถิติติดตามเคสทุกสาขา</div><div class="psub">กรอกข้อมูล CF ประจำวัน — เมื่อทุกสาขากรอกครบ ระบบจะแจ้งเตือน Export</div></div>
@@ -520,7 +569,6 @@ select:focus,input:focus{border-color:var(--acc);}
   </div>
 </div>
 
-<!-- ===== TAB 4: DOCTOR FINANCE ===== -->
 <div id="t4" class="tp">
   <div class="ph">
     <div><div class="ptitle">👨‍⚕️ Doctor Finance — รายได้แพทย์รายวัน</div><div class="psub">ดึงรายชื่อแพทย์จาก Firestore — บันทึกยอดขายและค่า DF</div></div>
@@ -564,7 +612,6 @@ select:focus,input:focus{border-color:var(--acc);}
       </table>
       </div>
     </div>
-    <!-- Add form -->
     <div class="panel" id="t4ap" style="display:none;">
       <div class="panel-title">เพิ่มรายการวันทำงาน</div>
       <div class="fg fg4" style="margin-bottom:10px;">
@@ -583,7 +630,6 @@ select:focus,input:focus{border-color:var(--acc);}
   </div>
 </div>
 
-<!-- ===== TAB 5: SETTINGS ===== -->
 <div id="t5" class="tp">
   <div class="ph"><div><div class="ptitle">⚙️ Custom Settings — จัดการข้อมูลหลักของระบบ</div></div></div>
   <div class="pc">
@@ -624,7 +670,7 @@ select:focus,input:focus{border-color:var(--acc);}
 </div>
 
 </div></div>
-<!-- IMPORT PREVIEW MODAL -->
+
 <div id="import-modal" class="import-modal" style="display:none;">
   <div class="import-box">
     <div class="import-title">📥 Import Excel / CSV</div>
@@ -637,7 +683,6 @@ select:focus,input:focus{border-color:var(--acc);}
   </div>
 </div>
 
-<!-- EXPORT POPUP -->
 <div id="epop" class="pov" style="display:none;">
   <div class="pbox">
     <div class="ptitle2">📤 ทุกสาขากรอกข้อมูลครบแล้ว!</div>
@@ -660,7 +705,7 @@ const BK={central_rama9:"เซ็นทรัลพระราม 9",pinklao:"
 const BKS=Object.keys(BK);
 const ThM=["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
 const TF=[{k:"cf_old",l:"CF-มา (เก่า)"},{k:"cf_new",l:"CF-มา (ใหม่)"},{k:"cf_postpone",l:"CF-ขอเลื่อน"},{k:"cf_walkin",l:"CF walk-in"},{k:"no_answer",l:"ไม่รับสาย/ปิดเครื่อง"},{k:"total_call",l:"โทร CF ทั้งหมด"},{k:"came_old",l:"มาจริง (เก่า)"},{k:"came_new",l:"มาจริง (ใหม่)"}];
-const PI=["co2","pico","vbeam","elos","botox","filler","meso","thermage","ulthera","treatment","drip","product","misc"];
+const PI=["co2","pico","vbeam","elos","botox","filler","meso","thermage","ulthera","treatment","drip","product","charge","misc"];
 const CI=["kbank","credit","kbsc","ktc","bay","scb","other"];
 function g(id){return document.getElementById(id);}
 function fm(n){return(parseFloat(n)||0).toLocaleString("th-TH",{minimumFractionDigits:2,maximumFractionDigits:2});}
@@ -679,6 +724,10 @@ function rc(){
 }
 function odc(){
   const date=g("fd").value,branch=g("fb").value;if(!date||!branch)return;
+  // Update Print header
+  g("prt-date").textContent = date;
+  g("prt-branch").textContent = BK[branch];
+
   DB.ref("daily_records/"+date+"/"+branch).once("value",snap=>{
     if(snap.exists()){
       const d=snap.val();
@@ -692,8 +741,12 @@ function odc(){
       if(d.a_gowabi!==undefined&&g("a-gowabi"))g("a-gowabi").value=d.a_gowabi;
       if(d.p_treatment!==undefined&&g("p-treatment"))g("p-treatment").value=d.p_treatment;
       rc();
-      // แสดง note ว่าข้อมูลมาจาก Revenue Sheet
       if(d.last_rev_update){const n=g("t1-sync-note");if(n)n.textContent="✓ ซิงค์จาก Revenue Sheet ล่าสุด: "+new Date(d.last_rev_update).toLocaleString("th-TH");}
+    } else {
+      // Clear data
+      document.querySelectorAll('.num-in, .cell-input').forEach(el=>el.value="0");
+      document.querySelectorAll('.inline-input').forEach(el=>el.value="");
+      rc();
     }
   });
   ldash(date);
@@ -733,7 +786,6 @@ function lr(){
   g("rsh").textContent="ลาลิซ่าคลินิก สาขา"+BK[branch];
   const dim=new Date(rY,rM+1,0).getDate();
   const today=new Date();const td=rY+"-"+String(rM+1).padStart(2,"0")+"-"+String(today.getDate()).padStart(2,"0");
-  // Map: rev column key -> firebase key (for sync to Daily Ops Core)
   const REV_COLS=[
     {k:"rev_total",    lbl:"รายได้รวม",    fb:"total_prog"},
     {k:"rev_hathakon", lbl:"หัตถการ",       fb:"p_misc"},
@@ -752,17 +804,13 @@ function lr(){
       const ds=rY+"-"+String(rM+1).padStart(2,"0")+"-"+String(day).padStart(2,"0");
       const thD=day+" "+["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."][rM]+" "+(rY+543);
       const d=all[ds]?.[branch]||{};
-      // get saved rev_ values if exist, else derive from daily_records
       const rv={};
-      REV_COLS.forEach(c=>{
-        rv[c.k]=d["rev_"+c.k]!==undefined ? d["rev_"+c.k] : (c.fb&&d[c.fb]?d[c.fb]:0);
-      });
+      REV_COLS.forEach(c=>{rv[c.k]=d["rev_"+c.k]!==undefined?d["rev_"+c.k]:(c.fb&&d[c.fb]?d[c.fb]:0);});
       const t=rv.rev_total||d.total_prog||0;
-      // net = total - drug - charge - member - staff + deposit (simplified)
       const net=t;
       gt+=t;
       const hd=t>0,isTd=ds===td,rc2=isTd?" td-today":"",nc=hd?" td-has":" td-zero";
-      const inp=(key,val)=>`<input type="number" class="rev-cell-input" data-date="${ds}" data-branch="${branch}" data-key="${key}" value="${val||0}" oninput="onRevInput(this)">`;
+      const inp=(key,val)=>`<input type="number" class="rev-cell-input" data-date="${ds}" data-branch="${branch}" data-key="${key}" value="${val||0}" oninput="onRevInput(this)" style="border:none;background:transparent;text-align:right;width:100%;">`;
       tb.innerHTML+=`<tr><td class="td-branch${rc2}">${thD}</td>${REV_COLS.map(c=>`<td class="${hd?"td-has":""}">${inp(c.k, rv[c.k]||0)}</td>`).join("")}<td class="${nc.trim()}" id="net-${ds}">${hd?fm(net):"—"}</td></tr>`;
     }
     g("rtf").innerHTML=`<tr class="td-total"><td>Total</td><td colspan="${REV_COLS.length}"></td><td id="rev-grand-total">${fm(gt)}</td></tr>`;
@@ -772,12 +820,9 @@ function lr(){
     g("rs1").textContent=fm(gt);g("rs2").textContent=pct.toFixed(2)+"%";g("rs3").textContent=need>0?fm(need):fm(0);g("rs4").textContent=dl+" วัน";g("rs5").textContent=dl>0&&need>0?fm(need/dl):"—";
   });
 }
-
-// เมื่อพนักงานกรอกใน Revenue Sheet — save + sync ไป Daily Ops Core
 let revTimer={};
 function onRevInput(el){
   const date=el.dataset.date,branch=el.dataset.branch,key=el.dataset.key,val=parseFloat(el.value)||0;
-  // recalc net for this row
   const row=el.closest("tr");
   if(row){
     const inputs=row.querySelectorAll(".rev-cell-input");
@@ -785,74 +830,41 @@ function onRevInput(el){
     const netCell=g("net-"+date);if(netCell)netCell.textContent=rowTotal>0?fm(rowTotal):"—";
   }
   recalcRevTotals();
-  // debounce save
   clearTimeout(revTimer[date]);
   revTimer[date]=setTimeout(()=>saveRevRow(date,branch,row),800);
 }
-
 function recalcRevTotals(){
   let grand=0;
   document.querySelectorAll(".rev-cell-input[data-key='rev_total']").forEach(i=>{grand+=parseFloat(i.value)||0;});
   const gtEl=g("rev-grand-total");if(gtEl)gtEl.textContent=fm(grand);
-  // update KPI
   const branch=g("rbs").value,mt=tgM[branch]||0;
   g("rkt").textContent="฿"+fm(grand);
   if(mt>0){g("rkp").textContent=(grand/mt*100).toFixed(2)+"%";}
   g("rs1").textContent=fm(grand);if(mt>0)g("rs2").textContent=(grand/mt*100).toFixed(2)+"%";
 }
-
 async function saveRevRow(date,branch,row){
   if(!date||!branch)return;
   const payload={};
-  if(row){
-    row.querySelectorAll(".rev-cell-input").forEach(i=>{payload["rev_"+i.dataset.key]=parseFloat(i.value)||0;});
-  }
-  // Map ที่ match กัน → ไหลไป Daily Ops Core fields
-  const MAP={
-    rev_rev_total:"total_prog",
-    rev_rev_hdmall:"a_hdmall",
-    rev_rev_gowabi:"a_gowabi",
-    rev_rev_treatment:"p_treatment",
-  };
+  if(row){row.querySelectorAll(".rev-cell-input").forEach(i=>{payload["rev_"+i.dataset.key]=parseFloat(i.value)||0;});}
+  const MAP={rev_rev_total:"total_prog",rev_rev_hdmall:"a_hdmall",rev_rev_gowabi:"a_gowabi",rev_rev_treatment:"p_treatment"};
   const syncPayload={};
   Object.keys(MAP).forEach(rk=>{if(payload[rk]!==undefined)syncPayload[MAP[rk]]=payload[rk];});
   try{
-    // บันทึก rev_ fields ลง Firebase (merge กับ daily_records)
     await DB.ref("daily_records/"+date+"/"+branch).update({...payload,...syncPayload,last_rev_update:new Date().toISOString()});
-    // ถ้า tab1 เปิดอยู่และวันที่/สาขาตรงกัน → อัปเดต form
-    const t1date=g("fd")?.value,t1branch=g("fb")?.value;
-    if(t1date===date&&t1branch===branch){
-      if(syncPayload.total_prog&&g("p-co2")){}// reload form
-      syncDailyFormFromRev(date,branch,syncPayload);
-    }
-    // toast เบาๆ
     showRevSaved(date);
   }catch(e){console.error(e);}
 }
-
 function showRevSaved(date){
   const el=document.createElement("div");
   el.style.cssText="position:fixed;bottom:16px;right:16px;background:#2f9e44;color:#fff;padding:8px 14px;border-radius:6px;font-size:12px;z-index:9999;";
   el.textContent="✓ บันทึก "+date+" แล้ว — ไหลไป Daily Ops Core";
   document.body.appendChild(el);setTimeout(()=>el.remove(),2500);
 }
-
-function syncDailyFormFromRev(date,branch,data){
-  // sync fields ที่ match
-  if(data.a_hdmall!==undefined&&g("a-hdmall"))g("a-hdmall").value=data.a_hdmall;
-  if(data.a_gowabi!==undefined&&g("a-gowabi"))g("a-gowabi").value=data.a_gowabi;
-  if(data.p_treatment!==undefined&&g("p-treatment"))g("p-treatment").value=data.p_treatment;
-  if(data.total_prog!==undefined){
-    // กระจายไป total display
-  }
-  rc();
-}
-
-// export ฟอร์มใบสรุปยอด (tab1)
 function exportFormPNG(){
-  const panel=document.querySelector("#t1 .panel");
-  if(!panel){toast("ไม่พบฟอร์ม","error");return;}
-  html2canvas(panel,{backgroundColor:"#ffffff",scale:2,useCORS:true}).then(c=>{
+  // Before exporting, set display for print header
+  const pa = g("printable-area");
+  if(!pa){toast("ไม่พบฟอร์ม","error");return;}
+  html2canvas(pa,{backgroundColor:"#ffffff",scale:2,useCORS:true}).then(c=>{
     const a=document.createElement("a");
     const branch=g("fb").value,date=g("fd").value;
     a.download="cashier_form_"+branch+"_"+date+".png";
@@ -860,21 +872,20 @@ function exportFormPNG(){
   });
 }
 function exportFormPDF(){
-  const panel=document.querySelector("#t1 .panel");
-  if(!panel){toast("ไม่พบฟอร์ม","error");return;}
-  html2canvas(panel,{backgroundColor:"#ffffff",scale:2,useCORS:true}).then(c=>{
+  const pa = g("printable-area");
+  if(!pa){toast("ไม่พบฟอร์ม","error");return;}
+  html2canvas(pa,{backgroundColor:"#ffffff",scale:2,useCORS:true}).then(c=>{
     const {jsPDF}=window.jspdf;
-    const pdf=new jsPDF("p","mm","a4");
-    const iw=pdf.internal.pageSize.getWidth()-20;
+    const pdf=new jsPDF("l","mm","a4"); // Landscape
+    const iw=pdf.internal.pageSize.getWidth();
     const ih=(c.height/c.width)*iw;
-    pdf.addImage(c.toDataURL("image/jpeg",0.95),"JPEG",10,10,iw,ih);
+    pdf.addImage(c.toDataURL("image/jpeg",1.0),"JPEG",0,0,iw,ih);
     const branch=g("fb").value,date=g("fd").value;
     pdf.save("cashier_form_"+branch+"_"+date+".pdf");
   });
 }
 function xPNG(){html2canvas(g("revPanel"),{backgroundColor:"#ffffff",scale:2}).then(c=>{const a=document.createElement("a");a.download="revenue_"+rY+"_"+(rM+1)+".png";a.href=c.toDataURL();a.click();});}
 function xPDF(){html2canvas(g("revPanel"),{backgroundColor:"#ffffff",scale:2}).then(c=>{const {jsPDF}=window.jspdf;const pdf=new jsPDF("l","mm","a4");const iw=pdf.internal.pageSize.getWidth();const ih=pdf.internal.pageSize.getHeight();pdf.addImage(c.toDataURL(),"PNG",0,0,iw,ih);pdf.save("revenue_"+rY+"_"+(rM+1)+".pdf");});}
-// TAB 3
 function bldTG(){
   const tb=g("t3sb");if(!tb)return;tb.innerHTML="";
   const tf=g("t3tf");if(tf)tf.innerHTML="";
@@ -898,7 +909,6 @@ function updTS(){
     const co=d.cf_old||0,cn=d.cf_new||0,cpo=d.cf_postpone||0,cw=d.cf_walkin||0,no=d.no_answer||0,tc=d.total_call||0,go=d.came_old||0,gn=d.came_new||0;
     TF.forEach(f=>totals[f.k]=(totals[f.k]||0)+(d[f.k]||0));
     const hd=TF.some(f=>(d[f.k]||0)>0);if(hd)dc++;cf+=co+cn;pp+=cpo;na+=no;
-    // update row
     const row=g("tf-"+bk+"-cf_old")?.closest("tr");
     if(row){const last=row.cells[9];if(last)last.textContent=go+gn;}
     const dot=row?.querySelector(".branch-done-dot");if(dot)dot.classList.toggle("done",hd);
@@ -921,7 +931,6 @@ function cet(){
 }
 function xTrPNG(){g("epop").style.display="none";html2canvas(g("t3"),{backgroundColor:"#f0f2f5",scale:2}).then(c=>{const a=document.createElement("a");a.download="tracking_"+(g("t3d").value||"today")+".png";a.href=c.toDataURL();a.click();});}
 function xTrPDF(){g("epop").style.display="none";html2canvas(g("t3"),{backgroundColor:"#f0f2f5",scale:2}).then(c=>{const {jsPDF}=window.jspdf;const pdf=new jsPDF("l","mm","a4");const iw=pdf.internal.pageSize.getWidth();pdf.addImage(c.toDataURL(),"PNG",0,0,iw,iw*c.height/c.width);pdf.save("tracking_"+(g("t3d").value||"today")+".pdf");});}
-// TAB 4
 function ldf(){
   const branch=g("t4b").value,month=g("t4m").value;if(!month)return;
   const [yr,mo]=month.split("-"),prefix=yr+"-"+mo;
@@ -941,7 +950,6 @@ async function saveDR(){
   const p={doctor:doc,work_date:date,branch,time_in:g("t4ti").value,time_out:g("t4to").value,sales:parseFloat(g("t4sl").value)||0,df:parseFloat(g("t4df2").value)||0,note:g("t4nt").value,timestamp:new Date().toISOString()};
   try{await DB.ref("doctor_records").push(p);toast("บันทึกข้อมูลแพทย์สำเร็จ");g("t4ap").style.display="none";ldf();}catch(e){toast("Error: "+e.message,"error");}
 }
-// TAB 5
 function rndList(cid,bid,arr,delFn){const c=g(cid);if(!c)return;c.innerHTML=arr.map((x,i)=>`<div class="li">${x}<button class="lid" onclick="${delFn}(${i})">×</button></div>`).join("");g(bid).textContent=arr.length+" คน";}
 function rnd5(){
   rndList("dl","dcb",docL,"delDoc");rndList("cl","ccb",caL,"delCa");rndList("ml2","mcb",mgL,"delMg");
@@ -969,154 +977,53 @@ function init(){
   DB.ref("system_settings").on("value",snap=>{if(snap.exists()){const d=snap.val();docL=d.doctors||[];caL=d.cashiers||[];mgL=d.managers||[];tgM=d.targets||tgM;rDS();rSS();}});
   FS.collection("doctors").get().then(snapshot=>{const fd=[];snapshot.forEach(doc=>{if(doc.data().name)fd.push(doc.data().name);});if(fd.length>0){docL=[...new Set([...docL,...fd])];rDS();}}).catch(()=>{});
   bldTG();ldash(today);g("rml").textContent=ThM[rM]+" "+(rY+543);
-  // Live listener: Revenue Sheet → Daily Ops Core realtime sync
-  DB.ref("daily_records/"+today).on("value",snap=>{
-    if(!snap.exists())return;
-    const branch=g("fb")?.value;
-    if(!branch)return;
-    const d=snap.child(branch).val();
-    if(!d||!d.last_rev_update)return;
-    // ถ้า user ไม่ได้กำลังพิมพ์อยู่ ให้ sync
-    if(d.a_hdmall!==undefined&&g("a-hdmall")&&document.activeElement!==g("a-hdmall"))g("a-hdmall").value=d.a_hdmall;
-    if(d.a_gowabi!==undefined&&g("a-gowabi")&&document.activeElement!==g("a-gowabi"))g("a-gowabi").value=d.a_gowabi;
-    if(d.p_treatment!==undefined&&g("p-treatment")&&document.activeElement!==g("p-treatment"))g("p-treatment").value=d.p_treatment;
-    rc();
-  });
+  odc(); // Load form for today
 }
 
-// ============================================================
-// IMPORT EXCEL / CSV → Auto-fill Daily Ops Core form
-// ============================================================
-
-// Mapping: ชื่อคอลัมน์ใน Excel (lowercase, trimmed) → field ID ในฟอร์ม
+// IMPORT EXCEL LOGIC
 const EXCEL_MAP = {
-  // Programs
-  "co2":          "p-co2",
-  "pico":         "p-pico",
-  "vbeam":        "p-vbeam",
-  "elos":         "p-elos",
-  "botox":        "p-botox",
-  "filler":       "p-filler",
-  "meso":         "p-meso",
-  "thermage":     "p-thermage",
-  "ulthera":      "p-ulthera",
-  "treatment":    "p-treatment",
-  "drip vitamin": "p-drip",
-  "drip":         "p-drip",
-  "product":      "p-product",
-  "หัตถการอื่นๆ": "p-misc",
-  "misc":         "p-misc",
-  // VIP/Voucher
-  "vip co2":      "v-co2",
-  "vip pico":     "v-pico",
-  "vip vbeam":    "v-vbeam",
-  "vip elos":     "v-elos",
-  "vip botox":    "v-botox",
-  "vip filler":   "v-filler",
-  "vip meso":     "v-meso",
-  "vip thermage": "v-thermage",
-  "vip ulthera":  "v-ulthera",
-  "vip treatment":"v-treatment",
-  "vip drip":     "v-drip",
-  "vip product":  "v-product",
-  "voucher co2":  "v-co2",
-  // Credit cards
-  "kbank":        "c-kbank",
-  "กสิกร":        "c-kbank",
-  "1. kbank":     "c-kbank",
-  "credit":       "c-credit",
-  "เครดิต":       "c-credit",
-  "1.1 credit":   "c-credit",
-  "kbank scan":   "c-kbsc",
-  "kbank โอน":    "c-kbsc",
-  "สแกน":         "c-kbsc",
-  "1.2 กสิกร":    "c-kbsc",
-  "ktc":          "c-ktc",
-  "กรุงไทย":      "c-ktc",
-  "2.ktc":        "c-ktc",
-  "bay":          "c-bay",
-  "กรุงศรี":      "c-bay",
-  "3.bay":        "c-bay",
-  "scb":          "c-scb",
-  "ไทยพาณิชย์":   "c-scb",
-  "4. scb":       "c-scb",
-  "อื่นๆ":        "c-other",
-  "other":        "c-other",
-  // Apps
-  "hdmall":       "a-hdmall",
-  "hd mall":      "a-hdmall",
-  "gowabi":       "a-gowabi",
-  "app อื่นๆ":    "a-other",
-  // Info
-  "สาขา":         "__branch",
-  "วันที่":       "__date",
-  "แพทย์":        "__doctor1",
-  "doctor":       "__doctor1",
-  "แคชเชียร์":    "__cashier",
-  "cashier":      "__cashier",
-  "ผู้จัดการ":    "__manager",
-  "manager":      "__manager",
-  "บิลเริ่ม":     "__bill_start",
-  "บิลสิ้นสุด":   "__bill_end",
-  "หมายเหตุ":     "__note",
+  "co2": "p-co2", "pico": "p-pico", "vbeam": "p-vbeam", "elos": "p-elos", "botox": "p-botox", "filler": "p-filler", "meso": "p-meso", "thermage": "p-thermage", "ulthera": "p-ulthera", "treatment": "p-treatment", "drip vitamin": "p-drip", "drip": "p-drip", "product": "p-product", "หัตถการอื่นๆ": "p-misc", "misc": "p-misc",
+  "vip co2": "v-co2", "vip pico": "v-pico", "vip vbeam": "v-vbeam", "vip elos": "v-elos", "vip botox": "v-botox", "vip filler": "v-filler", "vip meso": "v-meso", "vip thermage": "v-thermage", "vip ulthera": "v-ulthera", "vip treatment":"v-treatment", "vip drip": "v-drip", "vip product": "v-product", "voucher co2": "v-co2",
+  "kbank": "c-kbank", "กสิกร": "c-kbank", "1. kbank": "c-kbank", "credit": "c-credit", "เครดิต": "c-credit", "1.1 credit": "c-credit", "kbank scan": "c-kbsc", "kbank โอน": "c-kbsc", "สแกน": "c-kbsc", "1.2 กสิกร": "c-kbsc", "ktc": "c-ktc", "กรุงไทย": "c-ktc", "2.ktc": "c-ktc", "bay": "c-bay", "กรุงศรี": "c-bay", "3.bay": "c-bay", "scb": "c-scb", "ไทยพาณิชย์": "c-scb", "4. scb": "c-scb", "อื่นๆ": "c-other", "other": "c-other",
+  "hdmall": "a-hdmall", "hd mall": "a-hdmall", "gowabi": "a-gowabi", "app อื่นๆ": "a-other",
+  "สาขา": "__branch", "วันที่": "__date", "แพทย์": "__doctor1", "doctor": "__doctor1", "แคชเชียร์": "__cashier", "cashier": "__cashier", "ผู้จัดการ": "__manager", "manager": "__manager", "บิลเริ่ม": "__bill_start", "บิลสิ้นสุด": "__bill_end", "หมายเหตุ": "__note"
 };
 
-let pendingImportData = null; // เก็บ data ก่อน confirm
+let pendingImportData = null;
 
 function importExcel(input) {
   const file = input.files[0];
   if (!file) return;
-  input.value = ""; // reset เพื่อ upload ซ้ำได้
+  input.value = "";
   const reader = new FileReader();
   reader.onload = function(e) {
     try {
       let rows = [];
       if (file.name.endsWith('.csv')) {
-        // CSV: parse manually
         const text = new TextDecoder('utf-8').decode(new Uint8Array(e.target.result));
         rows = parseCSV(text);
       } else {
-        // XLSX
         const wb = XLSX.read(new Uint8Array(e.target.result), {type:'array'});
         const ws = wb.Sheets[wb.SheetNames[0]];
         rows = XLSX.utils.sheet_to_json(ws, {header:1, defval:""});
       }
       processImportRows(rows, file.name);
-    } catch(err) {
-      toast("❌ อ่านไฟล์ไม่สำเร็จ: " + err.message, "error");
-    }
+    } catch(err) { toast("❌ อ่านไฟล์ไม่สำเร็จ: " + err.message, "error"); }
   };
   reader.readAsArrayBuffer(file);
 }
 
-function parseCSV(text) {
-  return text.split(/\r?\n/).map(line => line.split(',').map(v => v.trim().replace(/^"|"$/g,'')));
-}
+function parseCSV(text) { return text.split(/\r?\n/).map(line => line.split(',').map(v => v.trim().replace(/^"|"$/g,''))); }
 
 function processImportRows(rows, filename) {
   if (!rows || rows.length < 2) { toast("ไฟล์ไม่มีข้อมูล", "error"); return; }
-
-  // หา header row (แถวแรกที่มีข้อความ)
   let headerRow = -1;
-  for (let i = 0; i < Math.min(rows.length, 5); i++) {
-    if (rows[i].some(v => String(v).trim().length > 0)) { headerRow = i; break; }
-  }
+  for (let i = 0; i < Math.min(rows.length, 5); i++) { if (rows[i].some(v => String(v).trim().length > 0)) { headerRow = i; break; } }
   if (headerRow < 0) { toast("ไม่พบ header", "error"); return; }
-
   const headers = rows[headerRow].map(h => String(h).trim().toLowerCase());
-
-  // รูปแบบ 1: แนวนอน (header อยู่บน, ค่าอยู่ล่าง)
-  // รูปแบบ 2: แนวตั้ง (col0=label, col1=value) ← แบบใบสรุปยอด
   let mapped = {};
-
-  const isVertical = rows.length > 5 && headers[0] !== "" &&
-    (String(rows[headerRow][0]).includes("co2") ||
-     String(rows[headerRow][0]).includes("program") ||
-     String(rows[headerRow][0]).toLowerCase().includes("program") ||
-     rows.length > 10);
-
+  const isVertical = rows.length > 5 && headers[0] !== "" && (String(rows[headerRow][0]).includes("co2") || String(rows[headerRow][0]).includes("program") || String(rows[headerRow][0]).toLowerCase().includes("program") || rows.length > 10);
   if (isVertical || (headers.length <= 3)) {
-    // แนวตั้ง: แต่ละแถวคือ [label, value] หรือ [label, vip, credit, ...]
     for (let i = headerRow; i < rows.length; i++) {
       const row = rows[i];
       if (!row || row.length === 0) continue;
@@ -1124,24 +1031,17 @@ function processImportRows(rows, filename) {
       const val1  = parseFloat(String(row[1]).replace(/,/g,'')) || 0;
       const val2  = row[2] !== undefined ? parseFloat(String(row[2]).replace(/,/g,'')) || 0 : null;
       if (!label) continue;
-
-      // ลอง match ทุก key ใน EXCEL_MAP
       for (const [key, fieldId] of Object.entries(EXCEL_MAP)) {
         if (label.includes(key.toLowerCase()) || key.toLowerCase().includes(label)) {
           if (val1 !== 0 || val2 !== null) {
             mapped[fieldId] = val1;
-            // ถ้ามี col2 ลอง map vip
-            if (val2 !== null && val2 !== 0) {
-              const vipId = fieldId.replace('p-', 'v-');
-              if (g(vipId)) mapped[vipId] = val2;
-            }
+            if (val2 !== null && val2 !== 0) { const vipId = fieldId.replace('p-', 'v-'); if (g(vipId)) mapped[vipId] = val2; }
           }
           break;
         }
       }
     }
   } else {
-    // แนวนอน: header row บน, data row ล่าง
     const dataRow = rows[headerRow + 1] || [];
     headers.forEach((h, i) => {
       for (const [key, fieldId] of Object.entries(EXCEL_MAP)) {
@@ -1153,28 +1053,13 @@ function processImportRows(rows, filename) {
       }
     });
   }
-
   pendingImportData = mapped;
   showImportPreview(filename, mapped);
 }
 
 function showImportPreview(filename, mapped) {
   g("import-filename").textContent = "ไฟล์: " + filename + " — พบข้อมูล " + Object.keys(mapped).filter(k=>!k.startsWith("__")).length + " ช่อง";
-
-  const FIELD_LABELS = {
-    "p-co2":"Co2","p-pico":"Pico","p-vbeam":"Vbeam","p-elos":"Elos","p-botox":"Botox",
-    "p-filler":"Filler","p-meso":"Meso","p-thermage":"Thermage","p-ulthera":"Ulthera",
-    "p-treatment":"Treatment","p-drip":"Drip Vitamin","p-product":"Product","p-misc":"หัตถการอื่นๆ",
-    "v-co2":"VIP Co2","v-pico":"VIP Pico","v-vbeam":"VIP Vbeam","v-elos":"VIP Elos","v-botox":"VIP Botox",
-    "v-filler":"VIP Filler","v-meso":"VIP Meso","v-thermage":"VIP Thermage","v-ulthera":"VIP Ulthera",
-    "v-treatment":"VIP Treatment","v-drip":"VIP Drip","v-product":"VIP Product","v-misc":"VIP misc",
-    "c-kbank":"KBANK","c-credit":"Credit","c-kbsc":"KBANK สแกน/โอน","c-ktc":"KTC","c-bay":"BAY","c-scb":"SCB","c-other":"เครดิตอื่นๆ",
-    "a-hdmall":"HDMall","a-gowabi":"Gowabi","a-other":"แอปอื่นๆ",
-    "__branch":"สาขา","__date":"วันที่","__doctor1":"แพทย์","__cashier":"แคชเชียร์","__manager":"ผู้จัดการ",
-    "__bill_start":"เลขบิลเริ่ม","__bill_end":"เลขบิลสิ้นสุด","__note":"หมายเหตุ",
-  };
-
-  // แสดงเฉพาะที่ match และมีค่า
+  const FIELD_LABELS = { "p-co2":"Co2","p-pico":"Pico","p-vbeam":"Vbeam","p-elos":"Elos","p-botox":"Botox", "p-filler":"Filler","p-meso":"Meso","p-thermage":"Thermage","p-ulthera":"Ulthera", "p-treatment":"Treatment","p-drip":"Drip Vitamin","p-product":"Product","p-misc":"หัตถการอื่นๆ", "v-co2":"VIP Co2","v-pico":"VIP Pico","v-vbeam":"VIP Vbeam","v-elos":"VIP Elos","v-botox":"VIP Botox", "v-filler":"VIP Filler","v-meso":"VIP Meso","v-thermage":"VIP Thermage","v-ulthera":"VIP Ulthera", "v-treatment":"VIP Treatment","v-drip":"VIP Drip","v-product":"VIP Product","v-misc":"VIP misc", "c-kbank":"KBANK","c-credit":"Credit","c-kbsc":"KBANK สแกน/โอน","c-ktc":"KTC","c-bay":"BAY","c-scb":"SCB","c-other":"เครดิตอื่นๆ", "a-hdmall":"HDMall","a-gowabi":"Gowabi","a-other":"แอปอื่นๆ", "__branch":"สาขา","__date":"วันที่","__doctor1":"แพทย์","__cashier":"แคชเชียร์","__manager":"ผู้จัดการ", "__bill_start":"เลขบิลเริ่ม","__bill_end":"เลขบิลสิ้นสุด","__note":"หมายเหตุ" };
   const entries = Object.entries(mapped).filter(([k,v]) => v !== 0 && v !== "");
   let html2 = "";
   if (entries.length === 0) {
@@ -1195,29 +1080,19 @@ function showImportPreview(filename, mapped) {
   g("import-modal").style.display = "flex";
 }
 
-function closeImportModal() {
-  g("import-modal").style.display = "none";
-  pendingImportData = null;
-}
+function closeImportModal() { g("import-modal").style.display = "none"; pendingImportData = null; }
 
 function confirmImport() {
   if (!pendingImportData) return;
   const data = pendingImportData;
   let filled = 0;
-
-  // Fill numeric fields
-  const numFields = ["p-co2","p-pico","p-vbeam","p-elos","p-botox","p-filler","p-meso","p-thermage","p-ulthera","p-treatment","p-drip","p-product","p-misc",
-    "v-co2","v-pico","v-vbeam","v-elos","v-botox","v-filler","v-meso","v-thermage","v-ulthera","v-treatment","v-drip","v-product","v-misc",
-    "c-kbank","c-credit","c-kbsc","c-ktc","c-bay","c-scb","c-other","a-hdmall","a-gowabi","a-other"];
-
+  const numFields = ["p-co2","p-pico","p-vbeam","p-elos","p-botox","p-filler","p-meso","p-thermage","p-ulthera","p-treatment","p-drip","p-product","p-misc", "v-co2","v-pico","v-vbeam","v-elos","v-botox","v-filler","v-meso","v-thermage","v-ulthera","v-treatment","v-drip","v-product","v-misc", "c-kbank","c-credit","c-kbsc","c-ktc","c-bay","c-scb","c-other","a-hdmall","a-gowabi","a-other"];
   numFields.forEach(fieldId => {
     if (data[fieldId] !== undefined && data[fieldId] !== 0) {
       const el2 = g(fieldId);
       if (el2) { el2.value = data[fieldId]; filled++; el2.style.background="#fffde7"; el2.style.fontWeight="600"; }
     }
   });
-
-  // Fill meta fields
   if (data["__branch"] && g("fb")) g("fb").value = data["__branch"];
   if (data["__date"]   && g("fd")) g("fd").value = data["__date"];
   if (data["__doctor1"]&& g("fd1"))g("fd1").value= data["__doctor1"];
@@ -1227,13 +1102,14 @@ function confirmImport() {
   if (data["__bill_end"]  &&g("fbe"))g("fbe").value=data["__bill_end"];
   if (data["__note"]      &&g("fn")) g("fn").value =data["__note"];
 
-  // Trigger recalc
-  rc();
+  // เปลี่ยน tab ไปยังหน้า 1 หากไม่ได้อยู่ เพื่อให้เห็นการอัพเดท
+  if(!g('t1').classList.contains('active')) {
+    sw('t1', document.querySelector('.ni')); // switch back to tab 1 visually
+  }
 
+  rc();
   closeImportModal();
   toast("✅ Import สำเร็จ! หยอดข้อมูล "+filled+" ช่อง — คำนวณยอดรวมเรียบร้อย");
-
-  // Highlight effect: flash ทุก input ที่ถูกเติม
   numFields.forEach(fieldId => {
     if (data[fieldId] !== undefined && data[fieldId] !== 0) {
       const el2 = g(fieldId);
