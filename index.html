@@ -86,7 +86,7 @@ select:disabled{background:#e9ecef;cursor:not-allowed;font-weight:bold;color:var
 .rev-tbl td:first-child{text-align:center;font-weight:600;background:#f3f4f6;position:sticky;left:0;z-index:1;box-shadow:1px 0 0 #ccc;}
 
 .bg-date{background:#f3f4f6;} .bg-total{background:#dbeafe;} .bg-op{background:#f8d7da;}
-.bg-med{background:#d1e7dd;} .bg-trt{background:#e2d9f3;} .bg-hd{background:#cff4fc;}
+.bg-med{background:#d1e7dd;} .bg-treat{background:#e2d9f3;} .bg-hd{background:#cff4fc;}
 .bg-gw{background:#f3d0e2;} .bg-chg{background:#fff3cd;} .bg-drp{background:#d1e7dd;}
 .bg-mem{background:#f3f4f6;} .bg-old{background:#fff3cd;} .bg-new{background:#d1e7dd;} .bg-sum{background:#dbeafe;}
 
@@ -219,7 +219,7 @@ select:disabled{background:#e9ecef;cursor:not-allowed;font-weight:bold;color:var
   <div class="pc" id="t1-cap">
     
     <div class="br-dash-zone no-print" style="background:#fff; border:1px solid var(--bdr); border-radius:8px; padding:20px; margin-bottom:25px; box-shadow:0 2px 4px rgba(0,0,0,0.02);">
-      <h3 style="margin-bottom:15px; font-size:15px; border-bottom:2px solid #845ef7; padding-bottom:5px; color:#5c7cfa;">📈 สาขา Dashboard สรุปข้อมูลวิเคราะห์ยอดขายประจำสาขา</h3>
+      <h3 style="margin-bottom:15px; font-size:15px; border-bottom:2px solid #845ef7; padding-bottom:5px; color:#5c7cfa;">📈 Dashboard สรุปข้อมูลวิเคราะห์ยอดขายประจำสาขา</h3>
       <div class="kgrid" style="grid-template-columns: repeat(4, 1fr); margin-bottom:20px;">
         <div class="kc" style="border-left:4px solid var(--grn);"><div class="klbl">ยอดขายปัจจุบัน (Current Revenue)</div><div class="kval" style="color:var(--grn);" id="k1-rev">฿0</div></div>
         <div class="kc" style="border-left:4px solid var(--tx2);"><div class="klbl">เป้าหมายสาขา (Branch Target)</div><div class="kval" id="k1-tg" data-val="0">฿0</div></div>
@@ -238,7 +238,7 @@ select:disabled{background:#e9ecef;cursor:not-allowed;font-weight:bold;color:var
           <thead>
             <tr>
               <th rowspan="2" class="bg-date">วันที่</th><th rowspan="2" class="bg-total">รายได้รวม</th>
-              <th rowspan="2" class="bg-op">หัตถการ</th><th rowspan="2" class="bg-med">ขายยา</th><th rowspan="2" class="bg-trt">Treatment</th>
+              <th rowspan="2" class="bg-op">หัตถการ</th><th rowspan="2" class="bg-med">ขายยา</th><th rowspan="2" class="bg-treat">Treatment</th>
               <th rowspan="2" class="bg-hd">HD MALL</th><th rowspan="2" class="bg-gw">Gowabi</th><th rowspan="2" class="bg-chg">ชาร์จ 3%</th>
               <th rowspan="2" class="bg-drp">ฉีดผิว</th><th rowspan="2" class="bg-mem">member</th><th rowspan="2" class="bg-op">หัตถการ พนง.</th>
               <th rowspan="2" class="bg-chg">มัดจำเงิน</th><th rowspan="2" class="bg-total">รวมรายได้อื่นๆ</th>
@@ -413,35 +413,35 @@ select:disabled{background:#e9ecef;cursor:not-allowed;font-weight:bold;color:var
 
 <script>
 // ==========================================
-// USER DATABASE (Role-Based Login System 100% Correct)
+// USER DATABASE (Role-Based Login System 100% Fixed)
 // ==========================================
 const USERS = {
-  "16698": { role: "admin", br: "all", label: "Admin สูงสุด" },
+  "16698": { role: "admin", br: "all", label: "Admin สูงสุด | สาขา: ทุกสาขา" },
   
   // Cashiers
-  "64752": { role: "cashier", br: "rama9", label: "Cashier พระราม 9" },
-  "92165": { role: "cashier", br: "pinklao", label: "Cashier ปิ่นเกล้า" },
-  "29817": { role: "cashier", br: "bangkae", label: "Cashier บางแค" },
-  "56034": { role: "cashier", br: "rangsit", label: "Cashier รังสิต" },
-  "71483": { role: "cashier", br: "promanat", label: "Cashier พรอมานาด" },
-  "38926": { role: "cashier", br: "ngamwongwan", label: "Cashier งามวงศ์วาน" },
-  "47291": { role: "cashier", br: "srinakarin", label: "Cashier ศรีนครินทร์" },
-  "83640": { role: "cashier", br: "westgate", label: "Cashier เวสต์เกต" },
+  "64752": { role: "cashier", br: "rama9", label: "Cashier | สาขา: พระราม 9" },
+  "92165": { role: "cashier", br: "pinklao", label: "Cashier | สาขา: ปิ่นเกล้า" },
+  "29817": { role: "cashier", br: "bangkae", label: "Cashier | สาขา: บางแค" },
+  "56034": { role: "cashier", br: "rangsit", label: "Cashier | สาขา: รังสิต" },
+  "71483": { role: "cashier", br: "promanat", label: "Cashier | สาขา: พรอมานาด" },
+  "38926": { role: "cashier", br: "ngamwongwan", label: "Cashier | สาขา: งามวงศ์วาน" },
+  "47291": { role: "cashier", br: "srinakarin", label: "Cashier | สาขา: ศรีนครินทร์" },
+  "83640": { role: "cashier", br: "westgate", label: "Cashier | สาขา: เวสต์เกต" },
   
-  // Managers / Branch Admins
-  "847291": { role: "manager", br: "rama9", label: "Manager พระราม 9" },
-  "362058": { role: "manager", br: "pinklao", label: "Manager ปิ่นเกล้า" },
-  "519374": { role: "manager", br: "bangkae", label: "Manager บางแค" },
-  "728163": { role: "manager", br: "rangsit", label: "Manager รังสิต" },
-  "945612": { role: "manager", br: "promanat", label: "Manager พรอมานาด" },
-  "183749": { role: "manager", br: "ngamwongwan", label: "Manager งามวงศ์วาน" },
-  "637482": { role: "manager", br: "srinakarin", label: "Manager ศรีนครินทร์" },
-  "291856": { role: "manager", br: "westgate", label: "Manager เวสต์เกต" }
+  // Managers
+  "847291": { role: "manager", br: "rama9", label: "Manager | สาขา: พระราม 9" },
+  "362058": { role: "manager", br: "pinklao", label: "Manager | สาขา: ปิ่นเกล้า" },
+  "519374": { role: "manager", br: "bangkae", label: "Manager | สาขา: บางแค" },
+  "728163": { role: "manager", br: "rangsit", label: "Manager | สาขา: รังสิต" },
+  "945612": { role: "manager", br: "promanat", label: "Manager | สาขา: พรอมานาด" },
+  "183749": { role: "manager", br: "ngamwongwan", label: "Manager | สาขา: งามวงศ์วาน" },
+  "637482": { role: "manager", br: "srinakarin", label: "Manager | สาขา: ศรีนครินทร์" },
+  "291856": { role: "manager", br: "westgate", label: "Manager | สาขา: เวสต์เกต" }
 };
 let CURRENT_USER = null;
 
 // ==========================================
-// FIREBASE CONFIG (Connected & Isolated)
+// FIREBASE CONFIG
 // ==========================================
 const FBC = {
   apiKey: "AIzaSyC0P1LGtglA_t1Nc5PyM5uD3MOLnfBZwFM",
@@ -465,6 +465,9 @@ let SETTINGS = {
   docs: ["หมอ A"], cas: ["แคชเชียร์ A"], mgs: ["ผู้จัดการ A"]
 };
 
+let c0Bar, c0Pie, c0Funnel, c0Doc, c0Track1, c0Track2, c0D1, c0D2;
+let c1Trend, c1BrDonut, c3Donut, c4Bar;
+
 function injectBranchOptions() {
   const opts = bKeys.map(k=>`<option value="${k}">${BKS[k]}</option>`).join("");
   ["r-br","o-br","tk-br","df-br"].forEach(id=>{ const el = document.getElementById(id); if(el) el.innerHTML=opts; });
@@ -485,9 +488,16 @@ function toast(m, type="success"){
   el.textContent=m; document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
 }
 
-// -----------------------------------------------------
-// LOGIN & PERMISSION ACCESS CONTROL (Fix Nav Bug)
-// -----------------------------------------------------
+function expPNG(targetId, filename) {
+  const target = g(targetId); const obg = target.style.background; target.style.background = "#f0f2f5";
+  toast("กำลังประมวลผลรูปภาพ...");
+  html2canvas(target, {scale: 2, backgroundColor: "#f0f2f5"}).then(canvas => {
+    target.style.background = obg;
+    const a = document.createElement("a"); a.download = `${filename}_${new Date().getTime()}.png`;
+    a.href = canvas.toDataURL("image/png"); a.click(); toast("📸 บันทึกรูปภาพสำเร็จ!");
+  });
+}
+
 function checkLogin() {
   const pass = g("login-pass").value;
   if(!USERS[pass]) return toast("รหัสพนักงานไม่ถูกต้อง!", "error");
@@ -495,11 +505,11 @@ function checkLogin() {
   CURRENT_USER = USERS[pass];
   g("login-screen").style.display = "none"; 
   g("main-app").style.display = "flex";
-  g("nav-user-label").textContent = `👤 ${CURRENT_USER.label}`;
+  g("nav-user-label").textContent = `[${CURRENT_USER.label}]`;
 
   if(CURRENT_USER.role === "admin") {
     document.querySelectorAll('.admin-ni').forEach(el => el.style.display = "flex");
-    document.querySelectorAll('.admin-tp').forEach(el => el.style.removeAttribute ? el.style.removeAttribute('display') : el.style.display = '');
+    document.querySelectorAll('.admin-tp').forEach(el => { el.style.display = 'block'; });
     sw('t0', document.querySelector('.ni[onclick="sw(\'t0\',this)"]'));
   } else {
     document.querySelectorAll('.admin-ni, .admin-tp').forEach(el => el.style.display = "none");
@@ -509,12 +519,7 @@ function checkLogin() {
     });
     sw('t1', document.querySelector('.ni[onclick="sw(\'t1\',this)"]'));
   }
-  toast(`เข้าสู่ระบบสำเร็จ! สวัสดีคุณ ${CURRENT_USER.label}`);
 }
-
-document.getElementById("login-pass").addEventListener("keypress", function(event) {
-  if (event.key === "Enter") { event.preventDefault(); checkLogin(); }
-});
 
 function sw(id,item){
   document.querySelectorAll(".tp").forEach(p=>p.classList.remove("active"));
@@ -531,7 +536,7 @@ function updateSelects() {
 }
 
 // ==========================================
-// TAB 0: ADVANCED MASTER DASHBOARD (God-Tier)
+// TAB 0: ADVANCED MASTER DASHBOARD
 // ==========================================
 function buildT0() {
   const mo = g("d0-mo").value; if(!mo) return;
@@ -593,19 +598,12 @@ function buildT0() {
       }); 
     });
 
-    // Render God-Tier Leaderboard
     let gtHtml = "";
     bKeys.forEach(k => {
       let current = bRev[k]; let target = bTg[k];
       let pct = target > 0 ? ((current / target) * 100).toFixed(1) : "0";
       let rem = target > current ? `฿${fm(target - current)}` : `<span style="color:var(--grn); font-weight:bold;">🏆 ทะลุเป้า!</span>`;
-      gtHtml += `<tr>
-        <td style="text-align:left; font-weight:700;">📍 ${BKS[k]}</td>
-        <td style="color:#1D4ED8; font-weight:700;">฿${fm(current)}</td>
-        <td>฿${fm(target)}</td>
-        <td style="color:var(--amb); font-weight:700;">${pct}%</td>
-        <td style="color:var(--red); font-weight:700;">${rem}</td>
-      </tr>`;
+      gtHtml += `<tr><td style="text-align:left; font-weight:700;">📍 ${BKS[k]}</td><td style="color:#1D4ED8; font-weight:700;">฿${fm(current)}</td><td>฿${fm(target)}</td><td style="color:var(--amb); font-weight:700;">${pct}%</td><td style="color:var(--red); font-weight:700;">${rem}</td></tr>`;
     });
     g("gt-tbody").innerHTML = gtHtml;
 
@@ -616,37 +614,34 @@ function buildT0() {
 
     if(c0Bar) c0Bar.destroy();
     c0Bar = new Chart(g("c0-bar"), { type:'bar', data:{ labels:bKeys.map(k=>BKS[k]), datasets:[{label:'รายได้จริง', data:bKeys.map(k=>bRev[k]), backgroundColor:'#1971c2'}, {label:'เป้าหมาย', data:bKeys.map(k=>bTg[k]), backgroundColor:'#ced4da'}] }, options:{responsive:true, maintainAspectRatio:false} });
-
     if(c0Funnel) c0Funnel.destroy();
     c0Funnel = new Chart(g("c0-funnel"), { type:'bar', data:{ labels:['📞 โทรทั้งหมด', '✅ คอนเฟิร์มจะมา', '🏥 มาจริง (Success)'], datasets:[{label:'จำนวนคนไข้', data:[tkCall, tkConf, tkAct], backgroundColor:['#f08c00', '#1971c2', '#2f9e44'], borderRadius:4}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}} });
-
     if(c0Pie) c0Pie.destroy();
     c0Pie = new Chart(g("c0-pie"), { type:'doughnut', data:{ labels:['เงินสด', 'แอปพลิเคชัน', 'เงินโอน', 'บัตรเครดิต'], datasets:[{data:[tCash, tApp, tTrans, tCrd], backgroundColor:['#2f9e44', '#845ef7', '#f08c00', '#1971c2']}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{tooltip: donutTooltipOption}} });
-
     let sortedDocs = Object.keys(docStats).sort((a,b)=>docStats[b]-docStats[a]).slice(0,5);
     if(c0Doc) c0Doc.destroy();
     c0Doc = new Chart(g("c0-doc"), { type:'bar', data:{ labels:sortedDocs, datasets:[{label:'ยอดขายแพทย์รวม (บาท)', data:sortedDocs.map(d=>docStats[d]), backgroundColor:'#e64980', borderRadius:4}] }, options:{responsive:true, maintainAspectRatio:false, indexAxis:'y'} });
-
-    // Confirm Tracking Behaviours Donut
     if(c0Track1) c0Track1.destroy();
     c0Track1 = new Chart(g("c0-track1"), { type:'doughnut', data:{ labels:['ขอเลื่อนนัด', 'ไม่รับสาย/ปิดเครื่อง'], datasets:[{data:[tP_PP, tP_NA], backgroundColor:['#f08c00', '#c92a2a']}] }, options:{responsive:true, maintainAspectRatio:false} });
-
-    // Confirm Tracking Patient Types Donut
     if(c0Track2) c0Track2.destroy();
     c0Track2 = new Chart(g("c0-track2"), { type:'doughnut', data:{ labels:['คนไข้เก่า', 'คนไข้ใหม่'], datasets:[{data:[tP_Old, tP_New], backgroundColor:['#1971c2', '#20c997']}] }, options:{responsive:true, maintainAspectRatio:false} });
-
     if(c0D1) c0D1.destroy();
     c0D1 = new Chart(g("c0-d1"), { type:'doughnut', data:{ labels:['หัตถการ', 'ขายยา', 'Treatment'], datasets:[{data:[tOp, tMed, tTrt], backgroundColor:['#f08c00', '#2f9e44', '#845ef7']}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{tooltip: donutTooltipOption}} });
-
     if(c0D2) c0D2.destroy();
     c0D2 = new Chart(g("c0-d2"), { type:'doughnut', data:{ labels:['Co2', 'Pico', 'Vbeam'], datasets:[{data:[tCo2, tPico, tVb], backgroundColor:['#1971c2', '#e64980', '#20c997']}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{tooltip: donutTooltipOption}} });
   });
 }
 
 // ==========================================
-// TAB 1: REVENUE SHEET + BRANCH DASHBOARD SYSTEM
+// TAB 1: REVENUE SHEET + BRANCH DASHBOARD
 // ==========================================
-let curT1 = ""; let t1Listener = null;
+const R_COLS = [
+  {id:"r-op", cls:"bg-op"}, {id:"r-med", cls:"bg-med"}, {id:"r-trt", cls:"bg-treat"},
+  {id:"r-hd", cls:"bg-hd"}, {id:"r-gw", cls:"bg-gw"}, {id:"r-chg", cls:"bg-chg"},
+  {id:"r-drp", cls:"bg-drp"}, {id:"r-mem", cls:"bg-mem"}, {id:"r-stf", cls:"bg-op"},
+  {id:"r-dep", cls:"bg-chg"}, {id:"r-oth", cls:"bg-total"}, {id:"r-opx", cls:"bg-old"},
+  {id:"r-oam", cls:"bg-old"}, {id:"r-nyp", cls:"bg-new"}, {id:"r-nam", cls:"bg-new"}, {id:"r-nnp", cls:"bg-new"}
+];
 
 function buildT1() {
   const mo=g("r-mo").value, br=g("r-br").value; if(!mo)return;
@@ -719,21 +714,11 @@ function calcT1(triggerEl) {
   g("rs-avg-old").textContent = gOldP>0 ? fm(gOldA/gOldP) : "0"; g("rs-avg-new").textContent = gNewP>0 ? fm(gNewA/gNewP) : "0";
   g("rs-sop").textContent = fm(gOp); g("rs-smed").textContent = fm(gMed); g("rs-strt").textContent = fm(gTrt);
 
-  // ข้อ 4: Render Daily Trend Line Chart
   if(c1Trend) c1Trend.destroy();
-  c1Trend = new Chart(g("c1-trend"), {
-    type:'line',
-    data: { labels: Array.from({length:chartData.length},(_,i)=>i+1), datasets: [{label:'ยอดขายรายวัน', data:chartData, borderColor:'#845ef7', tension:0.2, fill:true, backgroundColor:'rgba(132, 94, 247, 0.08)'}] },
-    options: {responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}}
-  });
+  c1Trend = new Chart(g("c1-trend"), { type:'line', data:{ labels:Array.from({length:chartData.length},(_,i)=>i+1), datasets:[{label:'ยอดขายรายวัน', data:chartData, borderColor:'#845ef7', tension:0.2, fill:true, backgroundColor:'rgba(132, 94, 247, 0.08)'}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}} });
 
-  // ข้อ 4: Render Service Breakdown Donut Chart
   if(c1BrDonut) c1BrDonut.destroy();
-  c1BrDonut = new Chart(g("c1-br-donut"), {
-    type:'doughnut',
-    data: { labels:['หัตถการ', 'ขายยา', 'Treatment'], datasets:[{data:[gOp, gMed, gTrt], backgroundColor:['#f08c00', '#2f9e44', '#845ef7']}] },
-    options: {responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'right'}}}
-  });
+  c1BrDonut = new Chart(g("c1-br-donut"), { type:'doughnut', data:{ labels:['หัตถการ', 'ขายยา', 'Treatment'], datasets:[{data:[gOp, gMed, gTrt], backgroundColor:['#f08c00', '#2f9e44', '#845ef7']}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'right'}}} });
 
   if(triggerEl) {
     const dt = triggerEl.dataset.dt, br = g("r-br").value, id = triggerEl.dataset.id;
@@ -746,47 +731,8 @@ function calcT1(triggerEl) {
   }
 }
 
-// Global variable for Branch Donut
-let c1BrDonut;
-
-function downloadTemplate() {
-  const mo=g("r-mo").value; const [yr,m] = mo.split("-"); const dim = new Date(yr,m,0).getDate();
-  let data = [["วันที่", "หัตถการ", "ขายยา", "Treatment", "HD MALL", "Gowabi", "ชาร์จ 3%", "ฉีดผิว", "member", "หัตถการ พนง.", "มัดจำเงิน", "รวมรายได้อื่นๆ", "คนไข้เก่า (คน)", "คนไข้เก่า (ยอด)", "คนไข้ใหม่มี (คน)", "คนไข้ใหม่มียอด (บาท)", "คนไข้ใหม่ไม่มี (คน)", "แพทย์"]];
-  for(let i=1; i<=dim; i++) data.push([`${i}/${m}/${yr}`, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ""]);
-  const ws = XLSX.utils.aoa_to_sheet(data); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Template"); XLSX.writeFile(wb, `Template_Import_${mo}.xlsx`);
-}
-
-function importT1(input) {
-  const f = input.files[0]; if(!f) return; const reader = new FileReader();
-  reader.onload = (e) => {
-    try {
-      const data = new Uint8Array(e.target.result); const wb = XLSX.read(data, {type: 'array'});
-      const json = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header: 1});
-      const mo=g("r-mo").value, br=g("r-br").value; const [yr,m] = mo.split("-");
-      let updates = {}, count = 0;
-
-      for(let i=1; i<json.length; i++) {
-        let row = json[i]; if(!row || row.length === 0) continue;
-        let dt = `${yr}-${m}-${String(i).padStart(2,'0')}`;
-        let rVals = {"r-op": parseFloat(row[1])||0, "r-med": parseFloat(row[2])||0, "r-trt": parseFloat(row[3])||0, "r-hd": parseFloat(row[4])||0, "r-gw": parseFloat(row[5])||0, "r-chg": parseFloat(row[6])||0, "r-drp": parseFloat(row[7])||0, "r-mem": parseFloat(row[8])||0, "r-stf": parseFloat(row[9])||0, "r-dep": parseFloat(row[10])||0, "r-oth": parseFloat(row[11])||0, "r-opx": parseFloat(row[12])||0, "r-oam": parseFloat(row[13])||0, "r-nyp": parseFloat(row[14])||0, "r-nam": parseFloat(row[15])||0, "r-nnp": parseFloat(row[16])||0};
-        for(let key in rVals) {
-          updates[`${dt}/${br}/${key}`] = rVals[key];
-          if(key==="r-med") updates[`${dt}/${br}/p-product`]=rVals[key];
-          if(key==="r-trt") updates[`${dt}/${br}/p-treatment`]=rVals[key]; if(key==="r-hd") updates[`${dt}/${br}/a-hdmall`]=rVals[key];
-          if(key==="r-gw") updates[`${dt}/${br}/a-gowabi`]=rVals[key]; if(key==="r-chg") updates[`${dt}/${br}/p-charge`]=rVals[key];
-          if(key==="r-drp") updates[`${dt}/${br}/p-drip`]=rVals[key];
-        }
-        updates[`${dt}/${br}/r-doc`] = row[17] || ""; count++;
-      }
-      DB.ref('ops_daily').update(updates).then(() => toast(`✅ นำเข้าสำเร็จ ${count} วัน`)).catch(err => toast(err.message, "error"));
-    } catch(err) { toast("❌ รูปแบบไฟล์ไม่ถูกต้อง", "error"); }
-  };
-  reader.readAsArrayBuffer(f); input.value=""; 
-}
-function exportT1() { const wb = XLSX.utils.table_to_book(g("revTable")); XLSX.writeFile(wb, `Revenue_${g("r-mo").value}_${g("r-br").value}.xlsx`); }
-
 // ==========================================
-// TAB 2: DAILY OPS CORE (Symmetric Perfect Layout)
+// TAB 2: DAILY OPS CORE (Symmetric Layout)
 // ==========================================
 function buildT2() {
   const tb = g("o-tbody"); let ht = "";
@@ -967,7 +913,6 @@ function drawT3Chart() {
   document.querySelectorAll("[id^='tk-po-']").forEach(i=>pp+=parseFloat(i.value.replace(/,/g,''))||0);
   document.querySelectorAll("[id^='tk-pn-']").forEach(i=>pp+=parseFloat(i.value.replace(/,/g,''))||0);
   document.querySelectorAll("[id^='tk-na-']").forEach(i=>na+=parseFloat(i.value.replace(/,/g,''))||0);
-
   g("k3-cf").textContent=fmI(cf); g("k3-act").textContent=fmI(act); g("k3-pp").textContent=fmI(pp); g("k3-na").textContent=fmI(na);
   if(c3Donut) c3Donut.destroy();
   c3Donut = new Chart(g("c3-donut"), { type:'doughnut', data:{ labels:['มาจริง', 'ขอเลื่อน', 'ไม่รับสาย'], datasets:[{data:[act, pp, na], backgroundColor:['#2f9e44', '#f08c00', '#c92a2a']}] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:'right'} } } });
