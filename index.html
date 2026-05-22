@@ -445,7 +445,7 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 
 <script>
 // ==========================================
-// FIREBASE CONFIG 
+// FIREBASE CONFIG
 // ==========================================
 const FBC = {
   apiKey: "AIzaSyDetHuoARpuhqRp-o9mVzECi1nzWAEo-O4",
@@ -465,7 +465,6 @@ let SETTINGS = {
   docs: ["หมอ A"], cas: ["แคชเชียร์ A"], mgs: ["ผู้จัดการ A"]
 };
 
-// Global Charts
 let c0Bar, c0Pie, c1Trend, c3Donut, c4Bar;
 
 function injectBranchOptions() {
@@ -478,55 +477,33 @@ function g(id){return document.getElementById(id);}
 function fm(n){return (parseFloat(n)||0).toLocaleString("th-TH",{minimumFractionDigits:2,maximumFractionDigits:2});}
 function fmI(n){return Math.round(parseFloat(n)||0).toLocaleString("th-TH");}
 function toast(m, type="success"){
-  const el=document.createElement("div");
-  el.className="toast";
-  el.style.background = type==="error" ? "#c92a2a" : "#212529";
-  el.textContent=m;
-  document.body.appendChild(el);
-  setTimeout(()=>el.remove(),4000);
+  const el=document.createElement("div"); el.className="toast"; el.style.background = type==="error" ? "#c92a2a" : "#212529";
+  el.textContent=m; document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
 }
 
-// ==========================================
-// EXPORT PNG FUNCTION (มืออาชีพ)
-// ==========================================
 function expPNG(targetId, filename) {
-  const target = g(targetId);
-  const originalBackground = target.style.background;
-  target.style.background = "#fff"; // Make sure bg is white
-  
+  const target = g(targetId); const obg = target.style.background; target.style.background = "#fff";
   toast("กำลังประมวลผลรูปภาพ...");
   html2canvas(target, {scale: 2, backgroundColor: "#ffffff"}).then(canvas => {
-    target.style.background = originalBackground;
-    const a = document.createElement("a");
-    a.download = `${filename}_${new Date().getTime()}.png`;
-    a.href = canvas.toDataURL("image/png");
-    a.click();
-    toast("📸 บันทึกรูปภาพสำเร็จ!");
+    target.style.background = obg;
+    const a = document.createElement("a"); a.download = `${filename}_${new Date().getTime()}.png`;
+    a.href = canvas.toDataURL("image/png"); a.click(); toast("📸 บันทึกรูปภาพสำเร็จ!");
   });
 }
 
-// ==========================================
-// LOGIN
-// ==========================================
 function checkLogin() {
   const user = g("login-user").value; const pass = g("login-pass").value;
   if(!user) return toast("กรุณาเลือกชื่อผู้จัดการก่อนครับ", "error");
   if(pass !== "1234") return toast("รหัสผ่านไม่ถูกต้อง", "error");
   g("login-screen").style.display = "none"; g("main-app").style.display = "flex";
-  buildT0(); // Load master dash
-  toast(`ยินดีต้อนรับเข้าสู่ระบบคุณ ${user}`);
+  buildT0(); toast(`ยินดีต้อนรับเข้าสู่ระบบคุณ ${user}`);
 }
 
 function sw(id,item){
   document.querySelectorAll(".tp").forEach(p=>p.classList.remove("active"));
   document.querySelectorAll(".ni").forEach(n=>n.classList.remove("active"));
   g(id).classList.add("active"); item.classList.add("active");
-  if(id==='t0') buildT0();
-  if(id==='t1') buildT1();
-  if(id==='t2') buildT2();
-  if(id==='t3') buildT3();
-  if(id==='t4') buildT4();
-  if(id==='t5') loadT5();
+  if(id==='t0') buildT0(); if(id==='t1') buildT1(); if(id==='t2') buildT2(); if(id==='t3') buildT3(); if(id==='t4') buildT4(); if(id==='t5') loadT5();
 }
 
 function updateSelects() {
@@ -555,6 +532,7 @@ function buildT0() {
         bKeys.forEach(br => {
           if(all[dt][br]) {
             let d = all[dt][br];
+            // ใช้วิธีคำนวณรายได้รวมแบบเป๊ะ 11 ช่องที่ล็อกไว้
             let rTot = (d["r-op"]||0)+(d["r-med"]||0)+(d["r-trt"]||0)+(d["r-hd"]||0)+(d["r-gw"]||0)+(d["r-chg"]||0)+(d["r-drp"]||0)+(d["r-mem"]||0)+(d["r-stf"]||0)+(d["r-dep"]||0)+(d["r-oth"]||0);
             bRev[br] += rTot; totRev += rTot;
             totPax += (d["r-opx"]||0)+(d["r-nyp"]||0)+(d["r-nnp"]||0);
@@ -568,7 +546,6 @@ function buildT0() {
     g("k0-rev").textContent = "฿"+fm(totRev); g("k0-tg").textContent = "฿"+fm(totTg);
     g("k0-pax").textContent = fmI(totPax)+" คน";
 
-    // Chart 1: Bar
     if(c0Bar) c0Bar.destroy();
     c0Bar = new Chart(g("c0-bar"), {
       type: 'bar',
@@ -576,18 +553,13 @@ function buildT0() {
         labels: bKeys.map(k=>BKS[k]),
         datasets: [{label:'รายได้จริง', data:bKeys.map(k=>bRev[k]), backgroundColor:'#1971c2'},
                    {label:'เป้าหมาย', data:bKeys.map(k=>bTg[k]), backgroundColor:'#ced4da'}]
-      },
-      options: {responsive:true, maintainAspectRatio:false}
+      }, options: {responsive:true, maintainAspectRatio:false}
     });
 
-    // Chart 2: Donut
     if(c0Pie) c0Pie.destroy();
     c0Pie = new Chart(g("c0-pie"), {
       type: 'doughnut',
-      data: {
-        labels: ['หัตถการรวม', 'ขายยา', 'Treatment'],
-        datasets: [{data:[totSvc, totMed, totTrt], backgroundColor:['#f08c00', '#2f9e44', '#845ef7']}]
-      },
+      data: { labels: ['หัตถการรวม', 'ขายยา', 'Treatment'], datasets: [{data:[totSvc, totMed, totTrt], backgroundColor:['#f08c00', '#2f9e44', '#845ef7']}] },
       options: {responsive:true, maintainAspectRatio:false}
     });
   });
@@ -655,7 +627,10 @@ function calcT1(triggerEl) {
   const rows = document.querySelectorAll("#r-tbody tr");
   rows.forEach(row => {
     let q = (id) => parseFloat(row.querySelector(`[data-id="${id}"]`)?.value)||0;
+    
+    // YIELDS EXACTLY 11 FIELDS FOR TOTAL REVENUE AS REQUESTED
     let rTot = q("r-op")+q("r-med")+q("r-trt")+q("r-hd")+q("r-gw")+q("r-chg")+q("r-drp")+q("r-mem")+q("r-stf")+q("r-dep")+q("r-oth");
+    
     let rPax = q("r-opx")+q("r-nyp")+q("r-nnp");
     
     let elTot = row.querySelector('.row-tot'); if(elTot) elTot.value = fm(rTot);
@@ -678,15 +653,11 @@ function calcT1(triggerEl) {
   g("rs-avg-old").textContent = gOldP>0 ? fm(gOldA/gOldP) : "0.00"; g("rs-avg-new").textContent = gNewP>0 ? fm(gNewA/gNewP) : "0.00";
   g("rs-sop").textContent = fm(gOp); g("rs-smed").textContent = fm(gMed); g("rs-strt").textContent = fm(gTrt);
 
-  // Update Trend Chart
   if(c1Trend) c1Trend.destroy();
   let dim = chartData.length;
   c1Trend = new Chart(g("c1-trend"), {
     type:'line',
-    data: {
-      labels: Array.from({length:dim},(_,i)=>i+1),
-      datasets: [{label:'รายได้รายวัน', data:chartData, borderColor:'#1971c2', tension:0.3, fill:true, backgroundColor:'rgba(25, 113, 194, 0.1)'}]
-    },
+    data: { labels: Array.from({length:dim},(_,i)=>i+1), datasets: [{label:'รายได้รายวัน', data:chartData, borderColor:'#1971c2', tension:0.3, fill:true, backgroundColor:'rgba(25, 113, 194, 0.1)'}] },
     options: {responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}}
   });
 
@@ -754,10 +725,8 @@ function buildT2() {
   const tb = g("o-tbody"); let ht = ""; const mx = Math.max(SETTINGS.progs.length, 8);
   for(let i=0; i<mx; i++) {
     ht += `<tr>`;
-    // Left: Merge ยอดหน้าร้าน into 1 big input
     if(i===0) ht += `<td rowspan="${mx+1}" style="background:#f0f0f0;vertical-align:top;padding:10px;"><input type="number" id="front-store-val" class="num-in" style="font-size:16px;text-align:center;" placeholder="กรอกยอดหน้าร้าน" oninput="saveT2Quick('front-store-val',this.value)"></td>`;
     
-    // Middle: Programs
     if(i < SETTINGS.progs.length) {
       let nm = SETTINGS.progs[i].toLowerCase(), pid = `p${i}`;
       if(nm.includes("hdmall")) pid="a-hdmall"; else if(nm.includes("gowabi")) pid="a-gowabi";
@@ -767,17 +736,12 @@ function buildT2() {
       ht += `<td>${SETTINGS.progs[i]}</td><td style="padding:2px;"><input type="number" id="${pid}" class="num-in o-val" oninput="cT2()"></td><td style="padding:2px;"><input type="number" id="v${i}" class="num-in v-val red-tx" oninput="cT2()"></td>`;
     } else ht += `<td></td><td></td><td></td>`;
 
-    // Right: Credit & Cash
     if(i < O_R.length) {
       if(O_R[i].ro) ht += `<td style="text-align:right;font-weight:700;">${O_R[i].n}</td><td style="background:#f0f0f0;"><input type="text" id="${O_R[i].id}" class="num-in" readonly value="0.00"></td>`;
       else ht += `<td>${O_R[i].n}</td><td style="padding:2px;"><input type="number" id="${O_R[i].id}" class="num-in c-val" oninput="cT2()"></td>`;
       
-      // Side Panels mapping
       if(i===0) ht += `<td rowspan="2" style="vertical-align:bottom;text-align:center;">เงินสด<br><br><input type="number" id="pay-cash" class="num-in" style="font-size:18px;text-align:center;color:var(--tx)!important;" oninput="cT2()"></td>`;
-      if(i===2) ht += `<td rowspan="3" style="vertical-align:middle;text-align:center;font-size:11px;">แอปพลิเคชัน<br>
-        <div style="display:flex;justify-content:space-between;margin-top:5px;align-items:center;">HDmall: <input type="number" id="a-hd-pax" style="width:25px;" placeholder="คน"> <input type="number" id="a-hdmall" class="num-in c-val" style="width:40px;color:var(--tx)!important;" oninput="cT2()" placeholder="ยอด"></div>
-        <div style="display:flex;justify-content:space-between;margin-top:2px;align-items:center;">Gowabi: <input type="number" id="a-gw-pax" style="width:25px;" placeholder="คน"> <input type="number" id="a-gowabi" class="num-in c-val" style="width:40px;color:var(--tx)!important;" oninput="cT2()" placeholder="ยอด"></div>
-        </td>`;
+      if(i===2) ht += `<td rowspan="3" style="vertical-align:middle;text-align:center;font-size:11px;">แอปพลิเคชัน<br><div style="display:flex;justify-content:space-between;margin-top:5px;align-items:center;">HDmall: <input type="number" id="a-hd-pax" style="width:25px;" placeholder="คน"> <input type="number" id="a-hdmall" class="num-in c-val" style="width:40px;color:var(--tx)!important;" oninput="cT2()" placeholder="ยอด"></div><div style="display:flex;justify-content:space-between;margin-top:2px;align-items:center;">Gowabi: <input type="number" id="a-gw-pax" style="width:25px;" placeholder="คน"> <input type="number" id="a-gowabi" class="num-in c-val" style="width:40px;color:var(--tx)!important;" oninput="cT2()" placeholder="ยอด"></div></td>`;
       if(i===5) ht += `<td rowspan="2" style="vertical-align:middle;text-align:center;">ยอดเงินโอน<br><br><input type="number" id="pay-trans" class="num-in" style="font-size:18px;text-align:center;color:var(--tx)!important;" oninput="cT2()"></td>`;
       if(i===7) ht += `<td rowspan="${mx-7}" style="vertical-align:middle;text-align:center;font-weight:700;">ยอดชำระรวม<br><br><input type="number" id="t-grand" class="num-in" style="font-size:20px;text-align:center;color:#000!important;border:1px solid #ccc!important;border-radius:4px;padding:5px;" oninput="saveT2Quick('t-grand',this.value)"></td>`;
     } else { ht += `<td></td><td></td>`; }
@@ -800,15 +764,12 @@ function cT2(fromLoad = false) {
   document.querySelectorAll(".v-val").forEach(e=>tv+=Number(e.value)||0);
   document.querySelectorAll(".c-val").forEach(e=>tc+=Number(e.value)||0);
   
-  if(g("t-prog")) g("t-prog").value = fm(tp);
-  if(g("t-vip")) g("t-vip").textContent = fm(tv);
+  if(g("t-prog")) g("t-prog").value = fm(tp); if(g("t-vip")) g("t-vip").textContent = fm(tv);
   if(g("t-crd")) g("t-crd").value = fm(tc);
   
-  // ยอดชำระรวม (ให้คีย์ได้ แต่จะออโต้บวกให้ถ้ายังไม่ได้พิมพ์แก้)
   let grandInput = g("t-grand");
   if(grandInput) {
     let autoSum = tc + (parseFloat(g("pay-cash")?.value)||0) + (parseFloat(g("pay-trans")?.value)||0);
-    // Only auto-update if not manually typing right now
     if(fromLoad || document.activeElement !== grandInput) grandInput.value = autoSum;
   }
 }
@@ -828,17 +789,11 @@ function loadT2() {
   DB.ref(`daily`).on('value', t2Listener);
 }
 
-function saveT2Quick(id, val) {
-  const dt=g("o-dt").value, br=g("o-br").value;
-  DB.ref(`daily/${dt}/${br}`).update({[id]: parseFloat(val)||val});
-}
+function saveT2Quick(id, val) { const dt=g("o-dt").value, br=g("o-br").value; DB.ref(`daily/${dt}/${br}`).update({[id]: parseFloat(val)||val}); }
 
 function saveT2() {
   const dt=g("o-dt").value, br=g("o-br").value; if(!dt)return;
-  let p={};
-  document.querySelectorAll('#t2-content input, #t2-content select').forEach(e=>{
-    if(e.id && !e.readOnly) p[e.id] = e.type==="number"?parseFloat(e.value)||0 : e.value;
-  });
+  let p={}; document.querySelectorAll('#t2-content input, #t2-content select').forEach(e=>{ if(e.id && !e.readOnly) p[e.id] = e.type==="number"?parseFloat(e.value)||0 : e.value; });
   SETTINGS.progs.forEach((x,i)=>{ p[`name${i}`] = x; });
   DB.ref(`daily/${dt}/${br}`).update(p).then(()=>toast("บันทึกฟอร์ม PDF ลงฐานข้อมูลสำเร็จ!"));
 }
@@ -887,14 +842,11 @@ function buildT3() {
 let tm3={};
 function svT3(el) {
   const dt = el.dataset.dt, br = g("tk-br").value, mo = g("tk-mo").value, id = el.dataset.id, val = parseFloat(el.value)||0;
-  calcT3Row(el);
-  drawT3Chart();
-  clearTimeout(tm3[dt]);
-  tm3[dt] = setTimeout(()=>{ DB.ref(`tracking_mth/${mo}/${br}/${dt}`).update({[id]:val}); }, 500);
+  calcT3Row(el); drawT3Chart();
+  clearTimeout(tm3[dt]); tm3[dt] = setTimeout(()=>{ DB.ref(`tracking_mth/${mo}/${br}/${dt}`).update({[id]:val}); }, 500);
 }
 function calcT3Row(el) {
-  if(!el) return;
-  const row = el.closest('tr'); if(row) {
+  if(!el) return; const row = el.closest('tr'); if(row) {
     let ro = parseFloat(row.querySelector(`[id^='tk-ro-']`).value)||0;
     let rn = parseFloat(row.querySelector(`[id^='tk-rn-']`).value)||0;
     row.querySelector('.row-tk-tot').value = ro+rn;
@@ -963,20 +915,16 @@ function svT4(el) {
   const dt = el.dataset.dt, br = g("df-br").value, mo = g("df-mo").value, id = el.dataset.id;
   const val = el.type==="number"?parseFloat(el.value)||0 : el.value;
   drawT4Chart();
-  clearTimeout(tm4[dt]);
-  tm4[dt] = setTimeout(()=>{ DB.ref(`docfin_mth/${mo}/${br}/${dt}`).update({[id]:val}); }, 500);
+  clearTimeout(tm4[dt]); tm4[dt] = setTimeout(()=>{ DB.ref(`docfin_mth/${mo}/${br}/${dt}`).update({[id]:val}); }, 500);
 }
 
 function drawT4Chart() {
-  let sSal=0, sDf=0;
-  let docStats = {};
-  
+  let sSal=0, sDf=0; let docStats = {};
   document.querySelectorAll("#df-tbody tr").forEach(row => {
     let sl = parseFloat(row.querySelector("[id^='df-sl-']").value)||0;
     let df = parseFloat(row.querySelector("[id^='df-df-']").value)||0;
     let doc = row.querySelector("[id^='df-doc-']").value;
-    sSal += sl; sDf += df;
-    if(doc && sl>0) { docStats[doc] = (docStats[doc]||0) + sl; }
+    sSal += sl; sDf += df; if(doc && sl>0) { docStats[doc] = (docStats[doc]||0) + sl; }
   });
 
   g("k4-sal").textContent="฿"+fm(sSal); g("k4-df").textContent="฿"+fm(sDf);
@@ -985,11 +933,8 @@ function drawT4Chart() {
   if(c4Bar) c4Bar.destroy();
   c4Bar = new Chart(g("c4-bar"), {
     type: 'bar',
-    data: {
-      labels: sortedDocs,
-      datasets: [{label: 'ยอดขายแพทย์ (บาท)', data: sortedDocs.map(d=>docStats[d]), backgroundColor: '#1971c2', borderRadius:4}]
-    },
-    options: {responsive:true, maintainAspectRatio:false, indexAxis:'y'} // แนวนอนให้อ่านชื่อหมอง่าย
+    data: { labels: sortedDocs, datasets: [{label: 'ยอดขายแพทย์ (บาท)', data: sortedDocs.map(d=>docStats[d]), backgroundColor: '#1971c2', borderRadius:4}] },
+    options: {responsive:true, maintainAspectRatio:false, indexAxis:'y'}
   });
 }
 
