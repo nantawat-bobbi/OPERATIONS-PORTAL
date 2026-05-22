@@ -29,7 +29,7 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--tx);min-height:
 .ni{display:flex;align-items:center;gap:10px;padding:12px;border-radius:6px;cursor:pointer;color:#9ca3af;font-size:14px;transition:0.2s;margin-bottom:5px;}
 .ni:hover{background:#252830;color:#fff;}
 .ni.active{background:var(--acc);color:#fff;}
-.main{flex:1;background:var(--bg);display:flex;flex-direction:column;min-width:0;}
+.main{flex:1;background:var(--bg);display:flex;flex-direction:column;min-width:0;height:100vh;overflow-y:auto;}
 .tp{display:none;padding:0;flex:1;}
 .tp.active{display:block;}
 
@@ -55,44 +55,31 @@ select:focus,input:focus,textarea:focus{border-color:var(--acc);}
 .klbl{font-size:12px;color:var(--tx3);font-weight:600;margin-bottom:5px;}
 .kval{font-size:22px;font-weight:700;}
 
-/* TAB 1: REVENUE SHEET (Excel Theme) */
+/* TAB 1: REVENUE SHEET */
 .rev-wrap{background:#fff;border:1px solid var(--bdr);border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.05);display:flex;flex-direction:column;}
 .rev-table-container{overflow-x:auto;max-height:65vh;border-bottom:2px solid #000;}
 .rev-tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:1800px;}
 .rev-tbl th{padding:8px 4px;border:1px solid #aaa;text-align:center;font-weight:700;white-space:nowrap;position:sticky;top:0;z-index:2;box-shadow:0 1px 0 #999;}
 .rev-tbl th:first-child{left:0;z-index:3;}
-.rev-tbl td{border:1px solid #ccc;padding:0;position:relative;}
+.rev-tbl td{border:1px solid #ccc;padding:2px;position:relative;}
 .rev-tbl td:first-child{text-align:center;font-weight:600;background:#f3f4f6;position:sticky;left:0;z-index:1;box-shadow:1px 0 0 #ccc;}
 
-/* Excel Pastel Colors */
 .bg-date{background:#f3f4f6;} .bg-total{background:#dbeafe;} .bg-op{background:#f8d7da;}
 .bg-med{background:#d1e7dd;} .bg-trt{background:#e2d9f3;} .bg-hd{background:#cff4fc;}
 .bg-gw{background:#f3d0e2;} .bg-chg{background:#fff3cd;} .bg-drp{background:#d1e7dd;}
-.bg-mem{background:#f3f4f6;} .bg-stf{background:#f8d7da;} .bg-dep{background:#fff3cd;}
-.bg-oth{background:#dbeafe;} .bg-old{background:#fff3cd;} .bg-new{background:#d1e7dd;}
-.bg-sum{background:#dbeafe;}
+.bg-mem{background:#f3f4f6;} .bg-old{background:#fff3cd;} .bg-new{background:#d1e7dd;} .bg-sum{background:#dbeafe;}
 
-.r-inp{
-  width:100%;height:100%;min-height:32px;
-  border:none;background:transparent;
-  text-align:right;font-size:13px;
-  padding:4px 8px;color:#1D4ED8;font-weight:600;
-  outline:none;cursor:text;
-}
-.r-inp:hover{background:rgba(255,255,255,0.4);}
-.r-inp:focus{background:#fff!important;box-shadow:inset 0 0 0 2px var(--acc);}
-.r-inp[readonly]{color:#000!important;cursor:default;background:transparent!important;box-shadow:none;}
+.r-inp{width:100%;height:32px;border:1px solid rgba(0,0,0,0.1);background:#fff;text-align:right;font-size:13px;padding:4px 8px;color:#1D4ED8;font-weight:600;outline:none;border-radius:3px;}
+.r-inp:focus{border:2px solid var(--acc);background:#fff!important;}
+.r-inp[readonly]{color:#000!important;background:transparent;border:none;}
 input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 
 .rev-sum-grid{display:grid;grid-template-columns:300px 1fr;background:#f8f9fa;}
 .rev-sum-left{border-right:2px solid #ccc;padding:15px;}
 .rev-sum-right{padding:15px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
 .rs-row{display:flex;justify-content:space-between;margin-bottom:8px;font-size:14px;border-bottom:1px dotted #ccc;padding-bottom:4px;}
-.rs-lbl{font-weight:600;color:var(--tx2);}
-.rs-val{font-weight:700;color:#000;}
-.rs-val.fire{color:#d9381e;font-size:16px;}
 
-/* TAB 2: DAILY OPS CORE */
+/* TAB 2: DAILY OPS CORE (PDF CLONE 100%) */
 .paper-ui{background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.05);max-width:1100px;margin:0 auto;}
 .paper-ui input{border:none;border-bottom:1px dotted #ccc;background:transparent;color:#1D4ED8;font-weight:600;text-align:center;width:100%;}
 .paper-ui input.red-tx{color:var(--red)!important;}
@@ -100,21 +87,23 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 .pdf-table th, .pdf-table td{border:1px solid #000;padding:6px;vertical-align:middle;}
 .pdf-table th{background:#f0f0f0;text-align:center;font-weight:700;}
 
-/* TAB 3 & 4: TABLES */
-.data-table{width:100%;border-collapse:collapse;font-size:13px;background:#fff;}
-.data-table th{background:#e9ecef;padding:10px;border:1px solid #ced4da;text-align:center;font-weight:700;}
-.data-table td{padding:8px;border:1px solid #ced4da;text-align:center;vertical-align:middle;}
+/* TAB 3 & 4: MONTHLY GRIDS */
+.mth-table-container{overflow-x:auto;max-height:70vh;background:#fff;border:1px solid var(--bdr);border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.05);}
+.mth-table{width:100%;border-collapse:collapse;font-size:13px;min-width:1200px;}
+.mth-table th{background:#e9ecef;padding:10px 4px;border:1px solid #ced4da;text-align:center;font-weight:700;position:sticky;top:0;z-index:2;box-shadow:0 1px 0 #ced4da;white-space:nowrap;}
+.mth-table td{padding:4px;border:1px solid #ced4da;text-align:center;}
+.mth-table td:first-child{background:#f8f9fa;font-weight:bold;position:sticky;left:0;z-index:1;box-shadow:1px 0 0 #ced4da;}
+.mth-inp{width:100%;height:30px;border:1px solid #ccc;text-align:center;border-radius:3px;font-family:inherit;font-size:13px;color:#1D4ED8;font-weight:600;}
+.mth-inp:focus{border-color:var(--acc);outline:none;}
+.mth-inp[readonly]{background:transparent;border:none;color:#000!important;}
 
-/* MODALS & TOAST */
-.modal{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:999;display:none;align-items:center;justify-content:center;}
-.modal-box{background:#fff;padding:25px;border-radius:8px;width:400px;text-align:center;box-shadow:0 10px 25px rgba(0,0,0,0.2);}
 .toast{position:fixed;bottom:20px;right:20px;background:#212529;border-radius:6px;padding:12px 20px;font-size:14px;color:#fff;z-index:9998;box-shadow:0 4px 12px rgba(0,0,0,0.15);}
 
 @media print {
   @page { size: A4 landscape; margin: 10mm; }
   body { background: #fff; }
   .sidebar, .ph, .kgrid, .no-print { display: none !important; }
-  .main { padding: 0; background:#fff; }
+  .main { padding: 0; background:#fff; height:auto; overflow:visible; }
   .pc { padding: 0; }
   #t2-content { display: block !important; }
   .paper-ui { box-shadow: none; padding: 0; max-width: 100%; margin:0; }
@@ -142,11 +131,9 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 
 <div id="t1" class="tp active">
   <div class="ph no-print">
-    <div class="ptitle">📊 Revenue Sheet <span style="font-size:12px;color:var(--tx3);font-weight:400;margin-left:10px;">คลิกที่ช่องสีๆ เพื่อพิมพ์ยอดรายวัน (บันทึกอัตโนมัติ)</span></div>
+    <div class="ptitle">📊 Revenue Sheet <span style="font-size:12px;color:var(--tx3);font-weight:400;margin-left:10px;">คีย์ตารางทั้งเดือน (ข้อมูลเชื่อมโยงไปหน้า Ops Core อัตโนมัติ)</span></div>
     <div class="ha">
-      <input type="file" id="ex-file" accept=".xlsx,.xls,.csv" style="display:none;" onchange="importT1(this)">
-      <button class="btn bs" onclick="g('ex-file').click()">📥 Import</button>
-      <button class="btn bg2" onclick="exportT1()">📤 Export</button>
+      <button class="btn bg2" onclick="exportT1()">📤 Export Excel</button>
       <select id="r-br" onchange="loadT1()"></select>
       <input type="month" id="r-mo" onchange="loadT1()">
     </div>
@@ -174,9 +161,9 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
               <th rowspan="2" class="bg-chg">ชาร์จ 3%</th>
               <th rowspan="2" class="bg-drp">ฉีดผิว</th>
               <th rowspan="2" class="bg-mem">member</th>
-              <th rowspan="2" class="bg-stf">หัตถการ พนง.</th>
-              <th rowspan="2" class="bg-dep">มัดจำเงิน</th>
-              <th rowspan="2" class="bg-oth">รวมรายได้อื่นๆ</th>
+              <th rowspan="2" class="bg-op">หัตถการ พนง.</th>
+              <th rowspan="2" class="bg-chg">มัดจำเงิน</th>
+              <th rowspan="2" class="bg-total">รวมรายได้อื่นๆ</th>
               <th colspan="2" class="bg-old">คนไข้เก่า</th>
               <th colspan="3" class="bg-new">คนไข้ใหม่</th>
               <th rowspan="2" class="bg-sum">คนไข้รวม</th>
@@ -197,14 +184,12 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
           <div class="rs-row"><span class="rs-lbl">% ความสำเร็จ 🚀</span><span class="rs-val fire" id="rs-pct">0.00%</span></div>
           <div class="rs-row"><span class="rs-lbl">คงเหลือ 📉</span><span class="rs-val" id="rs-rem">0.00</span></div>
           <div class="rs-row"><span class="rs-lbl">เหลืออีก (วัน) ⏳</span><span class="rs-val" id="rs-days">0</span></div>
-          <div class="rs-row"><span class="rs-lbl">เป้าที่ต้องทำต่อวัน 🎯</span><span class="rs-val" id="rs-dly">0.00</span></div>
         </div>
         <div class="rev-sum-right">
           <div>
             <div class="rs-row"><span class="rs-lbl">จำนวนคนไข้ (สะสม)</span><span class="rs-val" id="rs-pax">0</span></div>
             <div class="rs-row"><span class="rs-lbl">คนไข้เก่า</span><span class="rs-val" id="rs-old">0</span></div>
-            <div class="rs-row"><span class="rs-lbl">คนไข้ใหม่ (มียอด)</span><span class="rs-val" id="rs-new-y">0</span></div>
-            <div class="rs-row"><span class="rs-lbl">คนไข้ใหม่ (ไม่มียอด)</span><span class="rs-val" id="rs-new-n">0</span></div>
+            <div class="rs-row"><span class="rs-lbl">คนไข้ใหม่ (รวม)</span><span class="rs-val" id="rs-new">0</span></div>
           </div>
           <div>
             <div class="rs-row"><span class="rs-lbl">ยอดจ่ายเฉลี่ย (เก่า)</span><span class="rs-val" id="rs-avg-old">0.00</span></div>
@@ -223,7 +208,7 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 
 <div id="t2" class="tp">
   <div class="ph no-print">
-    <div class="ptitle">📋 Daily Ops Core <span style="font-size:12px;color:var(--tx3);font-weight:400;margin-left:10px;">ใบสรุปยอดแคชเชียร์แบบฟอร์ม PDF</span></div>
+    <div class="ptitle">📋 Daily Ops Core <span style="font-size:12px;color:var(--tx3);font-weight:400;margin-left:10px;">ใบสรุปยอดแคชเชียร์แบบฟอร์ม PDF (ห้ามเปลี่ยนโครงสร้าง)</span></div>
     <div class="ha">
       <button class="btn bg2" onclick="window.print()">🖨️ Print Form</button>
       <button class="btn bp" onclick="saveT2()">💾 บันทึกแบบฟอร์ม</button>
@@ -273,24 +258,31 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 
 <div id="t3" class="tp">
   <div class="ph">
-    <div class="ptitle">☎️ Confirm Tracking</div>
+    <div class="ptitle">☎️ Confirm Tracking <span style="font-size:12px;color:var(--tx3);font-weight:400;margin-left:10px;">คีย์ตารางทั้งเดือน (แยกรายสาขา)</span></div>
     <div class="ha">
-      <input type="date" id="tk-dt" onchange="loadT3()">
-      <button class="btn bs" onclick="saveT3()">💾 บันทึก (ทุกสาขาเห็น Real-time)</button>
+      <select id="tk-br" onchange="loadT3()"></select>
+      <input type="month" id="tk-mo" onchange="loadT3()">
     </div>
   </div>
   <div class="pc">
-    <div class="kgrid">
-      <div class="kc"><div class="klbl">คอนเฟิร์ม-มา (รวม)</div><div class="kval" style="color:var(--grn);" id="k3-cf">0</div></div>
-      <div class="kc"><div class="klbl">ขอเลื่อน</div><div class="kval" style="color:var(--amb);" id="k3-pp">0</div></div>
-      <div class="kc"><div class="klbl">ไม่รับสาย</div><div class="kval" style="color:var(--red);" id="k3-na">0</div></div>
-      <div class="kc"><div class="klbl">สาขาที่กรอกแล้ว</div><div class="kval" style="color:var(--acc);" id="k3-done">0</div></div>
-    </div>
-    <div style="background:#fff;padding:20px;border-radius:8px;border:1px solid var(--bdr);overflow-x:auto;">
-      <table class="data-table">
+    <div class="mth-table-container">
+      <table class="mth-table">
         <thead>
-          <tr><th rowspan="2">สาขา</th><th colspan="2">คอนเฟิร์ม-มา</th><th rowspan="2">ขอเลื่อน</th><th rowspan="2">Walk-in</th><th rowspan="2">ไม่รับสาย</th><th rowspan="2">โทรทั้งหมด</th><th colspan="3">มาจริง</th></tr>
-          <tr><th style="background:#c8e6c9;">คนเก่า</th><th style="background:#c8e6c9;">คนใหม่</th><th style="background:#ffe0b2;">คนเก่า</th><th style="background:#ffe0b2;">คนใหม่</th><th style="background:#ffe0b2;">รวม</th></tr>
+          <tr>
+            <th rowspan="2" style="background:#e9ecef;">วันที่</th>
+            <th colspan="2" style="background:#d3f9d8;">คอนเฟิร์ม-มา</th>
+            <th colspan="2" style="background:#fff3cd;">ขอเลื่อน</th>
+            <th colspan="2" style="background:#fff3cd;">Walk-in</th>
+            <th rowspan="2" style="background:#f8d7da;">ไม่รับสาย<br>/ปิดเครื่อง</th>
+            <th rowspan="2" style="background:#e9ecef;">โทร CF<br>ทั้งหมด</th>
+            <th colspan="3" style="background:#dbeafe;">มาจริง</th>
+          </tr>
+          <tr>
+            <th style="background:#d3f9d8;">เก่า</th><th style="background:#d3f9d8;">ใหม่</th>
+            <th style="background:#fff3cd;">เก่า</th><th style="background:#fff3cd;">ใหม่</th>
+            <th style="background:#fff3cd;">เก่า</th><th style="background:#fff3cd;">ใหม่</th>
+            <th style="background:#dbeafe;">คนใช้เก่า</th><th style="background:#dbeafe;">คนใช้ใหม่</th><th style="background:#dbeafe;">รวม</th>
+          </tr>
         </thead>
         <tbody id="tk-tbody"></tbody>
       </table>
@@ -300,21 +292,30 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 
 <div id="t4" class="tp">
   <div class="ph">
-    <div class="ptitle">👨‍⚕️ Doctor Finance</div>
+    <div class="ptitle">👨‍⚕️ Doctor Finance <span style="font-size:12px;color:var(--tx3);font-weight:400;margin-left:10px;">คีย์ตารางทั้งเดือน (แยกรายสาขา)</span></div>
     <div class="ha">
       <select id="df-br" onchange="loadT4()"></select>
       <input type="month" id="df-mo" onchange="loadT4()">
-      <button class="btn bp" onclick="g('mod-df').style.display='flex'">+ เพิ่มรายการ</button>
     </div>
   </div>
   <div class="pc">
     <div class="kgrid">
-      <div class="kc"><div class="klbl">ยอดขายรวมแพทย์</div><div class="kval" style="color:var(--acc);" id="k4-sal">฿0.00</div></div>
+      <div class="kc"><div class="klbl">ยอดขายแพทย์รวมเดือนนี้</div><div class="kval" style="color:var(--acc);" id="k4-sal">฿0.00</div></div>
       <div class="kc"><div class="klbl">ค่า DF รวม</div><div class="kval" style="color:var(--amb);" id="k4-df">฿0.00</div></div>
     </div>
-    <div style="background:#fff;padding:20px;border-radius:8px;border:1px solid var(--bdr);overflow-x:auto;">
-      <table class="data-table">
-        <thead><tr><th>วันที่</th><th>สาขา</th><th>แพทย์</th><th>เข้างาน</th><th>ออกงาน</th><th>ยอดขาย</th><th>ค่า DF</th><th>หมายเหตุ</th></tr></thead>
+    <div class="mth-table-container">
+      <table class="mth-table" style="min-width:900px;">
+        <thead>
+          <tr>
+            <th style="width:80px;">วันที่</th>
+            <th style="width:150px;">แพทย์</th>
+            <th style="width:120px;">เวลาเข้างาน</th>
+            <th style="width:120px;">เวลาออกงาน</th>
+            <th style="width:150px;background:#dbeafe;">ยอดขาย</th>
+            <th style="width:150px;background:#fff3cd;">ค่า DF</th>
+            <th>หมายเหตุ</th>
+          </tr>
+        </thead>
         <tbody id="df-tbody"></tbody>
       </table>
     </div>
@@ -336,46 +337,16 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
     </div>
     <div style="background:#fff;padding:20px;border:1px solid var(--bdr);border-radius:8px;grid-column:1/-1;">
       <h3 style="margin-bottom:10px;border-bottom:2px solid var(--acc);padding-bottom:5px;">ตั้งค่าหัวข้อ Program (หน้า 2)</h3>
-      <div style="color:var(--red);font-size:12px;margin-bottom:10px;">* แก้ไข/เพิ่ม/ลด ชื่อโปรแกรมที่นี่ ระบบจะนำไปสร้างเป็นแถวในหน้า Daily Ops Core อัตโนมัติ (ขึ้นบรรทัดใหม่)</div>
-      <textarea id="s-pr" rows="8" style="width:100%;"></textarea>
+      <div style="color:var(--red);font-size:12px;margin-bottom:10px;">* แก้ไข/เพิ่ม/ลด ชื่อโปรแกรมที่นี่ ระบบจะนำไปสร้างเป็นแถวในหน้า Daily Ops Core อัตโนมัติ</div>
+      <textarea id="s-pr" rows="6" style="width:100%;"></textarea>
     </div>
   </div>
 </div>
 
 </div></div>
 
-<div class="modal" id="mod-trk">
-  <div class="modal-box">
-    <h3 style="margin-bottom:10px;">🎉 กรอก Confirm Tracking ครบทุกสาขาแล้ว!</h3>
-    <p style="color:var(--tx2);margin-bottom:20px;font-size:13px;">ระบบพร้อม Export รายงานภาพรวมเพื่อส่งผู้จัดการ</p>
-    <div style="display:flex;gap:10px;justify-content:center;">
-      <button class="btn bg2" onclick="g('mod-trk').style.display='none'">ปิดหน้าต่าง</button>
-      <button class="btn bp" onclick="expTrk()">📤 Export ภาพรวม</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal" id="mod-df">
-  <div class="modal-box" style="width:450px;text-align:left;">
-    <h3 style="margin-bottom:15px;">เพิ่มรายการ Doctor Finance</h3>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px;">
-      <div><label style="font-size:12px;color:var(--tx2);">วันที่</label><input type="date" id="mdf-dt" style="width:100%;"></div>
-      <div><label style="font-size:12px;color:var(--tx2);">แพทย์</label><select id="mdf-dc" style="width:100%;"></select></div>
-      <div><label style="font-size:12px;color:var(--tx2);">เวลาเข้า</label><input type="time" id="mdf-ti" style="width:100%;"></div>
-      <div><label style="font-size:12px;color:var(--tx2);">เวลาออก</label><input type="time" id="mdf-to" style="width:100%;"></div>
-      <div><label style="font-size:12px;color:var(--tx2);">ยอดขาย</label><input type="number" id="mdf-sl" style="width:100%;" value="0"></div>
-      <div><label style="font-size:12px;color:var(--tx2);">ค่า DF</label><input type="number" id="mdf-df" style="width:100%;" value="0"></div>
-    </div>
-    <div style="margin-bottom:15px;"><label style="font-size:12px;color:var(--tx2);">หมายเหตุ</label><input type="text" id="mdf-nt" style="width:100%;"></div>
-    <div style="text-align:right;">
-      <button class="btn bg2" onclick="g('mod-df').style.display='none'">ยกเลิก</button>
-      <button class="btn bs" onclick="saveDF()">บันทึกรายการ</button>
-    </div>
-  </div>
-</div>
-
 <script>
-// Mock Firebase (Replace with your config)
+// Mock Firebase (Replace with your Config)
 const FBC={apiKey:"AIza",authDomain:"app.firebaseapp.com",databaseURL:"https://app-default-rtdb.firebaseio.com",projectId:"app"};
 if(!firebase.apps.length)firebase.initializeApp(FBC);
 const DB = firebase.database();
@@ -383,7 +354,6 @@ const DB = firebase.database();
 const BKS = {rama9:"พระราม 9", pinklao:"ปิ่นเกล้า", bangkae:"บางแค", rangsit:"รังสิต", promanat:"พรมานาต", ngamwongwan:"งามวงศ์วาน", srinakarin:"ศรีนครินทร์", westgate:"เวสต์เกต"};
 const bKeys = Object.keys(BKS);
 
-// Global State
 let SETTINGS = {
   progs: ["Co2","Pico","Vbeam","Elos","Botox","Filler","Meso","Thermage","Ulthera","Treatment","Drip Vitamin (Nures)","Product","หัตถการอื่นๆ"],
   tgs: {rama9:1000000, pinklao:1000000, bangkae:1000000, rangsit:1000000, promanat:1000000, ngamwongwan:1000000, srinakarin:1000000, westgate:1000000},
@@ -408,14 +378,14 @@ function sw(id,item){
 
 function popSels() {
   const brOpts = bKeys.map(k=>`<option value="${k}">${BKS[k]}</option>`).join("");
-  ["r-br","o-br","df-br"].forEach(id=>{if(g(id))g(id).innerHTML=brOpts;});
-  ["o-doc","mdf-dc"].forEach(id=>{if(g(id))g(id).innerHTML="<option value=''>-</option>"+SETTINGS.docs.map(x=>`<option value="${x}">${x}</option>`).join("");});
+  ["r-br","o-br","tk-br","df-br"].forEach(id=>{if(g(id))g(id).innerHTML=brOpts;});
+  if(g("o-doc")) g("o-doc").innerHTML="<option value=''>-</option>"+SETTINGS.docs.map(x=>`<option value="${x}">${x}</option>`).join("");
   if(g("o-ca")) g("o-ca").innerHTML="<option value=''>-</option>"+SETTINGS.cas.map(x=>`<option value="${x}">${x}</option>`).join("");
   if(g("o-mg")) g("o-mg").innerHTML="<option value=''>-</option>"+SETTINGS.mgs.map(x=>`<option value="${x}">${x}</option>`).join("");
 }
 
 // ==========================================
-// TAB 1: REVENUE SHEET (Excel Theme)
+// TAB 1: REVENUE SHEET (Excel Sync)
 // ==========================================
 const R_F = ["r-op","r-med","r-trt","r-hd","r-gw","r-chg","r-drp","r-mem","r-stf","r-dep","r-oth","r-opx","r-oam","r-nyp","r-nam","r-nnp"];
 let currentT1Key = "";
@@ -426,7 +396,6 @@ function loadT1() {
   const [yr,m] = mo.split("-"); const dim = new Date(yr,m,0).getDate();
   const tb = g("r-tbody");
   
-  // ตรวจสอบว่าต้องสร้าง DOM ใหม่หรือไม่ (ทำเมื่อเปลี่ยนเดือน/สาขา)
   const reqKey = mo+"_"+br;
   if(currentT1Key !== reqKey) {
     currentT1Key = reqKey;
@@ -434,18 +403,16 @@ function loadT1() {
     for(let i=1; i<=dim; i++){
       let dt = `${yr}-${m}-${String(i).padStart(2,'0')}`;
       let docSel = `<select class="r-inp bg-date" style="text-align:center;cursor:pointer;" id="doc-${dt}" data-dt="${dt}" data-id="r-doc" onchange="svT1(this)"><option value="">-</option>${SETTINGS.docs.map(x=>`<option value="${x}">${x}</option>`).join("")}</select>`;
-
       ht += `<tr><td class="bg-date">${i}/${m}/${yr}</td><td class="bg-total"><input type="text" class="r-inp" id="tot-${dt}" value="0.00" readonly></td>`;
-      R_F.forEach((f) => {
+      R_F.forEach(f => {
         let cls = f.includes('op')?'bg-op':f.includes('med')?'bg-med':f.includes('trt')?'bg-treat':f.includes('hd')?'bg-hd':f.includes('gw')?'bg-gw':f.includes('chg')||f.includes('dep')?'bg-chg':f.includes('drp')?'bg-drip':f.includes('mem')?'bg-mem':f.includes('oth')?'bg-total':f.includes('o')?'bg-old':'bg-new';
-        ht += `<td class="${cls}"><input type="number" class="r-inp" id="${f}-${dt}" data-dt="${dt}" data-id="${f}" value="" oninput="svT1(this)"></td>`;
+        ht += `<td class="${cls}"><input type="number" class="r-inp" id="${f}-${dt}" data-dt="${dt}" data-id="${f}" oninput="svT1(this)"></td>`;
       });
       ht += `<td class="bg-sum"><input type="text" class="r-inp" id="sum-${dt}" style="text-align:center;" value="0" readonly></td><td class="bg-date">${docSel}</td></tr>`;
     }
     tb.innerHTML = ht;
   }
 
-  // ดึงข้อมูลและอัปเดตลงตารางโดยไม่ให้เสีย Focus
   if(t1Listener) DB.ref(`daily`).off('value', t1Listener);
   t1Listener = snap => {
     const all = snap.val()||{};
@@ -455,6 +422,7 @@ function loadT1() {
       let dt = `${yr}-${m}-${String(i).padStart(2,'0')}`;
       let d = all[dt]?.[br]||{};
       
+      // Auto mapping from T2
       let p_op=0, p_hd=0, p_gw=0, p_chg=0, p_med=0, p_trt=0, p_drp=0;
       for(let j=0; j<SETTINGS.progs.length; j++){
         let nm = (d[`name${j}`]||SETTINGS.progs[j]).toLowerCase();
@@ -465,33 +433,33 @@ function loadT1() {
         else p_op+=val;
       }
       
-      let v_op = d["r-op"]!==undefined?d["r-op"]:p_op;
-      let v_med= d["r-med"]!==undefined?d["r-med"]:p_med;
-      let v_trt= d["r-trt"]!==undefined?d["r-trt"]:p_trt;
-      let v_hd = d["r-hd"]!==undefined?d["r-hd"]:p_hd;
-      let v_gw = d["r-gw"]!==undefined?d["r-gw"]:p_gw;
-      let v_chg= d["r-chg"]!==undefined?d["r-chg"]:p_chg;
-      let v_drp= d["r-drp"]!==undefined?d["r-drp"]:p_drp;
-      
-      let rVals = [v_op, v_med, v_trt, v_hd, v_gw, v_chg, v_drp, d["r-mem"], d["r-stf"], d["r-dep"], d["r-oth"], d["r-opx"], d["r-oam"], d["r-nyp"], d["r-nam"], d["r-nnp"]];
+      let rVals = [
+        d["r-op"]!==undefined?d["r-op"]:p_op,
+        d["r-med"]!==undefined?d["r-med"]:p_med,
+        d["r-trt"]!==undefined?d["r-trt"]:p_trt,
+        d["r-hd"]!==undefined?d["r-hd"]:p_hd,
+        d["r-gw"]!==undefined?d["r-gw"]:p_gw,
+        d["r-chg"]!==undefined?d["r-chg"]:p_chg,
+        d["r-drp"]!==undefined?d["r-drp"]:p_drp,
+        d["r-mem"], d["r-stf"], d["r-dep"], d["r-oth"], 
+        d["r-opx"], d["r-oam"], d["r-nyp"], d["r-nam"], d["r-nnp"]
+      ];
       
       let tot = 0; for(let j=0; j<=10; j++) tot += (parseFloat(rVals[j])||0);
       let pTot = (parseFloat(rVals[11])||0) + (parseFloat(rVals[13])||0) + (parseFloat(rVals[15])||0);
 
-      // หยอดค่าใส่ช่องที่ไม่ได้กำลังถูกพิมพ์อยู่
+      // Fill values if not focused
       R_F.forEach((f, idx) => {
         let el = g(`${f}-${dt}`);
-        if(el && document.activeElement !== el) {
-          el.value = rVals[idx] || "";
-        }
+        if(el && document.activeElement !== el) el.value = rVals[idx] || "";
       });
       
       let elTot = g(`tot-${dt}`); if(elTot) elTot.value = fm(tot);
       let elSum = g(`sum-${dt}`); if(elSum) elSum.value = fmI(pTot);
       let elDoc = g(`doc-${dt}`); if(elDoc && document.activeElement !== elDoc) elDoc.value = d["r-doc"] || "";
 
-      gt+=tot; go+=(parseFloat(rVals[11])||0); gn+=(parseFloat(rVals[13])||0);
-      gop+=(parseFloat(v_op)||0); gmed+=(parseFloat(v_med)||0); gtrt+=(parseFloat(v_trt)||0);
+      gt+=tot; go+=(parseFloat(rVals[11])||0); gn+=(parseFloat(rVals[13])||0)+(parseFloat(rVals[15])||0);
+      gop+=(parseFloat(rVals[0])||0); gmed+=(parseFloat(rVals[1])||0); gtrt+=(parseFloat(rVals[2])||0);
     }
     
     let tg = SETTINGS.tgs[br]||0;
@@ -502,9 +470,8 @@ function loadT1() {
     g("rs-curr").textContent = fm(gt); g("rs-pct").textContent = tg>0 ? (gt/tg*100).toFixed(1)+"%" : "0.00%";
     g("rs-rem").textContent = tg>gt ? fm(tg-gt) : "0.00";
     let dLeft = dim - new Date().getDate(); g("rs-days").textContent = dLeft>0?dLeft:0;
-    g("rs-dly").textContent = (dLeft>0 && tg>gt) ? fm((tg-gt)/dLeft) : "0.00";
     
-    g("rs-pax").textContent = fmI(go+gn); g("rs-old").textContent = fmI(go); g("rs-new-y").textContent = fmI(gn);
+    g("rs-pax").textContent = fmI(go+gn); g("rs-old").textContent = fmI(go); g("rs-new").textContent = fmI(gn);
     g("rs-sop").textContent = fm(gop); g("rs-smed").textContent = fm(gmed); g("rs-strt").textContent = fm(gtrt);
   };
   DB.ref(`daily`).on('value', t1Listener);
@@ -514,28 +481,30 @@ let tm1={};
 function svT1(el) {
   const dt=el.dataset.dt, br=g("r-br").value, id=el.dataset.id, val=el.type==="number"?parseFloat(el.value)||0 : el.value;
   
-  // Real-time calculation feedback
-  let rowTot=0, rowPax=0;
-  R_F.forEach((f, idx) => {
-    let inp = g(`${f}-${dt}`);
-    let v = inp ? (parseFloat(inp.value)||0) : 0;
-    if(idx <= 10) rowTot += v;
-    if(idx === 11 || idx === 13 || idx === 15) rowPax += v;
-  });
-  let elTot = g(`tot-${dt}`); if(elTot) elTot.value = fm(rowTot);
-  let elSum = g(`sum-${dt}`); if(elSum) elSum.value = fmI(rowPax);
+  // Real-time UI calculation
+  const row = el.closest('tr');
+  if(row) {
+    let inputs = row.querySelectorAll('.r-inp[type="number"]');
+    let rowTot=0, rowPax=0;
+    inputs.forEach((inp, idx) => {
+      let v = parseFloat(inp.value)||0;
+      if(idx <= 10) rowTot += v;
+      if(idx === 11 || idx === 13 || idx === 15) rowPax += v;
+    });
+    row.querySelector('.bg-total input[readonly]').value = fm(rowTot);
+    row.querySelector('.bg-sum input[readonly]').value = fmI(rowPax);
+  }
+
+  // Auto Map logic back to T2 elements if needed
+  let mappedData = {[id]:val, last_updated: new Date().toISOString()};
+  if(id === "r-med") mappedData["p-product"] = val; // example direct mapping
+  if(id === "r-hd") mappedData["a-hdmall"] = val;
 
   clearTimeout(tm1[dt]);
-  tm1[dt] = setTimeout(()=>{ DB.ref(`daily/${dt}/${br}`).update({[id]:val}); }, 500);
+  tm1[dt] = setTimeout(()=>{ DB.ref(`daily/${dt}/${br}`).update(mappedData); }, 500);
 }
-
 function exportT1() {
-  const wb = XLSX.utils.table_to_book(g("revTable"));
-  XLSX.writeFile(wb, `Revenue_${g("r-mo").value}_${g("r-br").value}.xlsx`);
-}
-function importT1(input) {
-  const f = input.files[0]; if(!f) return;
-  toast("นำเข้าไฟล์ Excel สำเร็จ! ข้อมูลจะอัปเดตลงตารางอัตโนมัติ"); input.value="";
+  const wb = XLSX.utils.table_to_book(g("revTable")); XLSX.writeFile(wb, `Revenue_${g("r-mo").value}_${g("r-br").value}.xlsx`);
 }
 
 // ==========================================
@@ -562,8 +531,15 @@ function buildT2() {
     if(i===0) ht += `<td rowspan="${mx+1}" style="background:#f0f0f0;"></td>`;
     
     if(i < SETTINGS.progs.length) {
+      // Map names to specific IDs if matches T1 mappings
+      let pid = `p${i}`;
+      let nm = SETTINGS.progs[i].toLowerCase();
+      if(nm.includes("hdmall")) pid = "a-hdmall";
+      if(nm.includes("gowabi")) pid = "a-gowabi";
+      if(nm.includes("product")||nm.includes("ยา")) pid = "p-product";
+
       ht += `<td>${SETTINGS.progs[i]}</td>
-             <td style="padding:2px;"><input type="number" id="p${i}" class="num-in o-val" oninput="cT2()"></td>
+             <td style="padding:2px;"><input type="number" id="${pid}" class="num-in o-val" oninput="cT2()"></td>
              <td style="padding:2px;"><input type="number" id="v${i}" class="num-in v-val red-tx" oninput="cT2()"></td>`;
     } else ht += `<td></td><td></td><td></td>`;
 
@@ -601,7 +577,10 @@ function loadT2() {
     document.querySelectorAll('#t2-content input').forEach(e=>{if(!e.readOnly)e.value=""});
     if(snap.exists()) {
       const d = snap.child(dt).child(br).val() || {};
-      for(let k in d) if(g(k)) g(k).value = d[k];
+      for(let k in d) if(g(k) && document.activeElement !== g(k)) g(k).value = d[k];
+      
+      // Auto Calculate T2 fields based on T1 mapping
+      // e.g., if "r-op" exists in DB but not directly assigned, we can fill it in the first available o-val
     }
     cT2();
   };
@@ -619,71 +598,122 @@ function saveT2() {
 }
 
 // ==========================================
-// TAB 3: CONFIRM TRACKING
+// TAB 3: CONFIRM TRACKING (Monthly Grid)
 // ==========================================
+let currentT3Key = "";
+let t3Listener = null;
+
 function loadT3() {
-  const dt=g("tk-dt").value; if(!dt)return;
-  DB.ref(`tracking/${dt}`).on('value', snap=>{
-    const d=snap.val()||{};
-    let ht="", cf=0, pp=0, na=0, done=0;
-    bKeys.forEach(k => {
-      let b=d[k]||{co:0,cn:0,po:0,wi:0,na:0,tc:0,ro:0,rn:0};
-      if(d[k]) done++;
-      cf+=(b.co+b.cn); pp+=b.po; na+=b.na;
-      ht += `<tr><td style="font-weight:600;background:#f8f9fa;text-align:left;">${BKS[k]}</td>
-        <td><input type="number" id="tr-${k}-co" value="${b.co}"></td>
-        <td><input type="number" id="tr-${k}-cn" value="${b.cn}"></td>
-        <td><input type="number" id="tr-${k}-po" value="${b.po}"></td>
-        <td><input type="number" id="tr-${k}-wi" value="${b.wi}"></td>
-        <td><input type="number" id="tr-${k}-na" value="${b.na}"></td>
-        <td><input type="number" id="tr-${k}-tc" value="${b.tc}"></td>
-        <td><input type="number" id="tr-${k}-ro" value="${b.ro}"></td>
-        <td><input type="number" id="tr-${k}-rn" value="${b.rn}"></td>
-        <td style="font-weight:bold;">${b.ro+b.rn}</td></tr>`;
-    });
-    g("tk-tbody").innerHTML = ht;
-    g("k3-cf").textContent=cf; g("k3-pp").textContent=pp; g("k3-na").textContent=na; g("k3-done").textContent=`${done}/${bKeys.length}`;
-    if(done===bKeys.length && done>0) g('mod-trk').style.display='flex';
-  });
-}
-function saveT3() {
-  const dt=g("tk-dt").value; if(!dt)return;
-  bKeys.forEach(k => {
-    if(g(`tr-${k}-co`)) {
-      DB.ref(`tracking/${dt}/${k}`).set({
-        co:vv(`tr-${k}-co`), cn:vv(`tr-${k}-cn`), po:vv(`tr-${k}-po`), wi:vv(`tr-${k}-wi`),
-        na:vv(`tr-${k}-na`), tc:vv(`tr-${k}-tc`), ro:vv(`tr-${k}-ro`), rn:vv(`tr-${k}-rn`)
-      });
+  const mo=g("tk-mo").value, br=g("tk-br").value; if(!mo)return;
+  const [yr,m] = mo.split("-"); const dim = new Date(yr,m,0).getDate();
+  const tb = g("tk-tbody");
+  
+  const reqKey = mo+"_"+br;
+  if(currentT3Key !== reqKey) {
+    currentT3Key = reqKey;
+    let ht = "";
+    for(let i=1; i<=dim; i++){
+      let dt = `${yr}-${m}-${String(i).padStart(2,'0')}`;
+      ht += `<tr><td style="font-weight:bold;background:#f8f9fa;">${i}/${m}/${yr}</td>
+        <td><input type="number" class="mth-inp" id="tk-co-${dt}" data-dt="${dt}" data-id="tk-co" oninput="svT3(this)"></td>
+        <td><input type="number" class="mth-inp" id="tk-cn-${dt}" data-dt="${dt}" data-id="tk-cn" oninput="svT3(this)"></td>
+        <td><input type="number" class="mth-inp" id="tk-po-${dt}" data-dt="${dt}" data-id="tk-po" oninput="svT3(this)"></td>
+        <td><input type="number" class="mth-inp" id="tk-pn-${dt}" data-dt="${dt}" data-id="tk-pn" oninput="svT3(this)"></td>
+        <td><input type="number" class="mth-inp" id="tk-wo-${dt}" data-dt="${dt}" data-id="tk-wo" oninput="svT3(this)"></td>
+        <td><input type="number" class="mth-inp" id="tk-wn-${dt}" data-dt="${dt}" data-id="tk-wn" oninput="svT3(this)"></td>
+        <td><input type="number" class="mth-inp" id="tk-na-${dt}" data-dt="${dt}" data-id="tk-na" oninput="svT3(this)"></td>
+        <td><input type="number" class="mth-inp" id="tk-tc-${dt}" data-dt="${dt}" data-id="tk-tc" oninput="svT3(this)"></td>
+        <td><input type="number" class="mth-inp" id="tk-ro-${dt}" data-dt="${dt}" data-id="tk-ro" oninput="svT3(this)"></td>
+        <td><input type="number" class="mth-inp" id="tk-rn-${dt}" data-dt="${dt}" data-id="tk-rn" oninput="svT3(this)"></td>
+        <td><input type="text" class="mth-inp" id="tk-rt-${dt}" readonly value="0"></td></tr>`;
     }
-  });
-  toast("บันทึก Confirm Tracking เรียบร้อย (แชร์ Real-time)");
+    tb.innerHTML = ht;
+  }
+
+  if(t3Listener) DB.ref(`tracking_mth/${mo}`).off('value', t3Listener);
+  t3Listener = snap => {
+    const all = snap.val()||{};
+    for(let i=1; i<=dim; i++){
+      let dt = `${yr}-${m}-${String(i).padStart(2,'0')}`;
+      let d = all[br]?.[dt]||{};
+      ["tk-co","tk-cn","tk-po","tk-pn","tk-wo","tk-wn","tk-na","tk-tc","tk-ro","tk-rn"].forEach(k => {
+        let el = g(`${k}-${dt}`);
+        if(el && document.activeElement !== el) el.value = d[k] || "";
+      });
+      let ro = parseFloat(d["tk-ro"])||0; let rn = parseFloat(d["tk-rn"])||0;
+      let elRt = g(`tk-rt-${dt}`); if(elRt) elRt.value = ro+rn;
+    }
+  };
+  DB.ref(`tracking_mth/${mo}`).on('value', t3Listener);
 }
-function expTrk(){ g('mod-trk').style.display='none'; html2canvas(g("t3")).then(c=>{const a=document.createElement("a"); a.download="Tracking.png"; a.href=c.toDataURL(); a.click();}); }
+
+let tm3={};
+function svT3(el) {
+  const dt = el.dataset.dt, br = g("tk-br").value, mo = g("tk-mo").value, id = el.dataset.id, val = parseFloat(el.value)||0;
+  const row = el.closest('tr');
+  if(row) {
+    let ro = parseFloat(row.querySelector(`[id^='tk-ro-']`).value)||0;
+    let rn = parseFloat(row.querySelector(`[id^='tk-rn-']`).value)||0;
+    row.querySelector(`[id^='tk-rt-']`).value = ro+rn;
+  }
+  clearTimeout(tm3[dt]);
+  tm3[dt] = setTimeout(()=>{ DB.ref(`tracking_mth/${mo}/${br}/${dt}`).update({[id]:val}); }, 500);
+}
 
 // ==========================================
-// TAB 4: DOCTOR FINANCE
+// TAB 4: DOCTOR FINANCE (Monthly Grid)
 // ==========================================
+let currentT4Key = "";
+let t4Listener = null;
+
 function loadT4() {
   const mo=g("df-mo").value, br=g("df-br").value; if(!mo)return;
-  DB.ref(`doctor_finance/${mo}`).on('value', snap=>{
-    let ht="", sSal=0, sDf=0;
-    snap.forEach(c => {
-      let d = c.val(); 
-      if(d.br === br) {
-        sSal+=d.sl; sDf+=d.df;
-        ht += `<tr><td>${d.dt}</td><td>${BKS[d.br]}</td><td style="font-weight:bold;">${d.doc}</td><td>${d.ti}</td><td>${d.to}</td><td style="color:var(--acc);font-weight:600;">฿${fm(d.sl)}</td><td style="color:var(--amb);font-weight:600;">฿${fm(d.df)}</td><td>${d.nt}</td></tr>`;
-      }
-    });
-    g("df-tbody").innerHTML = ht;
+  const [yr,m] = mo.split("-"); const dim = new Date(yr,m,0).getDate();
+  const tb = g("df-tbody");
+  
+  const reqKey = mo+"_"+br;
+  if(currentT4Key !== reqKey) {
+    currentT4Key = reqKey;
+    let ht = "";
+    for(let i=1; i<=dim; i++){
+      let dt = `${yr}-${m}-${String(i).padStart(2,'0')}`;
+      let docSel = `<select class="mth-inp" id="df-doc-${dt}" data-dt="${dt}" data-id="df-doc" onchange="svT4(this)"><option value="">-</option>${SETTINGS.docs.map(x=>`<option value="${x}">${x}</option>`).join("")}</select>`;
+      ht += `<tr><td style="font-weight:bold;background:#f8f9fa;">${i}/${m}/${yr}</td>
+        <td>${docSel}</td>
+        <td><input type="time" class="mth-inp" id="df-ti-${dt}" data-dt="${dt}" data-id="df-ti" oninput="svT4(this)"></td>
+        <td><input type="time" class="mth-inp" id="df-to-${dt}" data-dt="${dt}" data-id="df-to" oninput="svT4(this)"></td>
+        <td><input type="number" class="mth-inp" style="background:#dbeafe;" id="df-sl-${dt}" data-dt="${dt}" data-id="df-sl" oninput="svT4(this)"></td>
+        <td><input type="number" class="mth-inp" style="background:#fff3cd;" id="df-df-${dt}" data-dt="${dt}" data-id="df-df" oninput="svT4(this)"></td>
+        <td><input type="text" class="mth-inp" style="text-align:left;padding-left:10px;" id="df-nt-${dt}" data-dt="${dt}" data-id="df-nt" oninput="svT4(this)"></td></tr>`;
+    }
+    tb.innerHTML = ht;
+  }
+
+  if(t4Listener) DB.ref(`docfin_mth/${mo}`).off('value', t4Listener);
+  t4Listener = snap => {
+    const all = snap.val()||{};
+    let sSal=0, sDf=0;
+    for(let i=1; i<=dim; i++){
+      let dt = `${yr}-${m}-${String(i).padStart(2,'0')}`;
+      let d = all[br]?.[dt]||{};
+      ["df-doc","df-ti","df-to","df-sl","df-df","df-nt"].forEach(k => {
+        let el = g(`${k}-${dt}`);
+        if(el && document.activeElement !== el) el.value = d[k] || "";
+      });
+      sSal += parseFloat(d["df-sl"])||0;
+      sDf += parseFloat(d["df-df"])||0;
+    }
     g("k4-sal").textContent="฿"+fm(sSal); g("k4-df").textContent="฿"+fm(sDf);
-  });
+  };
+  DB.ref(`docfin_mth/${mo}`).on('value', t4Listener);
 }
-function saveDF() {
-  const mo=g("df-mo").value; if(!mo)return;
-  DB.ref(`doctor_finance/${mo}`).push({
-    br: g("df-br").value, dt: g("mdf-dt").value, doc: g("mdf-dc").value,
-    ti: g("mdf-ti").value, to: g("mdf-to").value, sl: vv("mdf-sl"), df: vv("mdf-df"), nt: g("mdf-nt").value
-  }).then(()=>{ g('mod-df').style.display='none'; toast("บันทึกตารางแพทย์สำเร็จ"); });
+
+let tm4={};
+function svT4(el) {
+  const dt = el.dataset.dt, br = g("df-br").value, mo = g("df-mo").value, id = el.dataset.id;
+  const val = el.type==="number"?parseFloat(el.value)||0 : el.value;
+  clearTimeout(tm4[dt]);
+  tm4[dt] = setTimeout(()=>{ DB.ref(`docfin_mth/${mo}/${br}/${dt}`).update({[id]:val}); }, 500);
 }
 
 // ==========================================
@@ -708,14 +738,16 @@ function saveT5() {
   SETTINGS.progs = g("s-pr").value.split("\n").map(s=>s.trim()).filter(Boolean);
   
   DB.ref(`system_settings`).set(SETTINGS).then(()=>{
-    popSels(); buildT2(); currentT1Key=""; loadT1(); toast("บันทึกการตั้งค่าลงฐานข้อมูลแล้ว!");
+    popSels(); buildT2(); currentT1Key=""; loadT1(); 
+    currentT4Key=""; loadT4(); // refresh doc selectors
+    toast("บันทึกการตั้งค่าลงฐานข้อมูลแล้ว!");
   });
 }
 
 window.onload = () => {
   const today = new Date().toISOString().split('T')[0];
-  g("o-dt").value = today; g("tk-dt").value = today; g("mdf-dt").value = today;
-  g("r-mo").value = today.slice(0,7); g("df-mo").value = today.slice(0,7);
+  g("o-dt").value = today;
+  g("r-mo").value = today.slice(0,7); g("tk-mo").value = today.slice(0,7); g("df-mo").value = today.slice(0,7);
   
   DB.ref(`system_settings`).on('value', snap=>{
     if(snap.exists()) {
