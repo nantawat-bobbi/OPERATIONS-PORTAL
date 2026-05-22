@@ -43,7 +43,7 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--tx);min-height:
 .ni.active{background:var(--acc);color:#fff;font-weight:600;}
 .main{flex:1;background:var(--bg);display:flex;flex-direction:column;min-width:0;height:100vh;overflow-y:auto;}
 .tp{display:none;padding:0;flex:1;}
-.tp.active{display:block !important;}
+.tp.active{display:block;}
 
 /* HEADER & CONTROLS */
 .ph{background:#fff;border-bottom:1px solid var(--bdr);padding:15px 24px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:20;}
@@ -91,7 +91,7 @@ select:disabled{background:#e9ecef;cursor:not-allowed;font-weight:bold;color:var
 .bg-gw{background:#f3d0e2;} .bg-chg{background:#fff3cd;} .bg-drp{background:#d1e7dd;}
 .bg-mem{background:#f3f4f6;} .bg-old{background:#fff3cd;} .bg-new{background:#d1e7dd;} .bg-sum{background:#dbeafe;}
 
-/* FIXED VISIBILITY INPUTS: สไตล์แบบฟอร์มคีย์บอร์ดที่แคชเชียร์บางแคจะมองเห็นได้อย่างชัดเจน 100% */
+/* FIXED INPUTS: คืนชีพกล่องพิมพ์ยอดด้วยขอบเส้นเทาและพื้นผิวขาว สะอาดตา เห็นช่องชัดเจน */
 .r-inp{width:100%;height:32px;border:1px solid #ced4da !important;background:#ffffff !important;text-align:right;font-size:14px;font-weight:700;padding:4px 8px;color:#1D4ED8;border-radius:4px;outline:none;cursor:text;}
 .r-inp:hover{background:#f1f3f5 !important; border-color:var(--acc) !important;}
 .r-inp:focus{background:#fff3cd !important;box-shadow:inset 0 0 0 1px var(--acc);border-color:var(--acc) !important;}
@@ -233,7 +233,7 @@ select.r-inp { background:#ffffff !important; text-align-last: center; padding:2
           <thead>
             <tr>
               <th rowspan="2" class="bg-date">วันที่</th><th rowspan="2" class="bg-total">รายได้รวม</th>
-              <th rowspan="2" class="bg-op">หัตถการ</th><th rowspan="2" class="bg-med">ขายยา</th><th rowspan="2" class="bg-trt">Treatment</th>
+              <th rowspan="2" class="bg-op">หัตถการ</th><th rowspan="2" class="bg-med">ขายยา</th><th rowspan="2" class="bg-treat">Treatment</th>
               <th rowspan="2" class="bg-hd">HD MALL</th><th rowspan="2" class="bg-gw">Gowabi</th><th rowspan="2" class="bg-chg">ชาร์จ 3%</th>
               <th rowspan="2" class="bg-drp">ฉีดผิว</th><th rowspan="2" class="bg-mem">member</th><th rowspan="2" class="bg-op">หัตถการ พนง.</th>
               <th rowspan="2" class="bg-chg">มัดจำเงิน</th><th rowspan="2" class="bg-total">รวมรายได้อื่นๆ</th>
@@ -411,7 +411,7 @@ select.r-inp { background:#ffffff !important; text-align-last: center; padding:2
 
 <script>
 // ==========================================
-// 1. ARCHITECTURE DECLARATIONS (Hoisting Protection Fixed)
+// 1. GLOBAL LIFE-CYCLE DECLARATIONS (Strict Unique Scoping)
 // ==========================================
 const USERS = {
   "16698": { role: "admin", br: "all", label: "Admin สูงสุด | ทุกสาขา" },
@@ -473,39 +473,24 @@ const O_CREDITS = [
   {n:"ยอดรวมเครดิต", id:"t-crd", ro:true}
 ];
 
+// Table identifiers
 let curT1 = ""; let t1Listener = null;
 let curT3 = ""; let curT4 = ""; 
 
+// Chart structures (NO RE-DECLARATION BLOCKS WITHIN MIDDLE SCRIPT)
 let c0Bar, c0Pie, c0Funnel, c0Doc, c0Track1, c0Track2, c0D1, c0D2;
 let c1Trend, c1BrDonut, c3Donut, c4Bar;
 
 function g(id){return document.getElementById(id);}
 
-function fm(n){
-  let num = parseFloat(n) || 0;
-  if (num % 1 !== 0) return num.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  return num.toLocaleString("th-TH");
-}
-function fmI(n){ return Math.round(parseFloat(n)||0).toLocaleString("th-TH"); }
-
-function toast(m, type="success"){
-  const el=document.createElement("div"); el.className="toast"; el.style.background = type==="error" ? "#c92a2a" : "#212529";
-  el.textContent=m; document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
+function injectBranchOptions() {
+  const opts = bKeys.map(k=>`<option value="${k}">${BKS[k]}</option>`).join("");
+  ["r-br","o-br","tk-br","df-br"].forEach(id=>{ const el = g(id); if(el) el.innerHTML=opts; });
 }
 
-function expPNG(targetId, filename) {
-  const target = g(targetId); const obg = target.style.background; target.style.background = "#f0f2f5";
-  toast("กำลังประมวลผลรูปภาพ...");
-  html2canvas(target, {scale: 2, backgroundColor: "#f0f2f5"}).then(canvas => {
-    target.style.background = obg;
-    const a = document.createElement("a"); a.download = `${filename}_${new Date().getTime()}.png`;
-    a.href = canvas.toDataURL("image/png"); a.click(); toast("📸 บันทึกรูปภาพสำเร็จ!");
-  });
-}
-
-// -----------------------------------------------------
-// 2. CORE SECURITY & AUTHENTICATION OVERRIDE
-// -----------------------------------------------------
+// ==========================================
+// 2. CORE SECURITY & PRIVILEGE MANAGER
+// ==========================================
 function checkLogin() {
   const pass = g("login-pass").value;
   if(!USERS[pass]) return toast("รหัสพนักงานไม่ถูกต้อง!", "error");
@@ -514,6 +499,8 @@ function checkLogin() {
   g("login-screen").style.setProperty('display', 'none', 'important');
   g("main-app").style.setProperty('display', 'flex', 'important');
   g("nav-user-label").textContent = `[${CURRENT_USER.label}]`;
+
+  document.querySelectorAll(".tp").forEach(p => p.style.setProperty('display', 'none', 'important'));
 
   if(CURRENT_USER.role === "admin") {
     document.querySelectorAll('.admin-ni').forEach(el => el.style.setProperty('display', 'flex', 'important'));
@@ -526,6 +513,10 @@ function checkLogin() {
     sw('t1', document.getElementById('ni-t1'));
   }
 }
+
+document.getElementById("login-pass").addEventListener("keypress", function(event) {
+  if (event.key === "Enter") { event.preventDefault(); checkLogin(); }
+});
 
 function sw(id, item) {
   document.querySelectorAll(".tp").forEach(p => p.style.setProperty('display', 'none', 'important'));
@@ -543,9 +534,8 @@ function updateSelects() {
   if(g("o-mg")) { let v=g("o-mg").value; g("o-mg").innerHTML="<option value=''>-</option>"+SETTINGS.mgs.map(x=>`<option value="${x}">${x}</option>`).join(""); g("o-mg").value=v; }
 }
 
-// Placeholder for future Google Sheets automated script bindings
 function triggerGoogleSheetSync(pageKey) {
-  toast(`🚀 กำหนดโครงสร้างสำเร็จ! ชีทสำหรับโปรแกรมหน้า [${pageKey.toUpperCase()}] สแตนด์บายพร้อมผูก Google Apps Script แล้วครับบอส`, "success");
+  toast(`🚀 ระบบพร้อมผูกดึงสคริปต์ Google Sheets ร่วมกับหน้ารายงาน [${pageKey.toUpperCase()}] เรียบร้อยครับบอส`, "success");
 }
 
 // ==========================================
@@ -646,15 +636,8 @@ function buildT0() {
 }
 
 // ==========================================
-// TAB 1: REVENUE SHEET + BRANCH DASHBOARD SYSTEM
+// TAB 1: REVENUE SHEET + BRANCH DASHBOARD
 // ==========================================
-function downloadTemplate() {
-  const mo=g("r-mo").value; const [yr,m] = mo.split("-"); const dim = new Date(yr,m,0).getDate();
-  let data = [["วันที่", "หัตถการ", "ขายยา", "Treatment", "HD MALL", "Gowabi", "ชาร์จ 3%", "ฉีดผิว", "member", "หัตถการ พนง.", "มัดจำเงิน", "รวมรายได้อื่นๆ", "คนไข้เก่า (คน)", "คนไข้เก่า (ยอด)", "คนไข้ใหม่มี (คน)", "คนไข้ใหม่มียอด (บาท)", "คนไข้ใหม่ไม่มี (คน)", "แพทย์"]];
-  for(let i=1; i<=dim; i++) data.push([`${i}/${m}/${yr}`, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ""]);
-  const ws = XLSX.utils.aoa_to_sheet(data); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Template"); XLSX.writeFile(wb, `Template_Import_${mo}.xlsx`);
-}
-
 function buildT1() {
   const mo=g("r-mo").value, br=g("r-br").value; if(!mo)return;
   const [yr,m] = mo.split("-"); const dim = new Date(yr,m,0).getDate();
@@ -734,14 +717,10 @@ function calcT1(triggerEl) {
     let rawVal = triggerEl.value.replace(/,/g,''); const val = parseFloat(rawVal)||0;
     let mapped = {[id]:val};
     
-    // AUTOMATIC FIXED PIPELINE: แกะเงื่อนไขสตริงแมปข้อมูลข้ามหน้าจากแถว 1 ไหลลงหน้า 2 ทันที
-    if(id === "r-med") mapped["p-product"] = val; 
-    if(id === "r-trt") mapped["p-treatment"] = val; 
-    if(id === "r-hd") mapped["a-hdmall"] = val; 
-    if(id === "r-gw") mapped["a-gowabi"] = val; 
-    if(id === "r-chg") mapped["p-charge"] = val; 
-    if(id === "r-drp") mapped["p-drip"] = val;
-    
+    // PIPELINE AUTO SYNC TO TAB 2 (Ops Core Node)
+    if(id === "r-med") mapped["p-product"] = val; if(id === "r-trt") mapped["p-treatment"] = val; 
+    if(id === "r-hd") mapped["a-hdmall"] = val; if(id === "r-gw") mapped["a-gowabi"] = val; 
+    if(id === "r-chg") mapped["p-charge"] = val; if(id === "r-drp") mapped["p-drip"] = val;
     clearTimeout(tm1[dt]); tm1[dt] = setTimeout(()=>{ DB.ref(`ops_daily/${dt}/${br}`).update(mapped); }, 500);
   }
 }
@@ -776,29 +755,24 @@ function importT1(input) {
   reader.readAsArrayBuffer(f); input.value=""; 
 }
 
-// ADVANCED FIXED EXPORT: วิ่งลูปดึงข้อมูลจากค่ากล่องอินพุตสระสะสมตรงๆ เพื่อให้ได้ไฟล์ Excel สรุปยอดขายสมบูรณ์
 function exportT1() {
-  const table = g("revTable");
   let data = [];
-  
-  // แกะข้อมูลหัวตาราง
   let headers = ["วันที่", "รายได้รวม", "หัตถการ", "ขายยา", "Treatment", "HD MALL", "Gowabi", "ชาร์จ 3%", "ฉีดผิว", "member", "หัตถการ พนง.", "มัดจำเงิน", "รวมรายได้อื่นๆ", "คนไข้เก่า(คน)", "คนไข้เก่า(ยอด)", "คนไข้ใหม่(คน)", "คนไข้ใหม่(ยอด)", "ใหม่ไม่มียอด(คน)", "คนไข้รวม", "แพทย์"];
   data.push(headers);
   
-  // วิ่งลูปดึงข้อมูลรายบรรทัดจากกล่อง Input
   const rows = document.querySelectorAll("#r-tbody tr");
   rows.forEach(row => {
     let rowData = [];
-    rowData.push(row.cells[0].textContent.trim()); // วันที่
-    rowData.push(parseFloat(row.querySelector('.row-tot').value.replace(/,/g,''))||0); // รายได้รวม
+    rowData.push(row.cells[0].textContent.trim());
+    rowData.push(parseFloat(row.querySelector('.row-tot').value.replace(/,/g,''))||0);
     
     R_COLS.forEach(c => {
       let val = parseFloat(row.querySelector(`[data-id="${c.id}"]`)?.value.replace(/,/g,''))||0;
       rowData.push(val);
     });
     
-    rowData.push(parseFloat(row.querySelector('.row-pax').value.replace(/,/g,''))||0); // คนไข้รวม
-    rowData.push(row.querySelector(`[data-id="r-doc"]`)?.value || ""); // แพทย์
+    rowData.push(parseFloat(row.querySelector('.row-pax').value.replace(/,/g,''))||0);
+    rowData.push(row.querySelector(`[data-id="r-doc"]`)?.value || "");
     data.push(rowData);
   });
   
