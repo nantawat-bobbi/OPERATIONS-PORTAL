@@ -202,6 +202,17 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
         <div style="position:relative; height:250px;"><canvas id="c0-doc"></canvas></div>
       </div>
     </div>
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-bottom:20px;">
+      <div class="chart-box">
+        <h3 style="margin-bottom:10px;font-size:15px;border-bottom:2px solid var(--acc);padding-bottom:5px;">💉 สัดส่วนบริการหลัก (หัตถการ vs ขายยา vs Treatment)</h3>
+        <div style="position:relative; height:250px;"><canvas id="c0-d1"></canvas></div>
+      </div>
+      <div class="chart-box">
+        <h3 style="margin-bottom:10px;font-size:15px;border-bottom:2px solid var(--acc);padding-bottom:5px;">✨ สัดส่วนหัตถการยอดฮิต (Co2 vs Pico vs Vbeam)</h3>
+        <div style="position:relative; height:250px;"><canvas id="c0-d2"></canvas></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -453,10 +464,14 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 
 <script>
 const FBC = {
-  apiKey: "AIzaSyDetHuoARpuhqRp-o9mVzECi1nzWAEo-O4",
-  authDomain: "operations-portal-d60a5.firebaseapp.com",
-  databaseURL: "https://operations-portal-d60a5-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "operations-portal-d60a5"
+  apiKey: "AIzaSyC0P1LGtglA_t1Nc5PyM5uD3MOLnfBZwFM",
+  authDomain: "lalizaclinic-work-schedule.firebaseapp.com",
+  databaseURL: "https://lalizaclinic-work-schedule-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "lalizaclinic-work-schedule",
+  storageBucket: "lalizaclinic-work-schedule.firebasestorage.app",
+  messagingSenderId: "1052920426382",
+  appId: "1:1052920426382:web:e07f91f2e56d0fc7497edf",
+  measurementId: "G-1HHWXV0FW7"
 };
 if(!firebase.apps.length)firebase.initializeApp(FBC);
 const DB = firebase.database();
@@ -470,7 +485,8 @@ let SETTINGS = {
   docs: ["หมอ A"], cas: ["แคชเชียร์ A"], mgs: ["ผู้จัดการ A"]
 };
 
-let c0Bar, c0Pie, c0Funnel, c0Doc;
+// Global Chart Variables
+let c0Bar, c0Pie, c0Funnel, c0Doc, c0D1, c0D2;
 let c1Trend, c3Donut, c4Bar;
 
 function injectBranchOptions() {
@@ -533,14 +549,19 @@ function buildT0() {
   const mo = g("d0-mo").value; if(!mo) return;
   
   Promise.all([
-    DB.ref('daily').once('value'),
-    DB.ref(`tracking_mth/${mo}`).once('value'),
-    DB.ref(`docfin_mth/${mo}`).once('value')
+    DB.ref('ops_daily').once('value'),
+    DB.ref(`ops_tracking_mth/${mo}`).once('value'),
+    DB.ref(`ops_docfin_mth/${mo}`).once('value')
   ]).then(([snapDaily, snapTrack, snapDoc]) => {
     
     // 1. Process Daily (Revenue & Ops Core)
     const allD = snapDaily.val()||{};
     let bRev={}, bTg={}, totRev=0, totTg=0, totPax=0, tCash=0, tApp=0, tTrans=0, tCrd=0;
+    
+    // For new Donut Charts
+    let tOp=0, tMed=0, tTrt=0;
+    let tCo2=0, tPico=0, tVb=0;
+
     bKeys.forEach(k => { bRev[k]=0; bTg[k] = SETTINGS.tgs[k]||0; totTg+=bTg[k]; });
 
     for(let dt in allD) {
@@ -548,7 +569,6 @@ function buildT0() {
         bKeys.forEach(br => {
           if(allD[dt][br]) {
             let d = allD[dt][br];
-            // EXACT 11 Fields
             let rTot = (parseFloat(d["r-op"])||0)+(parseFloat(d["r-med"])||0)+(parseFloat(d["r-trt"])||0)+(parseFloat(d["r-hd"])||0)+(parseFloat(d["r-gw"])||0)+(parseFloat(d["r-chg"])||0)+(parseFloat(d["r-drp"])||0)+(parseFloat(d["r-mem"])||0)+(parseFloat(d["r-stf"])||0)+(parseFloat(d["r-dep"])||0)+(parseFloat(d["r-oth"])||0);
             bRev[br] += rTot; totRev += rTot;
             totPax += (parseFloat(d["r-opx"])||0)+(parseFloat(d["r-nyp"])||0)+(parseFloat(d["r-nnp"])||0);
@@ -557,6 +577,15 @@ function buildT0() {
             tApp += (parseFloat(d["a-hdmall"])||0) + (parseFloat(d["a-gowabi"])||0);
             tTrans += parseFloat(d["pay-trans"])||0;
             tCrd += (parseFloat(d["c-kbank"])||0) + (parseFloat(d["c-crd"])||0) + (parseFloat(d["c-kbsc"])||0) + (parseFloat(d["c-ktc"])||0) + (parseFloat(d["c-bay"])||0) + (parseFloat(d["c-scb"])||0) + (parseFloat(d["c-oth"])||0);
+
+            // New Data Aggregation
+            tOp += parseFloat(d["r-op"])||0;
+            tMed += parseFloat(d["r-med"])||0;
+            tTrt += parseFloat(d["r-trt"])||0;
+
+            tCo2 += parseFloat(d["p0"])||0;
+            tPico += parseFloat(d["p1"])||0;
+            tVb += parseFloat(d["p2"])||0;
           }
         });
       }
@@ -590,6 +619,17 @@ function buildT0() {
     g("k0-rev").textContent = "฿"+fm(totRev); g("k0-tg").textContent = "฿"+fm(totTg);
     g("k0-pax").textContent = fmI(totPax)+" คน"; g("k0-df").textContent = "฿"+fm(tDf);
 
+    // Default Tooltip options for Donuts to show percentage
+    const donutTooltipOption = {
+      callbacks: {
+        label: function(ctx) {
+          let total = ctx.dataset.data.reduce((a,b)=>a+b,0);
+          let pct = total > 0 ? ((ctx.raw/total)*100).toFixed(1) : 0;
+          return `${ctx.label}: ฿${fm(ctx.raw)} (${pct}%)`;
+        }
+      }
+    };
+
     // Chart 1: Bar (Revenue)
     if(c0Bar) c0Bar.destroy();
     c0Bar = new Chart(g("c0-bar"), {
@@ -616,7 +656,7 @@ function buildT0() {
     c0Pie = new Chart(g("c0-pie"), {
       type: 'doughnut',
       data: { labels: ['เงินสด', 'แอปพลิเคชัน', 'เงินโอน', 'บัตรเครดิต'], datasets: [{data:[tCash, tApp, tTrans, tCrd], backgroundColor:['#2f9e44', '#845ef7', '#f08c00', '#1971c2']}] },
-      options: {responsive:true, maintainAspectRatio:false}
+      options: {responsive:true, maintainAspectRatio:false, plugins:{tooltip: donutTooltipOption}}
     });
 
     // Chart 4: Horizontal Bar (Doctors)
@@ -626,6 +666,22 @@ function buildT0() {
       type: 'bar',
       data: { labels: sortedDocs, datasets: [{label: 'ยอดขายแพทย์รวม (บาท)', data: sortedDocs.map(d=>docStats[d]), backgroundColor: '#e64980', borderRadius:4}] },
       options: {responsive:true, maintainAspectRatio:false, indexAxis:'y'}
+    });
+
+    // Chart 5: NEW Donut (หัตถการ vs ขายยา vs Treatment)
+    if(c0D1) c0D1.destroy();
+    c0D1 = new Chart(g("c0-d1"), {
+      type: 'doughnut',
+      data: { labels: ['หัตถการ', 'ขายยา', 'Treatment'], datasets: [{data:[tOp, tMed, tTrt], backgroundColor:['#f08c00', '#2f9e44', '#845ef7']}] },
+      options: {responsive:true, maintainAspectRatio:false, plugins:{tooltip: donutTooltipOption}}
+    });
+
+    // Chart 6: NEW Donut (Co2 vs Pico vs Vbeam)
+    if(c0D2) c0D2.destroy();
+    c0D2 = new Chart(g("c0-d2"), {
+      type: 'doughnut',
+      data: { labels: ['Co2', 'Pico', 'Vbeam'], datasets: [{data:[tCo2, tPico, tVb], backgroundColor:['#1971c2', '#e64980', '#20c997']}] },
+      options: {responsive:true, maintainAspectRatio:false, plugins:{tooltip: donutTooltipOption}}
     });
 
   });
@@ -661,7 +717,7 @@ function buildT1() {
     g("k1-tg").dataset.val = SETTINGS.tgs[br]||0; g("k1-tg").textContent = "฿"+fm(SETTINGS.tgs[br]||0);
   }
 
-  if(t1Listener) DB.ref(`daily`).off('value', t1Listener);
+  if(t1Listener) DB.ref(`ops_daily`).off('value', t1Listener);
   t1Listener = snap => {
     const all = snap.val()||{};
     for(let i=1; i<=dim; i++){
@@ -676,7 +732,7 @@ function buildT1() {
     }
     calcT1(); 
   };
-  DB.ref(`daily`).on('value', t1Listener);
+  DB.ref(`ops_daily`).on('value', t1Listener);
 }
 
 function formatInput(el) { if(el.value!=="") el.value = fm(el.value.replace(/,/g,'')); }
@@ -737,7 +793,7 @@ function calcT1(triggerEl) {
     if(id === "r-trt") mapped["p-treatment"] = val; if(id === "r-hd") mapped["a-hdmall"] = val;
     if(id === "r-gw") mapped["a-gowabi"] = val; if(id === "r-chg") mapped["p-charge"] = val;
     if(id === "r-drp") mapped["p-drip"] = val;
-    clearTimeout(tm1[dt]); tm1[dt] = setTimeout(()=>{ DB.ref(`daily/${dt}/${br}`).update(mapped); }, 500);
+    clearTimeout(tm1[dt]); tm1[dt] = setTimeout(()=>{ DB.ref(`ops_daily/${dt}/${br}`).update(mapped); }, 500);
   }
 }
 
@@ -770,7 +826,7 @@ function importT1(input) {
         }
         updates[`${dt}/${br}/r-doc`] = row[17] || ""; count++;
       }
-      DB.ref('daily').update(updates).then(() => toast(`✅ นำเข้าสำเร็จ ${count} วัน`)).catch(err => toast(err.message, "error"));
+      DB.ref('ops_daily').update(updates).then(() => toast(`✅ นำเข้าสำเร็จ ${count} วัน`)).catch(err => toast(err.message, "error"));
     } catch(err) { toast("❌ รูปแบบไฟล์ไม่ถูกต้อง", "error"); }
   };
   reader.readAsArrayBuffer(f); input.value=""; 
@@ -849,7 +905,7 @@ function buildT2() {
   tb.innerHTML = ht;
   
   const dt=g("o-dt").value, br=g("o-br").value; if(!dt)return;
-  DB.ref(`daily/${dt}/${br}`).once('value').then(snap=>{
+  DB.ref(`ops_daily/${dt}/${br}`).once('value').then(snap=>{
     document.querySelectorAll('#t2-content input[type="text"]').forEach(e=>{if(!e.readOnly && e.id!=='t-grand' && !e.id.includes('cust-lbl') && e.id!=='o-rsn' && e.id!=='o-note' && e.id!=='c-oth-n')e.value=""});
     if(snap.exists()) { 
       const d = snap.val(); 
@@ -883,7 +939,7 @@ function cT2(fromLoad = false) {
 let t2Listener = null;
 function loadT2() {
   buildT2(); const dt=g("o-dt").value, br=g("o-br").value; if(!dt)return;
-  if(t2Listener) DB.ref(`daily`).off('value', t2Listener);
+  if(t2Listener) DB.ref(`ops_daily`).off('value', t2Listener);
   t2Listener = snap => {
     if(snap.exists()) {
       const d = snap.child(dt).child(br).val() || {};
@@ -896,12 +952,12 @@ function loadT2() {
     }
     cT2(true);
   };
-  DB.ref(`daily`).on('value', t2Listener);
+  DB.ref(`ops_daily`).on('value', t2Listener);
 }
 
 function saveT2Quick(id, val) { 
   const dt=g("o-dt").value, br=g("o-br").value; let rawVal = val.toString().replace(/,/g, '');
-  DB.ref(`daily/${dt}/${br}`).update({[id]: isNaN(parseFloat(rawVal)) ? rawVal : parseFloat(rawVal)}); 
+  DB.ref(`ops_daily/${dt}/${br}`).update({[id]: isNaN(parseFloat(rawVal)) ? rawVal : parseFloat(rawVal)}); 
 }
 
 function saveT2() {
@@ -912,7 +968,7 @@ function saveT2() {
       p[e.id] = (!isNaN(rawVal) && rawVal !== "" && !e.id.includes('lbl') && !e.id.includes('rsn') && !e.id.includes('note') && !e.id.includes('c-oth-n')) ? parseFloat(rawVal) : e.value; 
     }
   });
-  DB.ref(`daily/${dt}/${br}`).update(p).then(()=>toast("บันทึกฟอร์ม PDF ลงฐานข้อมูลสำเร็จ!"));
+  DB.ref(`ops_daily/${dt}/${br}`).update(p).then(()=>toast("บันทึกฟอร์ม PDF ลงฐานข้อมูลสำเร็จ!"));
 }
 
 // ==========================================
@@ -942,7 +998,7 @@ function buildT3() {
     g("tk-tbody").innerHTML = ht;
   }
 
-  DB.ref(`tracking_mth/${mo}/${br}`).once('value').then(snap=>{
+  DB.ref(`ops_tracking_mth/${mo}/${br}`).once('value').then(snap=>{
     const dAll = snap.val()||{};
     for(let i=1; i<=dim; i++){
       let dt = `${yr}-${m}-${String(i).padStart(2,'0')}`; let d = dAll[dt]||{};
@@ -959,7 +1015,7 @@ let tm3={};
 function svT3(el) {
   const dt = el.dataset.dt, br = g("tk-br").value, mo = g("tk-mo").value, id = el.dataset.id, val = parseFloat(el.value.replace(/,/g,''))||0;
   calcT3Row(el); drawT3Chart();
-  clearTimeout(tm3[dt]); tm3[dt] = setTimeout(()=>{ DB.ref(`tracking_mth/${mo}/${br}/${dt}`).update({[id]:val}); }, 500);
+  clearTimeout(tm3[dt]); tm3[dt] = setTimeout(()=>{ DB.ref(`ops_tracking_mth/${mo}/${br}/${dt}`).update({[id]:val}); }, 500);
 }
 function calcT3Row(el) {
   if(!el) return; const row = el.closest('tr'); if(row) {
@@ -984,7 +1040,20 @@ function drawT3Chart() {
   c3Donut = new Chart(g("c3-donut"), {
     type: 'doughnut',
     data: { labels: ['มาจริง', 'ขอเลื่อน', 'ไม่รับสาย'], datasets: [{data: [act, pp, na], backgroundColor: ['#2f9e44', '#f08c00', '#c92a2a']}] },
-    options: {responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'right'}}}
+    options: {
+      responsive:true, maintainAspectRatio:false, plugins:{
+        legend:{position:'right'},
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              let total = ctx.dataset.data.reduce((a,b)=>a+b,0);
+              let pct = total > 0 ? ((ctx.raw/total)*100).toFixed(1) : 0;
+              return `${ctx.label}: ${fmI(ctx.raw)} คน (${pct}%)`;
+            }
+          }
+        }
+      }
+    }
   });
 }
 
@@ -1011,7 +1080,7 @@ function buildT4() {
     g("df-tbody").innerHTML = ht; updateSelects();
   }
   
-  DB.ref(`docfin_mth/${mo}/${br}`).once('value').then(snap=>{
+  DB.ref(`ops_docfin_mth/${mo}/${br}`).once('value').then(snap=>{
     const dAll = snap.val()||{};
     for(let i=1; i<=dim; i++){
       let dt = `${yr}-${m}-${String(i).padStart(2,'0')}`; let d = dAll[dt]||{};
@@ -1033,7 +1102,7 @@ function svT4(el) {
   const dt = el.dataset.dt, br = g("df-br").value, mo = g("df-mo").value, id = el.dataset.id;
   const val = (id==="df-sl"||id==="df-df") ? parseFloat(el.value.replace(/,/g,''))||0 : el.value;
   drawT4Chart();
-  clearTimeout(tm4[dt]); tm4[dt] = setTimeout(()=>{ DB.ref(`docfin_mth/${mo}/${br}/${dt}`).update({[id]:val}); }, 500);
+  clearTimeout(tm4[dt]); tm4[dt] = setTimeout(()=>{ DB.ref(`ops_docfin_mth/${mo}/${br}/${dt}`).update({[id]:val}); }, 500);
 }
 
 function drawT4Chart() {
@@ -1075,21 +1144,18 @@ function saveT5() {
   SETTINGS.mgs = g("s-mg").value.split(",").map(s=>s.trim()).filter(Boolean);
   SETTINGS.progs = g("s-pr").value.split("\n").map(s=>s.trim()).filter(Boolean);
   
-  DB.ref(`system_settings`).set(SETTINGS).then(()=>{
+  DB.ref(`ops_system_settings`).set(SETTINGS).then(()=>{
     toast("✅ บันทึกการตั้งค่าลงฐานข้อมูลแล้ว!");
     setTimeout(() => location.reload(), 1000); 
   }).catch(err => toast("❌ Error: " + err.message, "error"));
 }
 
-// ==========================================
-// ONLOAD STARTUP
-// ==========================================
 window.onload = () => {
   const today = new Date().toISOString().split('T')[0];
   g("o-dt").value = today;
   g("d0-mo").value = today.slice(0,7); g("r-mo").value = today.slice(0,7); g("tk-mo").value = today.slice(0,7); g("df-mo").value = today.slice(0,7);
   
-  DB.ref(`system_settings`).once('value').then(snap=>{
+  DB.ref(`ops_system_settings`).once('value').then(snap=>{
     if(snap.exists()) {
       const d=snap.val();
       SETTINGS.progs = d.progs||SETTINGS.progs; SETTINGS.tgs = d.tgs||SETTINGS.tgs;
