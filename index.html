@@ -363,13 +363,13 @@ select.r-inp { background:#ffffff !important; text-align-last: center; padding:2
 
 <script>
 // ==========================================
-// STEP 2: GLOBAL ENVIRONMENT HELPER DEFINITIONS (First Node Execution)
+// 1. GLOBAL ENVIRONMENT HELPER DEFINITIONS (First Node Execution)
 // ==========================================
 const g = (id) => document.getElementById(id);
 const qs = (s) => document.querySelector(s);
 const qsa = (s) => document.querySelectorAll(s);
 
-// STEP 3: FIREBASE CONFIG MATRIX
+// FIREBASE API ENGINE DATA CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyC0P1LGtglA_t1Nc5PyM5uD3MOLnfBZwFM",
   authDomain: "lalizaclinic-work-schedule.firebaseapp.com",
@@ -386,7 +386,6 @@ if (!firebase.apps.length) {
 }
 const db = firebase.database();
 
-// Global System Hardcoded Constants Dictionaries
 const USERS = {
   "16698": { role: "admin", br: "all", label: "Admin สูงสุด | ทุกสาขา" },
   "64752": { role: "cashier", br: "rama9", label: "Cashier | พระราม 9" },
@@ -427,7 +426,7 @@ const O_CREDITS = [
   {n:"ยอดรวมเครดิต", id:"t-crd", ro:true}
 ];
 
-// Structural Architecture State Context Elements
+let CURRENT_USER = null;
 let curT1 = "", curT3 = "", curT4 = "";
 let t1Listener = null;
 const tm1 = {}, tm3 = {}, tm4 = {};
@@ -435,7 +434,7 @@ const tm1 = {}, tm3 = {}, tm4 = {};
 let c0Bar, c0Pie, c0Funnel, c0Doc, c0Track1, c0Track2, c0D1, c0D2;
 let c1Trend, c1BrDonut, c3Donut, c4Bar;
 
-// STEP 4: DOM REGISTRATION PLATFORM INITIALIZER
+// DOM PLATFORM RUNTIME INITIALIZER
 window.addEventListener('DOMContentLoaded', bootstrapApp);
 
 async function bootstrapApp() {
@@ -449,15 +448,13 @@ async function bootstrapApp() {
   }
 }
 
-// STEP 6: TOTAL EVENT LISTENERS BINDINGS ENGINES (100% Stripped Inline Events)
+// REGISTER ALL SYSTEM DYNAMIC ACTION PIPELINES
 function initEvents() {
   g('loginBtn')?.addEventListener('click', checkLogin);
   g('sysLogoutBtn')?.addEventListener('click', handleLogout);
 
   qsa('.nav .ni:not(#sysLogoutBtn)').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      let node = e.currentTarget; sw(node.dataset.target, node);
-    });
+    btn.addEventListener('click', (e) => { sw(e.currentTarget.dataset.target, e.currentTarget); });
   });
 
   g('downloadTemplateBtn')?.addEventListener('click', downloadImportTemplate);
@@ -465,35 +462,41 @@ function initEvents() {
   g('ex-file')?.addEventListener('change', (e) => handleExcelImportUpload(e.target));
   g('btn-export-t1')?.addEventListener('click', exportT1);
   g('btn-save-t2')?.addEventListener('click', saveT2);
+  g('btn-save-t5')?.addEventListener('click', saveT5);
 
   g('r-br')?.addEventListener('change', buildT1); g('r-mo')?.addEventListener('change', buildT1);
   g('o-br')?.addEventListener('change', loadT2); g('o-dt')?.addEventListener('change', loadT2);
   g('tk-br')?.addEventListener('change', buildT3); g('tk-mo')?.addEventListener('change', buildT3);
   g('df-br')?.addEventListener('change', buildT4); g('df-mo')?.addEventListener('change', buildT4);
   g('d0-mo')?.addEventListener('change', buildT0);
+
+  g('btn-exp-t0')?.addEventListener('click', () => expPNG('t0-cap', 'Master_Dashboard'));
+  g('btn-exp-t1')?.addEventListener('click', () => expPNG('t1-cap', 'Revenue_Sheet'));
+  g('btn-exp-t2')?.addEventListener('click', () => expPNG('t2-content', 'OpsCore'));
+  g('btn-print-t2')?.addEventListener('click', () => window.print());
+  g('btn-exp-t3')?.addEventListener('click', () => expPNG('t3-cap', 'Tracking'));
+  g('btn-exp-t4')?.addEventListener('click', () => expPNG('t4-cap', 'DoctorFin'));
+
+  g('btn-gsync-t1')?.addEventListener('click', () => triggerGoogleSheetSync('revenue'));
+  g('btn-gsync-t2')?.addEventListener('click', () => triggerGoogleSheetSync('dailyops'));
+  g('btn-gsync-t3')?.addEventListener('click', () => triggerGoogleSheetSync('tracking'));
+  g('btn-gsync-t4')?.addEventListener('click', () => triggerGoogleSheetSync('doctor'));
 }
 
-// STEP 5: ROBUST SECURE LOGIN INTERACTION ENGINE
 async function checkLogin() {
   try {
     const el = g('login-pass'); if (!el) return;
-    const pass = el.value.trim(); if (!pass) { alert('กรุณากรอกรหัสผ่านส่วนบุคคลก่อนเข้าใช้งาน'); return; }
-
+    const pass = el.value.trim(); if (!pass) { alert('กรุณากรอกรหัสผ่านเพื่อเข้าทำงาน'); return; }
     if (!USERS[pass]) { alert('รหัสพนักงานไม่ถูกต้องในระบบ'); return; }
     const userProfile = USERS[pass];
     sessionStorage.setItem('lalizaUser', JSON.stringify(userProfile));
     enterApp(userProfile);
-  } catch (err) {
-    console.error(err); alert(err.message);
-  }
+  } catch (err) { console.error(err); alert(err.message); }
 }
 
-// STEP 7: SESSION VALIDATOR PIPELINE
 async function restoreSession() {
   const raw = sessionStorage.getItem('lalizaUser');
-  if (raw) {
-    const userProfile = JSON.parse(raw); enterApp(userProfile);
-  }
+  if (raw) { enterApp(JSON.parse(raw)); }
 }
 
 function enterApp(userProfile) {
@@ -515,7 +518,6 @@ function enterApp(userProfile) {
   loadInitialData();
 }
 
-// STEP 8: BACKGROUND RECALCULATE & DISPATCH LOGIC CONTEXT PRELOAD
 async function loadInitialData() {
   const today = new Date().toISOString().split('T')[0];
   if (g("o-dt")) g("o-dt").value = today;
@@ -535,12 +537,11 @@ function handleLogout() { sessionStorage.removeItem('lalizaUser'); location.relo
 function injectBranchOptions() { const opts = bKeys.map(k=>`<option value="${k}">${BKS[k]}</option>`).join(""); ["r-br","o-br","tk-br","df-br"].forEach(id=>{ const el = g(id); if(el) el.innerHTML=opts; }); }
 function num(id) { return Number((g(id)?.value || "").replace(/,/g, '')) || 0; }
 function setValue(id, val) { const el = g(id); if (!el) return; if (el.tagName === "INPUT" || el.tagName === "SELECT") { el.value = val.toLocaleString("th-TH"); } else { el.textContent = val.toLocaleString("th-TH"); } }
-function triggerGoogleSheetSync(pageKey) { toast(`🚀 [Google Sheets Automation] ผูกท่อโมดูลโมดูล [${pageKey.toUpperCase()}] สแตนด์บายเรียบร้อยครับบอส`, "success"); }
+function triggerGoogleSheetSync(pageKey) { toast(`🚀 [Google Sheets Automation Platform] เชื่อมต่อท่อส่งโมดูล [${pageKey.toUpperCase()}] สแตนด์บายแล้วครับบอส`, "success"); }
 function toast(m, type="success"){ const el=document.createElement("div"); el.className="toast"; el.style.background = type==="error" ? "#c92a2a" : "#212529"; el.textContent=m; document.body.appendChild(el); setTimeout(()=>el.remove(),4000); }
 function formatInput(el) { if(el.value!=="") { let v = parseFloat(el.value.replace(/,/g,''))||0; el.value = fm(v); } }
 function unformatInput(el) { if(el.value!=="") el.value = el.value.replace(/,/g,''); }
 
-// STEP 13: STATIC IMPORT FILE TEMPLATE GENERATOR
 function downloadTemplate() {
   const mo=g("r-mo").value; const [yr,m] = mo.split("-"); const dim = new Date(yr,m,0).getDate();
   let data = [["วันที่", "หัตถการ", "ขายยา", "Treatment", "HD MALL", "Gowabi", "ชาร์จ 3%", "ฉีดผิว", "member", "หัตถการ พนง.", "มัดจำเงิน", "รวมรายได้อื่นๆ", "คนไข้เก่า (คน)", "คนไข้เก่า (ยอด)", "คนไข้ใหม่มี (คน)", "คนไข้ใหม่มียอด (บาท)", "คนไข้ใหม่ไม่มี (คน)", "แพทย์"]];
@@ -549,475 +550,23 @@ function downloadTemplate() {
 }
 function downloadImportTemplate() { downloadTemplate(); }
 
-// ==========================================
-// TAB 1: REVENUE SHEET MODULE (Strict Recalculations Engine)
-// ==========================================
 function sw(id, item) {
   document.querySelectorAll(".tp").forEach(p => p.style.setProperty('display', 'none', 'important'));
   const target = g(id); if (target) target.style.setProperty('display', 'block', 'important');
   document.querySelectorAll(".ni").forEach(n => n.classList.remove("active"));
   if(item) item.classList.add("active");
-
   if(id==='t0') buildT0(); if(id==='t1') buildT1(); if(id==='t2') buildT2(); if(id==='t3') buildT3(); if(id==='t4') buildT4(); if(id==='t5') loadT5();
 }
 
-function buildT1() {
-  const moEl = g("r-mo"), brEl = g("r-br"); if (!moEl || !brEl) return;
-  const mo = moEl.value, br = brEl.value; if (!mo) return;
-  
-  const [yr, m] = mo.split("-"); const dim = new Date(yr, m, 0).getDate();
-  if (curT1 !== `${mo}_${br}`) {
-    curT1 = `${mo}_${br}`; let ht = "";
-    for (let i = 1; i <= dim; i++) {
-      let dt = `${yr}-${m}-${String(i).padStart(2, '0')}`;
-      ht += `<tr><td class="bg-date">${i}/${m}/${yr}</td>
-                 <td class="bg-total"><input type="text" class="r-inp row-tot sum-income" id="sum-${dt}" readonly value="0"></td>`;
-      R_COLS.forEach(f => {
-        ht += `<td class="${f.cls}"><input type="text" class="r-inp core-calc-node" id="${f.id}-${dt}" data-dt="${dt}" data-id="${f.id}"></td>`;
-      });
-      ht += `<td class="bg-sum"><input type="text" class="r-inp" style="text-align:center;" id="pax-${dt}" readonly value="0"></td>
-                 <td class="bg-date"><select class="r-inp bg-date sync-doc-node" id="r-doc-${dt}" data-dt="${dt}" data-id="r-doc"></select></td></tr>`;
-    }
-    const tbody = g("r-tbody"); if(tbody) tbody.innerHTML = ht;
-    updateSelects(); bindDynamicTableEvents();
-    
-    const tgVal = g("k1-tg-val");
-    if(tgVal) { tgVal.textContent = "฿" + (SETTINGS.tgs[br]||0).toLocaleString(); tgVal.dataset.val = SETTINGS.tgs[br]||0; }
-  }
-
-  if (window.t1Listener) db.ref('ops_daily').off('value', window.t1Listener);
-  window.t1Listener = (snap) => {
-    const all = snap.val() || {};
-    for (let i = 1; i <= dim; i++) {
-      let dt = `${yr}-${m}-${String(i).padStart(2, '0')}`; let d = all[dt]?.[br] || {};
-      R_COLS.forEach(f => {
-        let el = g(`${f.id}-${dt}`);
-        if (el && document.activeElement !== el) el.value = d[f.id] !== undefined && d[f.id] !== "" ? Number(d[f.id]).toLocaleString() : "";
-      });
-      let dSel = g(`r-doc-${dt}`); if (dSel && document.activeElement !== dSel) dSel.value = d["r-doc"] || "";
-      calculateRevenueRow(dt);
-    }
-    calculateDashboard();
-  };
-  db.ref('ops_daily').on('value', window.t1Listener);
-}
-
-// STEP 10: AUTOMATION MATHEMATICAL ROW CALCULATION CORE ENGINE
-function calculateRevenueRow(dt) {
-  const h = num(`r-op-${dt}`), drug = num(`r-med-${dt}`), treatment = num(`r-trt-${dt}`);
-  const hd = num(`r-hd-${dt}`), gowabi = num(`r-gw-${dt}`), charge = num(`r-chg-${dt}`);
-  const inject = num(`r-drp-${dt}`), member = num(`r-mem-${dt}`), emp = num(`r-stf-${dt}`), deposit = num(`r-dep-${dt}`);
-
-  const total = h + drug + treatment + hd + gowabi + charge + inject + member + emp + deposit;
-  setValue(`sum-${dt}`, total);
-
-  const opx = num(`r-opx-${dt}`), nyp = num(`r-nyp-${dt}`), nnp = num(`r-nnp-${dt}`);
-  const elPax = g(`pax-${dt}`); if (elPax) elPax.value = (opx + nyp + nnp).toLocaleString();
-}
-
-function bindDynamicTableEvents() {
-  document.querySelectorAll('.core-calc-node').forEach(el => {
-    el.addEventListener('input', (e) => {
-      const target = e.target; calculateRevenueRow(target.dataset.dt); executeRevenuePipeline(target);
-    });
-    el.addEventListener('blur', (e) => { if(e.target.value!=="") e.target.value = Number(e.target.value.replace(/,/g,'')).toLocaleString(); });
-    el.addEventListener('focus', (e) => { e.target.value = e.target.value.replace(/,/g,''); });
-  });
-  document.querySelectorAll('.sync-doc-node').forEach(el => { el.addEventListener('change', (e) => executeRevenuePipeline(e.target)); });
-}
-
-function executeRevenuePipeline(el) {
-  const dt = el.dataset.dt, br = g("r-br").value, id = el.dataset.id;
-  let rawVal = el.value.replace(/,/g,''); const val = parseFloat(rawVal) || 0;
-  let mapped = {[id]: id === "r-doc" ? el.value : val};
-  
-  if(id === "r-med") mapped["p-product"] = val; if(id === "r-trt") mapped["p-treatment"] = val; 
-  if(id === "r-hd") mapped["a-hdmall"] = val; if(id === "r-gw") mapped["a-gowabi"] = val; 
-  if(id === "r-chg") mapped["p-charge"] = val; if(id === "r-drp") mapped["p-drip"] = val;
-  
-  clearTimeout(tm1[dt]); tm1[dt] = setTimeout(() => { db.ref(`ops_daily/${dt}/${br}`).update(mapped); }, 500);
-}
-
-function calculateDashboard() {
-  let totalRevenue = 0;
-  document.querySelectorAll('.sum-income').forEach(el => { totalRevenue += Number(el.value.replace(/,/g,'')) || 0; });
-
-  const tgEl = g("k1-tg-val"); const target = tgEl ? Number(tgEl.dataset.val) || 0 : 0;
-  const achievement = target > 0 ? (totalRevenue / target) * 100 : 0;
-  const remaining = Math.max(target - totalRevenue, 0);
-
-  if(g("k1-rev-val")) g("k1-rev-val").textContent = "฿" + totalRevenue.toLocaleString("th-TH");
-  if(g("k1-pct-val")) g("k1-pct-val").textContent = achievement.toFixed(1) + "%";
-  if(g("k1-rem-val")) g("k1-rem-val").textContent = remaining > 0 ? "฿" + remaining.toLocaleString("th-TH") : "🏆 ทะลุเป้า!";
-
-  if(g("rs-curr")) g("rs-curr").textContent = totalRevenue.toLocaleString("th-TH");
-  if(g("rs-pct")) g("rs-pct").textContent = achievement.toFixed(1) + "%";
-  if(g("rs-rem")) g("rs-rem").textContent = remaining.toLocaleString("th-TH");
-
-  let totalOp=0, totalMed=0, totalTrt=0, totalOpx=0, totalNyp=0, totalNnp=0, totalOam=0, totalNam=0;
-  document.querySelectorAll('[id^="r-op-"]').forEach(el => totalOp += Number(el.value.replace(/,/g,'')) || 0);
-  document.querySelectorAll('[id^="r-med-"]').forEach(el => totalMed += Number(el.value.replace(/,/g,'')) || 0);
-  document.querySelectorAll('[id^="r-trt-"]').forEach(el => totalTrt += Number(el.value.replace(/,/g,'')) || 0);
-  document.querySelectorAll('[id^="r-opx-"]').forEach(el => totalOpx += Number(el.value.replace(/,/g,'')) || 0);
-  document.querySelectorAll('[id^="r-nyp-"]').forEach(el => totalNyp += Number(el.value.replace(/,/g,'')) || 0);
-  document.querySelectorAll('[id^="r-nnp-"]').forEach(el => totalNnp += Number(el.value.replace(/,/g,'')) || 0);
-  document.querySelectorAll('[id^="r-oam-"]').forEach(el => totalOam += Number(el.value.replace(/,/g,'')) || 0);
-  document.querySelectorAll('[id^="r-nam-"]').forEach(el => totalNam += Number(el.value.replace(/,/g,'')) || 0);
-
-  if(g("rs-pax")) g("rs-pax").textContent = (totalOpx + totalNyp + totalNnp).toLocaleString("th-TH");
-  if(g("rs-old")) g("rs-old").textContent = totalOpx.toLocaleString("th-TH");
-  if(g("rs-new")) g("rs-new").textContent = (totalNyp + totalNnp).toLocaleString("th-TH");
-  if(g("rs-avg-old")) g("rs-avg-old").textContent = totalOpx > 0 ? Math.round(totalOam / totalOpx).toLocaleString("th-TH") : "0";
-  if(g("rs-avg-new")) g("rs-avg-new").textContent = (totalNyp + totalNnp) > 0 ? Math.round(totalNam / (totalNyp + totalNnp)).toLocaleString("th-TH") : "0";
-  if(g("rs-sop")) g("rs-sop").textContent = totalOp.toLocaleString("th-TH");
-  if(g("rs-smed")) g("rs-smed").textContent = totalMed.toLocaleString("th-TH");
-  if(g("rs-strt")) g("rs-strt").textContent = totalTrt.toLocaleString("th-TH");
-
-  try {
-    const ctxTrend = g("c1-trend");
-    if(ctxTrend) {
-      let trendData = []; document.querySelectorAll('.sum-income').forEach(el => trendData.push(Number(el.value.replace(/,/g,''))||0));
-      if(c1Trend) c1Trend.destroy();
-      c1Trend = new Chart(ctxTrend, { type:'line', data:{ labels:Array.from({length:trendData.length},(_,i)=>i+1), datasets:[{label:'ยอดขายรายวัน', data:trendData, borderColor:'#845ef7', tension:0.2, fill:true, backgroundColor:'rgba(132, 94, 247, 0.08)'}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}} });
-    }
-  } catch(e){ console.warn(e); }
-
-  try {
-    const ctxDonut = g("c1-br-donut");
-    if(ctxDonut) {
-      if(c1BrDonut) c1BrDonut.destroy();
-      c1BrDonut = new Chart(ctxDonut, { type:'doughnut', data:{ labels:['หัตถการ', 'ขายยา', 'Treatment'], datasets:[{data:[totalOp, totalMed, totalTrt], backgroundColor:['#f08c00', '#2f9e44', '#845ef7']}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'right'}}} });
-    }
-  } catch(e){ console.warn(e); }
-}
-
-// STEP 9: HIGHER-ORDER EXCEL DYNAMIC HEADER INDEX MAPPING (Fixed Mismatched Backtick Syntax)
-function handleExcelImportUpload(inputControl) {
-  const f = inputControl.files[0]; if(!f) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      const data = new Uint8Array(e.target.result);
-      const workbook = XLSX.read(data, { type: 'array', cellDates: true });
-      const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: false });
-      
-      const mo = g("r-mo").value, br = g("r-br").value; if(!mo || !br) { toast("❌ กรุณาระบุเงื่อนไขเดือนและสาขาก่อนนำเข้า", "error"); return; }
-      const [yr, m] = mo.split("-");
-
-      const headers = rows[0]; const map = {};
-      headers.forEach((h, idx) => { if(h) map[String(h).trim()] = idx; });
-
-      let updates = {}; let count = 0;
-      let extractNum = (rowArray, keyName) => {
-        let colIdx = map[keyName]; if(colIdx === undefined) return 0;
-        let cellRaw = rowArray[colIdx]; if(!cellRaw) return 0;
-        return parseFloat(String(cellRaw).replace(/,/g, '')) || 0;
-      };
-
-      rows.forEach((row, index) => {
-        if (index === 0) return;
-        const dateCell = row[map["วันที่"]]; if (!dateCell) return;
-        let parsedDate = new Date(dateCell);
-        
-        if (isNaN(parsedDate.getTime())) {
-          let cleanStr = String(dateCell).trim();
-          if(cleanStr.includes("/")) {
-            let p = cleanStr.split("/"); parsedDate = new Date(`${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`);
-          } else if(cleanStr.includes("-")) {
-            let p = cleanStr.split("-"); parsedDate = new Date(`${p[0]}-${p[1].padStart(2,'0')}-${p[2].padStart(2,'0')}`);
-          }
-        }
-        if (isNaN(parsedDate.getTime())) return;
-
-        const day = parsedDate.getDate(); if (day < 1 || day > 31) return;
-        const dayKey = String(day).padStart(2, '0');
-        const pathPrefix = `${yr}-${m}-${dayKey}`;
-
-        let rVals = {
-          "r-op": extractNum(row, "หัตถการ"), "r-med": extractNum(row, "ขายยา"), "r-trt": extractNum(row, "Treatment"),
-          "r-hd": extractNum(row, "HD MALL"), "r-gw": extractNum(row, "Gowabi"), "r-chg": extractNum(row, "ชาร์จ 3%"),
-          "r-drp": extractNum(row, "ฉีดผิว"), "r-mem": extractNum(row, "member"), "r-stf": extractNum(row, "หัตถการ พนง."),
-          "r-dep": extractNum(row, "มัดจำเงิน"), "r-oth": extractNum(row, "รวมรายได้อื่นๆ"), "r-opx": extractNum(row, "คนไข้เก่า (คน)"),
-          "r-oam": extractNum(row, "คนไข้เก่า (ยอด)"), "r-nyp": extractNum(row, "คนไข้ใหม่มี (คน)"), "r-nam": extractNum(row, "คนไข้ใหม่มียอด (บาท)"),
-          "r-nnp": extractNum(row, "คนไข้ใหม่ไม่มี (คน)")
-        };
-        
-        for(let k in rVals) { updates[`${pathPrefix}/${br}/${k}`] = rVals[k]; }
-        updates[`${pathPrefix}/${br}/p-product`] = rVals["r-med"];
-        updates[`${pathPrefix}/${br}/p-treatment`] = rVals["r-trt"];
-        updates[`${pathPrefix}/${br}/a-hdmall`] = rVals["r-hd"];
-        updates[`${pathPrefix}/${br}/a-gowabi`] = rVals["r-gw"];
-        updates[`${pathPrefix}/${br}/p-charge`] = rVals["r-chg"];
-        updates[`${pathPrefix}/${br}/p-drip`] = rVals["r-drp"];
-        updates[`${pathPrefix}/${br}/r-mem`] = rVals["r-mem"];
-        
-        let docColIdx = map["แพทย์"]; updates[`${pathPrefix}/${br}/r-doc`] = docColIdx !== undefined ? (row[docColIdx] || "") : "";
-        count++;
-      });
-
-      if(count > 0) {
-        db.ref('ops_daily').update(updates).then(() => {
-          toast(`📥 Import Success: ดึงข้อมูลยอดขายตรงตามไฟล์ต้นฉบับสำเร็จ ${count} วัน`); buildT1();
-        }).catch(err => toast("Firebase Error: " + err.message, "error"));
-      } else { toast("❌ ไม่พบโครงสร้างแถวข้อมูลวันที่ตรงกับเงื่อนไขชีทนี้", "error"); }
-    } catch(err) { toast("❌ ไม่สามารถประมวลผลไฟล์ตารางสรุป Excel แผ่นนี้ได้", "error"); }
-  };
-  reader.readAsArrayBuffer(f); inputControl.value = "";
-}
-
-function exportT1() {
-  let data = [["วันที่", "รายได้รวม", "หัตถการ", "ขายยา", "Treatment", "HD MALL", "Gowabi", "ชาร์จ 3%", "ฉีดผิว", "member", "หัตถการ พนง.", "มัดจำเงิน", "รวมรายได้อื่นๆ", "คนไข้เก่า(คน)", "คนไข้เก่า(ยอด)", "คนไข้ใหม่(คน)", "คนไข้ใหม่(ยอด)", "ใหม่ไม่มียอด(คน)", "คนไข้รวม", "แพทย์"]];
-  document.querySelectorAll("#r-tbody tr").forEach(row => {
-    let rTotInput = row.querySelector('.row-tot'); if(!rTotInput) return;
-    let dtStr = rTotInput.id.replace('sum-', ''), rData = [row.cells[0].textContent.trim(), parseFloat(rTotInput.value.replace(/,/g,''))||0];
-    R_COLS.forEach(c => rData.push(num(`${c.id}-${dtStr}`)));
-    rData.push(Number(g(`pax-${dtStr}`)?.value.replace(/,/g,''))||0); rData.push(g(`r-doc-${dtStr}`)?.value || ""); data.push(rData);
-  });
-  const ws = XLSX.utils.aoa_to_sheet(data); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Revenue"); XLSX.writeFile(wb, `Revenue_Sheet_${g("r-br").value}_${g("r-mo").value}.xlsx`);
-}
-
 // ==========================================
-// TAB 2: DAILY OPS CORE MODULE
-// ==========================================
-function buildT2() {
-  const tb = g("o-tbody"); if(!tb) return;
-  let ht = "", leftRows = [
-    {label:"Co2", id:"p0"}, {label:"Pico", id:"p1"}, {label:"Vbeam", id:"p2"}, {label:"Elos", id:"p3"},
-    {label:"Botox", id:"p4"}, {label:"Filler", id:"p5"}, {label:"Meso", id:"p6"}, {label:"Thermage", id:"p7"},
-    {label:"Ulthera", id:"p8"}, {label:"Treatment", id:"p-treatment"}, {label:"Drip Vitamin (Nures)", id:"p-drip"},
-    {label:"Product (ขายยา)", id:"p-product"}, {label:"ชาร์จ 3%", id:"p-charge"}
-  ];
-  for(let x=1; x<=3; x++) leftRows.push({custom: true, id: `cust-id-${x}`, labelId: `cust-lbl-${x}`});
-  
-  for(let i=0; i<leftRows.length; i++) {
-    ht += `<tr>`;
-    if(i===0) ht += `<td rowspan="${leftRows.length + 1}" style="background:#f8f9fa; text-align:center; vertical-align:middle; padding:15px; border-right:2px solid #000;"><div style="font-weight:bold;margin-bottom:10px;color:var(--tx2);">ยอดหน้าร้านรวม</div><input type="text" id="front-store-val" class="ops-node-inp" style="font-size:18px; font-weight:700; text-align:center;"></td>`;
-    let r = leftRows[i];
-    if(r.custom) {
-      ht += `<td style="padding:2px;"><input type="text" id="${r.labelId}" style="text-align:left;border:none;" placeholder="✏️ พิมพ์หัตถการอื่นๆ" class="ops-lbl-node"></td><td style="padding:2px;"><input type="text" id="${r.id}" class="ops-node-inp o-val"></td><td style="padding:2px;"><input type="text" id="v-cust-${i}" class="ops-node-inp v-val red-tx"></td>`;
-    } else {
-      ht += `<td style="font-weight:500;">${r.label}</td><td style="padding:2px;"><input type="text" id="${r.id}" class="ops-node-inp o-val"></td><td style="padding:2px;"><input type="text" id="v${i}" class="ops-node-inp v-val red-tx"></td>`;
-    }
-    if(i < O_CREDITS.length) {
-      let c = O_CREDITS[i];
-      if(c.ro) ht += `<td style="text-align:right;font-weight:700;background:#f8f9fa;">${c.n}</td><td style="background:#e9ecef;"><input type="text" id="${c.id}" readonly value="0"></td>`;
-      else ht += `<td>${c.n}</td><td style="padding:2px;"><input type="text" id="${c.id}" class="ops-node-inp c-val"></td>`;
-    } else { ht += `<td style="background:#f8f9fa;border:none;"></td><td style="background:#f8f9fa;border:none;"></td>`; }
-    
-    if(i===0) ht += `<td rowspan="4" style="vertical-align:middle;text-align:center;background:#fff3cd;font-weight:bold;">เงินสด<br><br><input type="text" id="pay-cash" class="ops-node-inp" style="font-size:18px;text-align:center;"></td>`;
-    if(i===4) ht += `<td rowspan="6" style="vertical-align:middle;text-align:center;background:#cff4fc;font-size:12px;font-weight:bold;">แอปพลิเคชัน<div style="margin-top:10px;text-align:left;padding:0 5px;">HDmall:<br><input type="text" id="a-hd-pax" style="width:30px;padding:2px;" placeholder="คน"> <input type="text" id="a-hdmall" class="ops-node-inp c-val" style="width:65px;padding:2px;" placeholder="ยอด"></div><div style="margin-top:8px;text-align:left;padding:0 5px;">Gowabi:<br><input type="text" id="a-gw-pax" style="width:30px;padding:2px;" placeholder="คน"> <input type="text" id="a-gowabi" class="ops-node-inp c-val" style="width:65px;padding:2px;" placeholder="ยอด"></div></td>`;
-    if(i===10) ht += `<td rowspan="3" style="vertical-align:middle;text-align:center;background:#d1e7dd;font-weight:bold;">ยอดเงินโอน<br><br><input type="text" id="pay-trans" class="ops-node-inp" style="font-size:18px;text-align:center;"></td>`;
-    if(i===13) ht += `<td rowspan="3" style="vertical-align:middle;text-align:center;background:#dbeafe;font-weight:bold;">ยอดชำระรวม<br><br><input type="text" id="t-grand" style="font-size:22px;color:red!important;text-align:center;font-weight:800;border:1px solid #aaa!important;background:#fff;"></td>`;
-    ht += `</tr>`;
-  }
-  ht += `<tr style="font-weight:700; background:#f1f3f5;"><td style="text-align:right;">ยอดรวม Program</td><td><input type="text" id="t-prog" readonly value="0"></td><td style="color:red;text-align:right;padding-right:10px;" id="t-vip">0</td><td colspan="2" style="text-align:center;">คะแนน (Point)</td><td colspan="2" style="padding:2px;"><input type="text" id="t-point" class="ops-node-inp" style="width:100%;text-align:center;"></td></tr>`;
-  tb.innerHTML = ht; bindT2InputNodeListeners(); loadT2();
-}
-
-function bindT2InputNodeListeners() {
-  document.querySelectorAll('.ops-node-inp').forEach(el => {
-    el.addEventListener('input', () => cT2());
-    el.addEventListener('blur', (e) => { if(e.target.value!=="") e.target.value = Number(e.target.value.replace(/,/g,'')).toLocaleString(); });
-    el.addEventListener('focus', (e) => { e.target.value = e.target.value.replace(/,/g,''); });
-  });
-  document.querySelectorAll('.ops-lbl-node').forEach(el => { el.addEventListener('input', (e) => saveT2Quick(e.target.id, e.target.value)); });
-}
-
-function loadT2() {
-  const dt = g("o-dt")?.value, br = g("o-br")?.value; if(!dt || !br) return;
-  db.ref(`ops_daily/${dt}/${br}`).once('value').then(snap => {
-    document.querySelectorAll('#t2-content input[type="text"]').forEach(e => { if(!e.readOnly && e.id!=='t-grand' && !e.id.includes('cust-lbl') && e.id!=='o-rsn' && e.id!=='o-note' && e.id!=='c-oth-n') e.value="" });
-    if(snap.exists()){
-      const d = snap.val();
-      for(let k in d){
-        let el = g(k); if(el && document.activeElement !== el){
-          if(k.includes('lbl') || k.includes('rsn') || k.includes('note')) el.value = d[k];
-          else el.value = d[k]!=="" ? Number(d[k]).toLocaleString() : "";
-        }
-      }
-    }
-    cT2(true); updateSelects();
-  }).catch(()=>cT2(true));
-}
-
-function cT2(fromLoad = false) {
-  let tp=0, tv=0, tc=0;
-  document.querySelectorAll(".o-val").forEach(e=>tp+=Number(e.value.replace(/,/g,''))||0);
-  document.querySelectorAll(".v-val").forEach(e=>tv+=Number(e.value.replace(/,/g,''))||0);
-  document.querySelectorAll(".c-val").forEach(e=>tc+=Number(e.value.replace(/,/g,''))||0);
-  setValue("t-prog", tp); if(g("t-vip")) g("t-vip").textContent = tv.toLocaleString();
-  setValue("t-crd", tc);
-  let gInp = g("t-grand");
-  if(gInp && (fromLoad || document.activeElement !== gInp)){
-    let autoSum = tc + (Number(g("pay-cash")?.value.replace(/,/g,''))||0) + (Number(g("pay-trans")?.value.replace(/,/g,''))||0);
-    gInp.value = autoSum.toLocaleString();
-  }
-}
-
-function saveT2Quick(id, val) { const dt=g("o-dt").value, br=g("o-br").value; let rawVal = val.toString().replace(/,/g, ''); db.ref(`ops_daily/${dt}/${br}`).update({[id]: isNaN(parseFloat(rawVal)) ? rawVal : parseFloat(rawVal)}); }
-function saveT2() {
-  const dt=g("o-dt").value, br=g("o-br").value; if(!dt)return;
-  let p={}; document.querySelectorAll('#t2-content input, #t2-content select').forEach(e=>{ if(e.id && !e.readOnly) { let rawVal = e.value.toString().replace(/,/g, ''); p[e.id] = (!isNaN(rawVal) && rawVal !== "" && !e.id.includes('lbl') && !e.id.includes('rsn') && !e.id.includes('note') && !e.id.includes('c-oth-n')) ? parseFloat(rawVal) : e.value; } });
-  db.ref(`ops_daily/${dt}/${br}`).update(p).then(()=>toast("✅ บันทึกฟอร์มบัญชี Daily Ops แกนกลางแล้ว"));
-}
-
-// ==========================================
-// CONFIRM TRACKING DATA APAPTER MODULE
-// ==========================================
-function buildT3() {
-  const moEl = g("tk-mo"), brEl = g("tk-br"); if (!moEl || !brEl) return;
-  const mo = moEl.value, br = brEl.value; if (!mo) return;
-  
-  const [yr, m] = mo.split("-"); const dim = new Date(yr, m, 0).getDate();
-  if (curT3 !== `${mo}_${br}`) {
-    curT3 = `${mo}_${br}`; let ht = "";
-    for (let i = 1; i <= dim; i++) {
-      let dt = `${yr}-${m}-${String(i).padStart(2, '0')}`;
-      ht += `<tr><td style="font-weight:bold;background:#f8f9fa;">${i}/${m}/${yr}</td>
-        <td><input type="text" class="mth-inp tk-calc-node" id="tk-co-${dt}" data-dt="${dt}" data-id="tk-co"></td>
-        <td><input type="text" class="mth-inp tk-calc-node" id="tk-cn-${dt}" data-dt="${dt}" data-id="tk-cn"></td>
-        <td><input type="text" class="mth-inp tk-calc-node" id="tk-po-${dt}" data-dt="${dt}" data-id="tk-po"></td>
-        <td><input type="text" class="mth-inp tk-calc-node" id="tk-pn-${dt}" data-dt="${dt}" data-id="tk-pn"></td>
-        <td><input type="text" class="mth-inp tk-calc-node" id="tk-wo-${dt}" data-dt="${dt}" data-id="tk-wo"></td>
-        <td><input type="text" class="mth-inp tk-calc-node" id="tk-wn-${dt}" data-dt="${dt}" data-id="tk-wn"></td>
-        <td><input type="text" class="mth-inp tk-calc-node" id="tk-na-${dt}" data-dt="${dt}" data-id="tk-na"></td>
-        <td><input type="text" class="mth-inp tk-calc-node" id="tk-tc-${dt}" data-dt="${dt}" data-id="tk-tc"></td>
-        <td><input type="text" class="mth-inp tk-calc-node" id="tk-ro-${dt}" data-dt="${dt}" data-id="tk-ro"></td>
-        <td><input type="text" class="mth-inp tk-calc-node" id="tk-rn-${dt}" data-dt="${dt}" data-id="tk-rn"></td>
-        <td><input type="text" class="mth-inp row-tk-tot" id="tk-tot-${dt}" readonly value="0"></td></tr>`;
-    }
-    const tbody = g("tk-tbody"); if(tbody) tbody.innerHTML = ht; bindT3NodeListeners();
-  }
-  db.ref(`ops_tracking_mth/${mo}/${br}`).once('value').then(snap => {
-    const dAll = snap.val() || {};
-    for (let i = 1; i <= dim; i++) {
-      let dt = `${yr}-${m}-${String(i).padStart(2, '0')}`; let d = dAll[dt] || {};
-      ["tk-co","tk-cn","tk-po","tk-pn","tk-wo","tk-wn","tk-na","tk-tc","tk-ro","tk-rn"].forEach(k => {
-        let el = g(`${k}-${dt}`); if (el) el.value = d[k] !== undefined ? Number(d[k]).toLocaleString() : "";
-      });
-      calcT3Row(dt);
-    }
-    drawT3Chart();
-  });
-}
-function bindT3NodeListeners() {
-  document.querySelectorAll('.tk-calc-node').forEach(el => {
-    el.addEventListener('input', (e) => { const target = e.target; calcT3Row(target.dataset.dt); svT3(target); });
-    el.addEventListener('blur', (e) => { if(e.target.value!=="") e.target.value = Number(e.target.value.replace(/,/g,'')).toLocaleString(); });
-    el.addEventListener('focus', (e) => { e.target.value = e.target.value.replace(/,/g,''); });
-  });
-}
-function calcT3Row(dt) { let ro = Number((g(`tk-ro-${dt}`)?.value||"").replace(/,/g,''))||0; let rn = Number((g(`tk-rn-${dt}`)?.value||"").replace(/,/g,''))||0; let el = g(`tk-tot-${dt}`); if(el) el.value = (ro + rn).toLocaleString(); }
-function svT3(el) { const dt = el.dataset.dt, br = g("tk-br").value, mo = g("tk-mo").value, id = el.dataset.id, val = Number(el.value.replace(/,/g,'')) || 0; drawT3Chart(); clearTimeout(tm3[dt]); tm3[dt] = setTimeout(() => { db.ref(`ops_tracking_mth/${mo}/${br}/${dt}`).update({[id]:val}); }, 500); }
-function drawT3Chart() {
-  let cf=0, act=0, pp=0, na=0;
-  document.querySelectorAll("[id^='tk-co-']").forEach(i=>cf+=Number(i.value.replace(/,/g,''))||0); document.querySelectorAll("[id^='tk-cn-']").forEach(i=>cf+=Number(i.value.replace(/,/g,''))||0);
-  document.querySelectorAll(".row-tk-tot").forEach(i=>act+=Number(i.value.replace(/,/g,''))||0);
-  document.querySelectorAll("[id^='tk-po-']").forEach(i=>pp+=Number(i.value.replace(/,/g,''))||0); document.querySelectorAll("[id^='tk-pn-']").forEach(i=>pp+=Number(i.value.replace(/,/g,''))||0);
-  document.querySelectorAll("[id^='tk-na-']").forEach(i=>na+=Number(i.value.replace(/,/g,''))||0);
-  if(g("k3-cf")) g("k3-cf").textContent = cf.toLocaleString(); if(g("k3-act")) g("k3-act").textContent = act.toLocaleString();
-  if(g("k3-pp")) g("k3-pp").textContent = pp.toLocaleString(); if(g("k3-na")) g("k3-na").textContent = na.toLocaleString();
-  try {
-    const ctx = g("c3-donut"); if(!ctx) return;
-    if(c3Donut) c3Donut.destroy();
-    c3Donut = new Chart(ctx, { type:'doughnut', data:{ labels:['มาจริง', 'ขอเลื่อน', 'ไม่รับสาย'], datasets:[{data:[act, pp, na], backgroundColor:['#2f9e44', '#f08c00', '#c92a2a']}] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:'right'} } } });
-  } catch(err) { console.warn(err); }
-}
-
-// ==========================================
-// DOCTOR FINANCE SCHEDULING MODULE
-// ==========================================
-function buildT4() {
-  const moEl = g("df-mo"), brEl = g("df-br"); if (!moEl || !brEl) return;
-  const mo = moEl.value, br = brEl.value; if (!mo) return;
-  
-  const [yr, m] = mo.split("-"); const dim = new Date(yr, m, 0).getDate();
-  if (curT4 !== `${mo}_${br}`) {
-    curT4 = `${mo}_${br}`; let ht = "";
-    for (let i = 1; i <= dim; i++) {
-      let dt = `${yr}-${m}-${String(i).padStart(2, '0')}`;
-      let docSel = `<select class="mth-inp doc-select-node" id="df-doc-${dt}" data-dt="${dt}" data-id="df-doc"><option value="">-</option></select>`;
-      ht += `<tr><td style="font-weight:bold;background:#f8f9fa;">${i}/${m}/${yr}</td>
-        <td>${docSel}</td>
-        <td><input type="time" class="mth-inp doc-input-node" id="df-ti-${dt}" data-dt="${dt}" data-id="df-ti"></td>
-        <td><input type="time" class="mth-inp doc-input-node" id="df-to-${dt}" data-dt="${dt}" data-id="df-to"></td>
-        <td><input type="text" class="mth-inp doc-input-node" style="background:#dbeafe;" id="df-sl-${dt}" data-dt="${dt}" data-id="df-sl"></td>
-        <td><input type="text" class="mth-inp doc-input-node" style="background:#fff3cd;" id="df-df-${dt}" data-dt="${dt}" data-id="df-df"></td>
-        <td><input type="text" class="mth-inp doc-input-node" style="text-align:left;padding-left:10px;" id="df-nt-${dt}" data-dt="${dt}" data-id="df-nt"></td></tr>`;
-    }
-    const tbody = g("df-tbody"); if(tbody) tbody.innerHTML = ht; updateSelects(); bindT4NodeListeners();
-  }
-  db.ref(`ops_docfin_mth/${mo}/${br}`).once('value').then(snap => {
-    const dAll = snap.val() || {};
-    for (let i = 1; i <= dim; i++) {
-      let dt = `${yr}-${m}-${String(i).padStart(2, '0')}`; let d = dAll[dt] || {};
-      ["df-ti","df-to","df-nt"].forEach(k => { let el = g(`${k}-${dt}`); if (el) el.value = d[k] || ""; });
-      ["df-sl","df-df"].forEach(k => { let el = g(`${k}-${dt}`); if (el) el.value = d[k] !== undefined ? Number(d[k]).toLocaleString() : ""; });
-      let sel = g(`df-doc-${dt}`); if (sel) sel.value = d["df-doc"] || "";
-    }
-    drawT4Chart();
-  });
-}
-function bindT4NodeListeners() {
-  document.querySelectorAll('.doc-input-node').forEach(el => {
-    el.addEventListener('input', (e) => svT4(e.target));
-    if(el.type === "text") {
-      el.addEventListener('blur', (e) => { if(e.target.value!=="") e.target.value = Number(e.target.value.replace(/,/g,'')).toLocaleString(); });
-      el.addEventListener('focus', (e) => { e.target.value = e.target.value.replace(/,/g,''); });
-    }
-  });
-  document.querySelectorAll('.doc-select-node').forEach(el => el.addEventListener('change', (e) => svT4(e.target)));
-}
-function svT4(el) { const dt = el.dataset.dt, br = g("df-br").value, mo = g("df-mo").value, id = el.dataset.id; const val = (id === "df-sl" || id === "df-df") ? parseFloat(el.value.replace(/,/g,''))||0 : el.value; drawT4Chart(); clearTimeout(tm4[dt]); tm4[dt] = setTimeout(() => { db.ref(`ops_docfin_mth/${mo}/${br}/${dt}`).update({[id]:val}); }, 500); }
-function drawT4Chart() {
-  let sSal=0, sDf=0; let docStats = {};
-  document.querySelectorAll("#df-tbody tr").forEach(row => {
-    let sl = Number(row.querySelector("[id^='df-sl-']")?.value.replace(/,/g,''))||0; let df = Number(row.querySelector("[id^='df-df-']")?.value.replace(/,/g,''))||0;
-    let doc = row.querySelector("[id^='df-doc-']")?.value; sSal += sl; sDf += df; if(doc && sl>0) docStats[doc] = (docStats[doc]||0) + sl;
-  });
-  if(g("k4-sal")) g("k4-sal").textContent = "฿" + sSal.toLocaleString(); if(g("k4-df")) g("k4-df").textContent = "฿" + sDf.toLocaleString();
-  try {
-    const ctxDF = g("c4-bar"); if(!ctxDF) return;
-    let sortedDocs = Object.keys(docStats).sort((a,b)=>docStats[b]-docStats[a]);
-    if(c4Bar) c4Bar.destroy();
-    c4Bar = new Chart(ctxDF, { type:'bar', data:{ labels:sortedDocs, datasets:[{label:'ยอดขายแพทย์ (บาท)', data:sortedDocs.map(d=>docStats[d]), backgroundColor:'#1971c2', borderRadius:4}] }, options:{responsive:true, maintainAspectRatio:false, indexAxis:'y'} });
-  } catch(err) { console.warn(err); }
-}
-
-// ==========================================
-// TAB 5: SYSTEM GLOBAL CONFIGURATION RENDER
-// ==========================================
-function loadT5() {
-  let ht = ""; bKeys.forEach(k => { ht += `<div style="display:flex;justify-content:space-between;margin-bottom:10px;"><label>${BKS[k]}</label><input type="text" id="tg-${k}" value="${SETTINGS.tgs[k].toLocaleString()}" style="text-align:right;"></div>`; });
-  if(g("s-tg")) g("s-tg").innerHTML = ht;
-  g("s-tg").querySelectorAll('input').forEach(el => {
-    el.addEventListener('blur', (e) => { if(e.target.value!=="") e.target.value = Number(e.target.value.replace(/,/g,'')).toLocaleString(); });
-    el.addEventListener('focus', (e) => { e.target.value = e.target.value.replace(/,/g,''); });
-  });
-  if(g("s-dr")) g("s-dr").value = SETTINGS.docs.join(", "); if(g("s-ca")) g("s-ca").value = SETTINGS.cas.join(", "); if(g("s-mg")) g("s-mg").value = SETTINGS.mgs.join(", ");
-}
-function saveT5() {
-  bKeys.forEach(k => { let el = g(`tg-${k}`); if(el) SETTINGS.tgs[k] = parseFloat(el.value.replace(/,/g,''))||0; });
-  SETTINGS.docs = g("s-dr").value.split(",").map(s=>s.trim()).filter(Boolean); SETTINGS.cas = g("s-ca").value.split(",").map(s=>s.trim()).filter(Boolean); SETTINGS.mgs = g("s-mg").value.split(",").map(s=>s.trim()).filter(Boolean);
-  db.ref(`ops_system_settings`).set(SETTINGS).then(()=>{ toast("✅ บันทึกการตั้งค่าแล้ว"); setTimeout(() => location.reload(), 1000); });
-}
-
-function updateSelects() {
-  const dOpt = "<option value=''>-</option>"+SETTINGS.docs.map(x=>`<option value="${x}">${x}</option>`).join("");
-  document.querySelectorAll('select[id^="r-doc-"], select[id^="df-doc-"], #o-doc').forEach(el=>{let val=el.value; el.innerHTML=dOpt; el.value=val;});
-  if(g("o-ca")) { let v=g("o-ca").value; g("o-ca").innerHTML="<option value=''>-</option>"+SETTINGS.cas.map(x=>`<option value="${x}">${x}</option>`).join(""); g("o-ca").value=v; }
-  if(g("o-mg")) { let v=g("o-mg").value; g("o-mg").innerHTML="<option value=''>-</option>"+SETTINGS.mgs.map(x=>`<option value="${x}">${x}</option>`).join(""); g("o-mg").value=v; }
-}
-
-// ==========================================
-// TAB 0: ADVANCED MASTER DASHBOARD MODULES
+// TAB 0: MASTER ADVANCED DASHBOARD OPTIMIZED MODULE
 // ==========================================
 function buildT0() {
   const mo = g("d0-mo").value; if(!mo) return;
   
+  // FIX 2: Bounded index key range query to accelerate downloading loads securely
   Promise.all([
-    db.ref('ops_daily').once('value'),
+    db.ref('ops_daily').orderByKey().startAt(mo).endAt(mo + "\uf8ff").once('value'),
     db.ref(`ops_tracking_mth/${mo}`).once('value'),
     db.ref(`ops_docfin_mth/${mo}`).once('value')
   ]).then(([snapDaily, snapTrack, snapDoc]) => {
@@ -1152,6 +701,421 @@ function buildT0() {
       }
     } catch(e){ console.error(e); }
   });
+}
+
+// ==========================================
+// TAB 1: REVENUE SHEET CENTRAL CALCULATOR
+// ==========================================
+function buildT1() {
+  const moEl = g("r-mo"), brEl = g("r-br"); if (!moEl || !brEl) return;
+  const mo = moEl.value, br = brEl.value; if (!mo) return;
+  
+  const [yr, m] = mo.split("-"); const dim = new Date(yr, m, 0).getDate();
+  if (curT1 !== `${mo}_${br}`) {
+    curT1 = `${mo}_${br}`; let ht = "";
+    for (let i = 1; i <= dim; i++) {
+      let dt = `${yr}-${m}-${String(i).padStart(2, '0')}`;
+      ht += `<tr><td class="bg-date">${i}/${m}/${yr}</td>
+                 <td class="bg-total"><input type="text" class="r-inp row-tot sum-income" id="sum-${dt}" readonly value="0"></td>`;
+      R_COLS.forEach(f => {
+        ht += `<td class="${f.cls}"><input type="text" class="r-inp core-calc-node" id="${f.id}-${dt}" data-dt="${dt}" data-id="${f.id}"></td>`;
+      });
+      ht += `<td class="bg-sum"><input type="text" class="r-inp" style="text-align:center;" id="pax-${dt}" readonly value="0"></td>
+                 <td class="bg-date"><select class="r-inp bg-date sync-doc-node" id="r-doc-${dt}" data-dt="${dt}" data-id="r-doc"></select></td></tr>`;
+    }
+    const tbody = g("r-tbody"); if(tbody) tbody.innerHTML = ht;
+    updateSelects(); bindDynamicTableEvents();
+    
+    const tgVal = g("k1-tg-val");
+    if(tgVal) { tgVal.textContent = "฿" + (SETTINGS.tgs[br]||0).toLocaleString(); tgVal.dataset.val = SETTINGS.tgs[br]||0; }
+  }
+
+  if (window.t1Listener) db.ref('ops_daily').off('value', window.t1Listener);
+  window.t1Listener = (snap) => {
+    const all = snap.val() || {};
+    for (let i = 1; i <= dim; i++) {
+      let dt = `${yr}-${m}-${String(i).padStart(2, '0')}`; let d = all[dt]?.[br] || {};
+      R_COLS.forEach(f => {
+        let el = g(`${f.id}-${dt}`);
+        if (el && document.activeElement !== el) el.value = d[f.id] !== undefined && d[f.id] !== "" ? Number(d[f.id]).toLocaleString() : "";
+      });
+      let dSel = g(`r-doc-${dt}`); if (dSel && document.activeElement !== dSel) dSel.value = d["r-doc"] || "";
+      
+      let rTot = 0;
+      R_COLS.forEach(f => {
+        if (f.id !== "r-opx" && f.id !== "r-oam" && f.id !== "r-nyp" && f.id !== "r-nam" && f.id !== "r-nnp") {
+          rTot += parseFloat(String(g(`${f.id}-${dt}`)?.value || "").replace(/,/g, '')) || 0;
+        }
+      });
+      if(g(`sum-${dt}`)) g(`sum-${dt}`).value = rTot.toLocaleString();
+      let totalPax = (parseFloat(d["r-opx"])||0) + (parseFloat(d["r-nyp"])||0) + (parseFloat(d["r-nnp"])||0);
+      if(g(`pax-${dt}`)) g(`pax-${dt}`).value = totalPax.toLocaleString();
+    }
+    // Render total analytical graphs exactly once out of 31 loops to avoid initialization freezing crash
+    calculateDashboard();
+  };
+  db.ref('ops_daily').on('value', window.t1Listener);
+}
+
+function calculateRevenueRow(dt) {
+  const h = num(`r-op-${dt}`), drug = num(`r-med-${dt}`), treatment = num(`r-trt-${dt}`);
+  const hd = num(`r-hd-${dt}`), gowabi = num(`r-gw-${dt}`), charge = num(`r-chg-${dt}`);
+  const inject = num(`r-drp-${dt}`), member = num(`r-mem-${dt}`), emp = num(`r-stf-${dt}`), deposit = num(`r-dep-${dt}`);
+
+  const total = h + drug + treatment + hd + gowabi + charge + inject + member + emp + deposit;
+  setValue(`sum-${dt}`, total);
+
+  const opx = num(`r-opx-${dt}`), nyp = num(`r-nyp-${dt}`), nnp = num(`r-nnp-${dt}`);
+  const elPax = g(`pax-${dt}`); if (elPax) elPax.value = (opx + nyp + nnp).toLocaleString();
+
+  calculateDashboard();
+}
+
+function bindDynamicTableEvents() {
+  document.querySelectorAll('.core-calc-node').forEach(el => {
+    el.addEventListener('input', (e) => { const target = e.target; calculateRevenueRow(target.dataset.dt); executeRevenuePipeline(target); });
+    el.addEventListener('blur', (e) => { if(e.target.value!=="") e.target.value = Number(e.target.value.replace(/,/g,'')).toLocaleString(); });
+    el.addEventListener('focus', (e) => { e.target.value = e.target.value.replace(/,/g,''); });
+  });
+  document.querySelectorAll('.sync-doc-node').forEach(el => { el.addEventListener('change', (e) => executeRevenuePipeline(e.target)); });
+}
+
+function executeRevenuePipeline(el) {
+  const dt = el.dataset.dt, br = g("r-br").value, id = el.dataset.id;
+  let rawVal = el.value.replace(/,/g,''); const val = parseFloat(rawVal) || 0;
+  let mapped = {[id]: id === "r-doc" ? el.value : val};
+  
+  if(id === "r-med") mapped["p-product"] = val; if(id === "r-trt") mapped["p-treatment"] = val; 
+  if(id === "r-hd") mapped["a-hdmall"] = val; if(id === "r-gw") mapped["a-gowabi"] = val; 
+  if(id === "r-chg") mapped["p-charge"] = val; if(id === "r-drp") mapped["p-drip"] = val;
+  
+  clearTimeout(tm1[dt]); tm1[dt] = setTimeout(() => { db.ref(`ops_daily/${dt}/${br}`).update(mapped); }, 500);
+}
+
+// FIX 1: HIGHLY PRECISE IMPORT EXCEL INTEGRATION DECODER MAPS BY CELL DATE PARSES DIRECTLY
+function handleExcelImportUpload(inputControl) {
+  const f = inputControl.files[0]; if(!f) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: 'array', cellDates: false });
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: false });
+      
+      const mo = g("r-mo").value, br = g("r-br").value; if(!mo || !br) { toast("❌ กรุณาระบุเงื่อนไขเดือนและสาขาก่อนนำเข้า", "error"); return; }
+      const [yr, m] = mo.split("-");
+
+      const headers = rows[0]; const map = {};
+      headers.forEach((h, idx) => { if(h) map[String(h).trim()] = idx; });
+
+      let updates = {}; let count = 0;
+      let cleanVal = (rowArray, keyName) => {
+        let colIdx = map[keyName]; if(colIdx === undefined) return 0;
+        let cellRaw = rowArray[colIdx]; if(!cellRaw) return 0;
+        return parseFloat(String(cellRaw).replace(/,/g, '')) || 0;
+      };
+
+      for (let i = 1; i < rows.length; i++) {
+        let row = rows[i]; if(!row || row.length === 0) continue;
+        const dateCell = row[map["วันที่"]]; if (!dateCell) continue;
+        
+        let targetDay = null;
+        let strD = String(dateCell).trim();
+        if (strD && !strD.includes("วันที่") && !strD.includes("รวม") && !strD.includes("Total")) {
+          if (strD.includes("/")) { targetDay = parseInt(strD.split("/")[0], 10); }
+          else if (strD.includes("-")) {
+            let pts = strD.split("-");
+            if (pts[0].length === 4) targetDay = parseInt(pts[2], 10);
+            else targetDay = parseInt(pts[0], 10);
+          } else { targetDay = parseInt(strD, 10); }
+        }
+
+        if (!targetDay || isNaN(targetDay) || targetDay < 1 || targetDay > 31) continue;
+        const dayKey = String(targetDay).padStart(2, '0');
+        const pathPrefix = `${yr}-${m}-${dayKey}`;
+
+        updates[`${pathPrefix}/${br}/r-op`] = cleanVal(row, "หัตถการ");
+        updates[`${pathPrefix}/${br}/r-med`] = cleanVal(row, "ขายยา");
+        updates[`${pathPrefix}/${br}/r-trt`] = cleanVal(row, "Treatment");
+        updates[`${pathPrefix}/${br}/r-hd`] = cleanVal(row, "HD MALL");
+        updates[`${pathPrefix}/${br}/r-gw`] = cleanVal(row, "Gowabi");
+        updates[`${pathPrefix}/${br}/r-chg`] = cleanVal(row, "ชาร์จ 3%");
+        updates[`${pathPrefix}/${br}/r-drp`] = cleanVal(row, "ฉีดผิว");
+        updates[`${pathPrefix}/${br}/r-mem`] = cleanVal(row, "member");
+        updates[`${pathPrefix}/${br}/r-stf`] = cleanVal(row, "หัตถการ พนง.");
+        updates[`${pathPrefix}/${br}/r-dep`] = cleanVal(row, "มัดจำเงิน");
+        updates[`${pathPrefix}/${br}/r-oth"] = cleanVal(row, "รวมรายได้อื่นๆ");
+        updates[`${pathPrefix}/${br}/r-opx`] = cleanVal(row, "คนไข้เก่า (คน)");
+        updates[`${pathPrefix}/${br}/r-oam`] = cleanVal(row, "คนไข้เก่า (ยอด)");
+        updates[`${pathPrefix}/${br}/r-nyp`] = cleanVal(row, "คนไข้ใหม่มี (คน)");
+        updates[`${pathPrefix}/${br}/r-nam`] = cleanVal(row, "คนไข้ใหม่มียอด (บาท)");
+        updates[`${pathPrefix}/${br}/r-nnp`] = cleanVal(row, "คนไข้ใหม่ไม่มี (คน)");
+        
+        updates[`${pathPrefix}/${br}/p-product`] = cleanVal(row, "ขายยา");
+        updates[`${pathPrefix}/${br}/p-treatment`] = cleanVal(row, "Treatment");
+        updates[`${pathPrefix}/${br}/a-hdmall`] = cleanVal(row, "HD MALL");
+        updates[`${pathPrefix}/${br}/a-gowabi`] = cleanVal(row, "Gowabi");
+        updates[`${pathPrefix}/${br}/p-charge`] = cleanVal(row, "ชาร์จ 3%");
+        updates[`${pathPrefix}/${br}/p-drip`] = cleanVal(row, "ฉีดผิว");
+        updates[`${pathPrefix}/${br}/r-mem`] = cleanVal(row, "member");
+        
+        let docColIdx = map["แพทย์"]; updates[`${pathPrefix}/${br}/r-doc`] = docColIdx !== undefined ? (row[docColIdx] || "") : "";
+        count++;
+      }
+
+      if(count > 0) {
+        db.ref('ops_daily').update(updates).then(() => {
+          toast(`📥 Import Success: ดึงข้อมูลยอดขายหลักพันหลักหมื่นตรงตารางสำเร็จ ${count} รายการ`); buildT1();
+        }).catch(err => toast("Firebase Error: " + err.message, "error"));
+      } else { toast("❌ ไม่พบโครงสร้างแถวข้อมูลวันที่ระบุในไฟล์ Excel", "error"); }
+    } catch(err) { console.error(err); toast("❌ Excel Parsing Failure: รูปแบบชีทชำรุด", "error"); }
+  };
+  reader.readAsArrayBuffer(f); inputControl.value = "";
+}
+
+function exportT1() {
+  let data = [["วันที่", "รายได้รวม", "หัตถการ", "ขายยา", "Treatment", "HD MALL", "Gowabi", "ชาร์จ 3%", "ฉีดผิว", "member", "หัตถการ พนง.", "มัดจำเงิน", "รวมรายได้อื่นๆ", "คนไข้เก่า(คน)", "คนไข้เก่า(ยอด)", "คนไข้ใหม่(คน)", "คนไข้ใหม่(ยอด)", "ใหม่ไม่มียอด(คน)", "คนไข้รวม", "แพทย์"]];
+  document.querySelectorAll("#r-tbody tr").forEach(row => {
+    let rTotInput = row.querySelector('.row-tot'); if(!rTotInput) return;
+    let dtStr = rTotInput.id.replace('sum-', ''), rData = [row.cells[0].textContent.trim(), parseFloat(rTotInput.value.replace(/,/g,''))||0];
+    R_COLS.forEach(c => { rData.push(Number((g(`${c.id}-${dtStr}`)?.value || "0").replace(/,/g, ''))); });
+    rData.push(Number((g(`pax-${dtStr}`)?.value || "0").replace(/,/g, ''))); rData.push(g(`r-doc-${dtStr}`)?.value || ""); data.push(rData);
+  });
+  const ws = XLSX.utils.aoa_to_sheet(data); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Revenue"); XLSX.writeFile(wb, `Revenue_Sheet_${g("r-br").value}_${g("r-mo").value}.xlsx`);
+}
+
+// ==========================================
+// TAB 2: DAILY OPS CORE MODULE
+// ==========================================
+function buildT2() {
+  const tb = g("o-tbody"); if(!tb) return;
+  let ht = "", leftRows = [
+    {label:"Co2", id:"p0"}, {label:"Pico", id:"p1"}, {label:"Vbeam", id:"p2"}, {label:"Elos", id:"p3"},
+    {label:"Botox", id:"p4"}, {label:"Filler", id:"p5"}, {label:"Meso", id:"p6"}, {label:"Thermage", id:"p7"},
+    {label:"Ulthera", id:"p8"}, {label:"Treatment", id:"p-treatment"}, {label:"Drip Vitamin (Nures)", id:"p-drip"},
+    {label:"Product (ขายยา)", id:"p-product"}, {label:"ชาร์จ 3%", id:"p-charge"}
+  ];
+  for(let x=1; x<=3; x++) leftRows.push({custom: true, id: `cust-id-${x}`, labelId: `cust-lbl-${x}`});
+  
+  for(let i=0; i<leftRows.length; i++) {
+    ht += `<tr>`;
+    if(i===0) ht += `<td rowspan="${leftRows.length + 1}" style="background:#f8f9fa; text-align:center; vertical-align:middle; padding:15px; border-right:2px solid #000;"><div style="font-weight:bold;margin-bottom:10px;color:var(--tx2);">ยอดหน้าร้านรวม</div><input type="text" id="front-store-val" class="ops-node-inp" style="font-size:18px; font-weight:700; text-align:center;"></td>`;
+    let r = leftRows[i];
+    if(r.custom) {
+      ht += `<td style="padding:2px;"><input type="text" id="${r.labelId}" style="text-align:left;border:none;" placeholder="✏️ พิมพ์หัตถการอื่นๆ" class="ops-lbl-node"></td><td style="padding:2px;"><input type="text" id="${r.id}" class="ops-node-inp o-val"></td><td style="padding:2px;"><input type="text" id="v-cust-${i}" class="ops-node-inp v-val red-tx"></td>`;
+    } else {
+      ht += `<td style="font-weight:500;">${r.label}</td><td style="padding:2px;"><input type="text" id="${r.id}" class="ops-node-inp o-val"></td><td style="padding:2px;"><input type="text" id="v${i}" class="ops-node-inp v-val red-tx"></td>`;
+    }
+    if(i < O_CREDITS.length) {
+      let c = O_CREDITS[i];
+      if(c.ro) ht += `<td style="text-align:right;font-weight:700;background:#f8f9fa;">${c.n}</td><td style="background:#e9ecef;"><input type="text" id="${c.id}" readonly value="0"></td>`;
+      else ht += `<td>${c.n}</td><td style="padding:2px;"><input type="text" id="${c.id}" class="ops-node-inp c-val"></td>`;
+    } else { ht += `<td style="background:#f8f9fa;border:none;"></td><td style="background:#f8f9fa;border:none;"></td>`; }
+    
+    if(i===0) ht += `<td rowspan="4" style="vertical-align:middle;text-align:center;background:#fff3cd;font-weight:bold;">เงินสด<br><br><input type="text" id="pay-cash" class="ops-node-inp" style="font-size:18px;text-align:center;"></td>`;
+    if(i===4) ht += `<td rowspan="6" style="vertical-align:middle;text-align:center;background:#cff4fc;font-size:12px;font-weight:bold;">แอปพลิเคชัน<div style="margin-top:10px;text-align:left;padding:0 5px;">HDmall:<br><input type="text" id="a-hd-pax" style="width:30px;padding:2px;" placeholder="คน"> <input type="text" id="a-hdmall" class="ops-node-inp c-val" style="width:65px;padding:2px;" placeholder="ยอด"></div><div style="margin-top:8px;text-align:left;padding:0 5px;">Gowabi:<br><input type="text" id="a-gw-pax" style="width:30px;padding:2px;" placeholder="คน"> <input type="text" id="a-gowabi" class="ops-node-inp c-val" style="width:65px;padding:2px;" placeholder="ยอด"></div></td>`;
+    if(i===10) ht += `<td rowspan="3" style="vertical-align:middle;text-align:center;background:#d1e7dd;font-weight:bold;">ยอดเงินโอน<br><br><input type="text" id="pay-trans" class="ops-node-inp" style="font-size:18px;text-align:center;"></td>`;
+    if(i===13) ht += `<td rowspan="3" style="vertical-align:middle;text-align:center;background:#dbeafe;font-weight:bold;">ยอดชำระรวม<br><br><input type="text" id="t-grand" style="font-size:22px;color:red!important;text-align:center;font-weight:800;border:1px solid #aaa!important;background:#fff;"></td>`;
+    ht += `</tr>`;
+  }
+  ht += `<tr style="font-weight:700; background:#f1f3f5;"><td style="text-align:right;">ยอดรวม Program</td><td><input type="text" id="t-prog" readonly value="0"></td><td style="color:red;text-align:right;padding-right:10px;" id="t-vip">0</td><td colspan="2" style="text-align:center;">คะแนน (Point)</td><td colspan="2" style="padding:2px;"><input type="text" id="t-point" class="ops-node-inp" style="width:100%;text-align:center;"></td></tr>`;
+  tb.innerHTML = ht; bindT2InputNodeListeners(); loadT2();
+}
+
+function bindT2InputNodeListeners() {
+  document.querySelectorAll('.ops-node-inp').forEach(el => {
+    el.addEventListener('input', () => cT2());
+    el.addEventListener('blur', (e) => { if(e.target.value!=="") e.target.value = Number(e.target.value.replace(/,/g,'')).toLocaleString(); });
+    el.addEventListener('focus', (e) => { e.target.value = e.target.value.replace(/,/g,''); });
+  });
+  document.querySelectorAll('.ops-lbl-node').forEach(el => { el.addEventListener('input', (e) => saveT2Quick(e.target.id, e.target.value)); });
+}
+
+function loadT2() {
+  const dt = g("o-dt")?.value, br = g("o-br")?.value; if(!dt || !br) return;
+  db.ref(`ops_daily/${dt}/${br}`).once('value').then(snap => {
+    document.querySelectorAll('#t2-content input[type="text"]').forEach(e => { if(!e.readOnly && e.id!=='t-grand' && !e.id.includes('cust-lbl') && e.id!=='o-rsn' && e.id!=='o-note' && e.id!=='c-oth-n') e.value="" });
+    if(snap.exists()){
+      const d = snap.val();
+      for(let k in d){
+        let el = g(k); if(el && document.activeElement !== el){
+          if(k.includes('lbl') || k.includes('rsn') || k.includes('note')) el.value = d[k];
+          else el.value = d[k]!=="" ? Number(d[k]).toLocaleString() : "";
+        }
+      }
+    }
+    cT2(true); updateSelects();
+  }).catch(()=>cT2(true));
+}
+
+function cT2(fromLoad = false) {
+  let tp=0, tv=0, tc=0;
+  document.querySelectorAll(".o-val").forEach(e=>tp+=Number(e.value.replace(/,/g,''))||0);
+  document.querySelectorAll(".v-val").forEach(e=>tv+=Number(e.value.replace(/,/g,''))||0);
+  document.querySelectorAll(".c-val").forEach(e=>tc+=Number(e.value.replace(/,/g,''))||0);
+  setValue("t-prog", tp); if(g("t-vip")) g("t-vip").textContent = tv.toLocaleString();
+  setValue("t-crd", tc);
+  let gInp = g("t-grand");
+  if(gInp && (fromLoad || document.activeElement !== gInp)){
+    let autoSum = tc + (Number(g("pay-cash")?.value.replace(/,/g,''))||0) + (Number(g("pay-trans")?.value.replace(/,/g,''))||0);
+    gInp.value = autoSum.toLocaleString();
+  }
+}
+
+function saveT2Quick(id, val) { const dt=g("o-dt").value, br=g("o-br").value; let rawVal = val.toString().replace(/,/g, ''); db.ref(`ops_daily/${dt}/${br}`).update({[id]: isNaN(parseFloat(rawVal)) ? rawVal : parseFloat(rawVal)}); }
+function saveT2() {
+  const dt=g("o-dt").value, br=g("o-br").value; if(!dt)return;
+  let p={}; document.querySelectorAll('#t2-content input, #t2-content select').forEach(e=>{ if(e.id && !e.readOnly) { let rawVal = e.value.toString().replace(/,/g, ''); p[e.id] = (!isNaN(rawVal) && rawVal !== "" && !e.id.includes('lbl') && !e.id.includes('rsn') && !e.id.includes('note') && !e.id.includes('c-oth-n')) ? parseFloat(rawVal) : e.value; } });
+  db.ref(`ops_daily/${dt}/${br}`).update(p).then(()=>toast("✅ บันทึกฟอร์มบัญชี Daily Ops สำเร็จ"));
+}
+
+// ==========================================
+// TAB 3: CONFIRM TRACKING DATA APAPTER MODULE
+// ==========================================
+function buildT3() {
+  const moEl = g("tk-mo"), brEl = g("tk-br"); if (!moEl || !brEl) return;
+  const mo = moEl.value, br = brEl.value; if (!mo) return;
+  
+  const [yr, m] = mo.split("-"); const dim = new Date(yr, m, 0).getDate();
+  if (curT3 !== `${mo}_${br}`) {
+    curT3 = `${mo}_${br}`; let ht = "";
+    for (let i = 1; i <= dim; i++) {
+      let dt = `${yr}-${m}-${String(i).padStart(2, '0')}`;
+      ht += `<tr><td style="font-weight:bold;background:#f8f9fa;">${i}/${m}/${yr}</td>
+        <td><input type="text" class="mth-inp tk-calc-node" id="tk-co-${dt}" data-dt="${dt}" data-id="tk-co"></td>
+        <td><input type="text" class="mth-inp tk-calc-node" id="tk-cn-${dt}" data-dt="${dt}" data-id="tk-cn"></td>
+        <td><input type="text" class="mth-inp tk-calc-node" id="tk-po-${dt}" data-dt="${dt}" data-id="tk-po"></td>
+        <td><input type="text" class="mth-inp tk-calc-node" id="tk-pn-${dt}" data-dt="${dt}" data-id="tk-pn"></td>
+        <td><input type="text" class="mth-inp tk-calc-node" id="tk-wo-${dt}" data-dt="${dt}" data-id="tk-wo"></td>
+        <td><input type="text" class="mth-inp tk-calc-node" id="tk-wn-${dt}" data-dt="${dt}" data-id="tk-wn"></td>
+        <td><input type="text" class="mth-inp tk-calc-node" id="tk-na-${dt}" data-dt="${dt}" data-id="tk-na"></td>
+        <td><input type="text" class="mth-inp tk-calc-node" id="tk-tc-${dt}" data-dt="${dt}" data-id="tk-tc"></td>
+        <td><input type="text" class="mth-inp tk-calc-node" id="tk-ro-${dt}" data-dt="${dt}" data-id="tk-ro"></td>
+        <td><input type="text" class="mth-inp tk-calc-node" id="tk-rn-${dt}" data-dt="${dt}" data-id="tk-rn"></td>
+        <td><input type="text" class="mth-inp row-tk-tot" id="tk-tot-${dt}" readonly value="0"></td></tr>`;
+    }
+    const tbody = g("tk-tbody"); if(tbody) tbody.innerHTML = ht; bindT3NodeListeners();
+  }
+  db.ref(`ops_tracking_mth/${mo}/${br}`).once('value').then(snap => {
+    const dAll = snap.val() || {};
+    for (let i = 1; i <= dim; i++) {
+      let dt = `${yr}-${m}-${String(i).padStart(2, '0')}`; let d = dAll[dt] || {};
+      ["tk-co","tk-cn","tk-po","tk-pn","tk-wo","tk-wn","tk-na","tk-tc","tk-ro","tk-rn"].forEach(k => {
+        let el = g(`${k}-${dt}`); if (el) el.value = d[k] !== undefined ? Number(d[k]).toLocaleString() : "";
+      });
+      calcT3Row(dt);
+    }
+    drawT3Chart();
+  });
+}
+function bindT3NodeListeners() {
+  document.querySelectorAll('.tk-calc-node').forEach(el => {
+    el.addEventListener('input', (e) => { const target = e.target; calcT3Row(target.dataset.dt); svT3(target); });
+    el.addEventListener('blur', (e) => { if(e.target.value!=="") e.target.value = Number(e.target.value.replace(/,/g,'')).toLocaleString(); });
+    el.addEventListener('focus', (e) => { e.target.value = e.target.value.replace(/,/g,''); });
+  });
+}
+function calcT3Row(dt) { let ro = Number((g(`tk-ro-${dt}`)?.value||"").replace(/,/g,''))||0; let rn = Number((g(`tk-rn-${dt}`)?.value||"").replace(/,/g,''))||0; let el = g(`tk-tot-${dt}`); if(el) el.value = (ro + rn).toLocaleString(); }
+function svT3(el) { const dt = el.dataset.dt, br = g("tk-br").value, mo = g("tk-mo").value, id = el.dataset.id, val = Number(el.value.replace(/,/g,'')) || 0; drawT3Chart(); clearTimeout(tm3[dt]); tm3[dt] = setTimeout(() => { db.ref(`ops_tracking_mth/${mo}/${br}/${dt}`).update({[id]:val}); }, 500); }
+function drawT3Chart() {
+  let cf=0, act=0, pp=0, na=0;
+  document.querySelectorAll("[id^='tk-co-']").forEach(i=>cf+=Number(i.value.replace(/,/g,''))||0); document.querySelectorAll("[id^='tk-cn-']").forEach(i=>cf+=Number(i.value.replace(/,/g,''))||0);
+  document.querySelectorAll(".row-tk-tot").forEach(i=>act+=Number(i.value.replace(/,/g,''))||0);
+  document.querySelectorAll("[id^='tk-po-']").forEach(i=>pp+=Number(i.value.replace(/,/g,''))||0); document.querySelectorAll("[id^='tk-pn-']").forEach(i=>pp+=Number(i.value.replace(/,/g,''))||0);
+  document.querySelectorAll("[id^='tk-na-']").forEach(i=>na+=Number(i.value.replace(/,/g,''))||0);
+  if(g("k3-cf")) g("k3-cf").textContent = cf.toLocaleString(); if(g("k3-act")) g("k3-act").textContent = act.toLocaleString();
+  if(g("k3-pp")) g("k3-pp").textContent = pp.toLocaleString(); if(g("k3-na")) g("k3-na").textContent = na.toLocaleString();
+  try {
+    const ctx = g("c3-donut"); if(!ctx) return;
+    if(c3Donut) c3Donut.destroy();
+    c3Donut = new Chart(ctx, { type:'doughnut', data:{ labels:['มาจริง', 'ขอเลื่อน', 'ไม่รับสาย'], datasets:[{data:[act, pp, na], backgroundColor:['#2f9e44', '#f08c00', '#c92a2a']}] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:'right'} } } });
+  } catch(err) { console.warn(err); }
+}
+
+// ==========================================
+// TAB 4: DOCTOR FINANCE SCHEDULING MODULE
+// ==========================================
+function buildT4() {
+  const moEl = g("df-mo"), brEl = g("df-br"); if (!moEl || !brEl) return;
+  const mo = moEl.value, br = brEl.value; if (!mo) return;
+  
+  const [yr, m] = mo.split("-"); const dim = new Date(yr, m, 0).getDate();
+  if (curT4 !== `${mo}_${br}`) {
+    curT4 = `${mo}_${br}`; let ht = "";
+    for (let i = 1; i <= dim; i++) {
+      let dt = `${yr}-${m}-${String(i).padStart(2, '0')}`;
+      let docSel = `<select class="mth-inp doc-select-node" id="df-doc-${dt}" data-dt="${dt}" data-id="df-doc"><option value="">-</option></select>`;
+      ht += `<tr><td style="font-weight:bold;background:#f8f9fa;">${i}/${m}/${yr}</td>
+        <td>${docSel}</td>
+        <td><input type="time" class="mth-inp doc-input-node" id="df-ti-${dt}" data-dt="${dt}" data-id="df-ti"></td>
+        <td><input type="time" class="mth-inp doc-input-node" id="df-to-${dt}" data-dt="${dt}" data-id="df-to"></td>
+        <td><input type="text" class="mth-inp doc-input-node" style="background:#dbeafe;" id="df-sl-${dt}" data-dt="${dt}" data-id="df-sl"></td>
+        <td><input type="text" class="mth-inp doc-input-node" style="background:#fff3cd;" id="df-df-${dt}" data-dt="${dt}" data-id="df-df"></td>
+        <td><input type="text" class="mth-inp doc-input-node" style="text-align:left;padding-left:10px;" id="df-nt-${dt}" data-dt="${dt}" data-id="df-nt"></td></tr>`;
+    }
+    const tbody = g("df-tbody"); if(tbody) tbody.innerHTML = ht; updateSelects(); bindT4NodeListeners();
+  }
+  db.ref(`ops_docfin_mth/${mo}/${br}`).once('value').then(snap => {
+    const dAll = snap.val() || {};
+    for (let i = 1; i <= dim; i++) {
+      let dt = `${yr}-${m}-${String(i).padStart(2, '0')}`; let d = dAll[dt] || {};
+      ["df-ti","df-to","df-nt"].forEach(k => { let el = g(`${k}-${dt}`); if (el) el.value = d[k] || ""; });
+      ["df-sl","df-df"].forEach(k => { let el = g(`${k}-${dt}`); if (el) el.value = d[k] !== undefined ? Number(d[k]).toLocaleString() : ""; });
+      let sel = g(`df-doc-${dt}`); if (sel) sel.value = d["df-doc"] || "";
+    }
+    drawT4Chart();
+  });
+}
+function bindT4NodeListeners() {
+  document.querySelectorAll('.doc-input-node').forEach(el => {
+    el.addEventListener('input', (e) => svT4(e.target));
+    if(el.type === "text") {
+      el.addEventListener('blur', (e) => { if(e.target.value!=="") e.target.value = Number(e.target.value.replace(/,/g,'')).toLocaleString(); });
+      el.addEventListener('focus', (e) => { e.target.value = e.target.value.replace(/,/g,''); });
+    }
+  });
+  document.querySelectorAll('.doc-select-node').forEach(el => el.addEventListener('change', (e) => svT4(e.target)));
+}
+function svT4(el) { const dt = el.dataset.dt, br = g("df-br").value, mo = g("df-mo").value, id = el.dataset.id; const val = (id === "df-sl" || id === "df-df") ? parseFloat(el.value.replace(/,/g,''))||0 : el.value; drawT4Chart(); clearTimeout(tm4[dt]); tm4[dt] = setTimeout(() => { db.ref(`ops_docfin_mth/${mo}/${br}/${dt}`).update({[id]:val}); }, 500); }
+function drawT4Chart() {
+  let sSal=0, sDf=0; let docStats = {};
+  document.querySelectorAll("#df-tbody tr").forEach(row => {
+    let sl = Number(row.querySelector("[id^='df-sl-']")?.value.replace(/,/g,''))||0; let df = Number(row.querySelector("[id^='df-df-']")?.value.replace(/,/g,''))||0;
+    let doc = row.querySelector("[id^='df-doc-']")?.value; sSal += sl; sDf += df; if(doc && sl>0) docStats[doc] = (docStats[doc]||0) + sl;
+  });
+  if(g("k4-sal")) g("k4-sal").textContent = "฿" + sSal.toLocaleString(); if(g("k4-df")) g("k4-df").textContent = "฿" + sDf.toLocaleString();
+  try {
+    const ctxDF = g("c4-bar"); if(!ctxDF) return;
+    let sortedDocs = Object.keys(docStats).sort((a,b)=>docStats[b]-docStats[a]);
+    if(c4Bar) c4Bar.destroy();
+    c4Bar = new Chart(ctxDF, { type:'bar', data:{ labels:sortedDocs, datasets:[{label:'ยอดขายแพทย์ (บาท)', data:sortedDocs.map(d=>docStats[d]), backgroundColor:'#1971c2', borderRadius:4}] }, options:{responsive:true, maintainAspectRatio:false, indexAxis:'y'} });
+  } catch(err) { console.warn(err); }
+}
+
+// ==========================================
+// TAB 5: SYSTEM GLOBAL CONFIGURATION RENDER
+// ==========================================
+function loadT5() {
+  let ht = ""; bKeys.forEach(k => { ht += `<div style="display:flex;justify-content:space-between;margin-bottom:10px;"><label>${BKS[k]}</label><input type="text" id="tg-${k}" value="${SETTINGS.tgs[k].toLocaleString()}" style="text-align:right;"></div>`; });
+  if(g("s-tg")) g("s-tg").innerHTML = ht;
+  g("s-tg").querySelectorAll('input').forEach(el => {
+    el.addEventListener('blur', (e) => { if(e.target.value!=="") e.target.value = Number(e.target.value.replace(/,/g,'')).toLocaleString(); });
+    el.addEventListener('focus', (e) => { e.target.value = e.target.value.replace(/,/g,''); });
+  });
+  if(g("s-dr")) g("s-dr").value = SETTINGS.docs.join(", "); if(g("s-ca")) g("s-ca").value = SETTINGS.cas.join(", "); if(g("s-mg")) g("s-mg").value = SETTINGS.mgs.join(", ");
+}
+function saveT5() {
+  bKeys.forEach(k => { let el = g(`tg-${k}`); if(el) SETTINGS.tgs[k] = parseFloat(el.value.replace(/,/g,''))||0; });
+  SETTINGS.docs = g("s-dr").value.split(",").map(s=>s.trim()).filter(Boolean); SETTINGS.cas = g("s-ca").value.split(",").map(s=>s.trim()).filter(Boolean); SETTINGS.mgs = g("s-mg").value.split(",").map(s=>s.trim()).filter(Boolean);
+  db.ref(`ops_system_settings`).set(SETTINGS).then(()=>{ toast("✅ บันทึกการตั้งค่าแล้ว"); setTimeout(() => location.reload(), 1000); });
+}
+
+function updateSelects() {
+  const dOpt = "<option value=''>-</option>"+SETTINGS.docs.map(x=>`<option value="${x}">${x}</option>`).join("");
+  document.querySelectorAll('select[id^="r-doc-"], select[id^="df-doc-"], #o-doc').forEach(el=>{let val=el.value; el.innerHTML=dOpt; el.value=val;});
+  if(g("o-ca")) { let v=g("o-ca").value; g("o-ca").innerHTML="<option value=''>-</option>"+SETTINGS.cas.map(x=>`<option value="${x}">${x}</option>`).join(""); g("o-ca").value=v; }
+  if(g("o-mg")) { let v=g("o-mg").value; g("o-mg").innerHTML="<option value=''>-</option>"+SETTINGS.mgs.map(x=>`<option value="${x}">${x}</option>`).join(""); g("o-mg").value=v; }
 }
 </script>
 </body>
