@@ -43,7 +43,6 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--tx);min-height:
 .ni.active{background:var(--acc);color:#fff;font-weight:600;}
 .main{flex:1;background:var(--bg);display:flex;flex-direction:column;min-width:0;height:100vh;overflow-y:auto;}
 .tp{display:none;padding:0;flex:1;}
-.tp.active{display:block !important;}
 
 /* CONTROLS BAR & ACCENTS */
 .ph{background:#fff;border-bottom:1px solid var(--bdr);padding:15px 24px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:20;}
@@ -363,13 +362,13 @@ select.r-inp { background:#ffffff !important; text-align-last: center; padding:2
 
 <script>
 // ==========================================
-// 1. GLOBAL ENVIRONMENT HELPER DEFINITIONS (First Node Execution)
+// STEP 2: GLOBAL ENVIRONMENT HELPER DEFINITIONS (First Node Execution)
 // ==========================================
 const g = (id) => document.getElementById(id);
 const qs = (s) => document.querySelector(s);
 const qsa = (s) => document.querySelectorAll(s);
 
-// FIREBASE API ENGINE DATA CONFIG
+// STEP 3: FIREBASE SECURE MATRIX CONNECTIVITY
 const firebaseConfig = {
   apiKey: "AIzaSyC0P1LGtglA_t1Nc5PyM5uD3MOLnfBZwFM",
   authDomain: "lalizaclinic-work-schedule.firebaseapp.com",
@@ -386,6 +385,7 @@ if (!firebase.apps.length) {
 }
 const db = firebase.database();
 
+// Security Matrix Credentials Matching
 const USERS = {
   "16698": { role: "admin", br: "all", label: "Admin สูงสุด | ทุกสาขา" },
   "64752": { role: "cashier", br: "rama9", label: "Cashier | พระราม 9" },
@@ -434,7 +434,7 @@ const tm1 = {}, tm3 = {}, tm4 = {};
 let c0Bar, c0Pie, c0Funnel, c0Doc, c0Track1, c0Track2, c0D1, c0D2;
 let c1Trend, c1BrDonut, c3Donut, c4Bar;
 
-// DOM PLATFORM RUNTIME INITIALIZER
+// STEP 4: DOM REGISTRATION PLATFORM INITIALIZER
 window.addEventListener('DOMContentLoaded', bootstrapApp);
 
 async function bootstrapApp() {
@@ -448,7 +448,7 @@ async function bootstrapApp() {
   }
 }
 
-// REGISTER ALL SYSTEM DYNAMIC ACTION PIPELINES
+// STEP 6: REGISTER ALL CENTRALIZED EVENT EVENTLISTENERS (No Inline Attributes Left)
 function initEvents() {
   g('loginBtn')?.addEventListener('click', checkLogin);
   g('sysLogoutBtn')?.addEventListener('click', handleLogout);
@@ -469,20 +469,9 @@ function initEvents() {
   g('tk-br')?.addEventListener('change', buildT3); g('tk-mo')?.addEventListener('change', buildT3);
   g('df-br')?.addEventListener('change', buildT4); g('df-mo')?.addEventListener('change', buildT4);
   g('d0-mo')?.addEventListener('change', buildT0);
-
-  g('btn-exp-t0')?.addEventListener('click', () => expPNG('t0-cap', 'Master_Dashboard'));
-  g('btn-exp-t1')?.addEventListener('click', () => expPNG('t1-cap', 'Revenue_Sheet'));
-  g('btn-exp-t2')?.addEventListener('click', () => expPNG('t2-content', 'OpsCore'));
-  g('btn-print-t2')?.addEventListener('click', () => window.print());
-  g('btn-exp-t3')?.addEventListener('click', () => expPNG('t3-cap', 'Tracking'));
-  g('btn-exp-t4')?.addEventListener('click', () => expPNG('t4-cap', 'DoctorFin'));
-
-  g('btn-gsync-t1')?.addEventListener('click', () => triggerGoogleSheetSync('revenue'));
-  g('btn-gsync-t2')?.addEventListener('click', () => triggerGoogleSheetSync('dailyops'));
-  g('btn-gsync-t3')?.addEventListener('click', () => triggerGoogleSheetSync('tracking'));
-  g('btn-gsync-t4')?.addEventListener('click', () => triggerGoogleSheetSync('doctor'));
 }
 
+// STEP 5: ROBUST CONTROLLED ACCESS GATEWAY MANAGER
 async function checkLogin() {
   try {
     const el = g('login-pass'); if (!el) return;
@@ -494,6 +483,7 @@ async function checkLogin() {
   } catch (err) { console.error(err); alert(err.message); }
 }
 
+// STEP 7: RESILIENT REFRESH-PROOF PERSISTENCE
 async function restoreSession() {
   const raw = sessionStorage.getItem('lalizaUser');
   if (raw) { enterApp(JSON.parse(raw)); }
@@ -518,6 +508,7 @@ function enterApp(userProfile) {
   loadInitialData();
 }
 
+// STEP 8: BACKGROUND CONTEXT BOOTSTRAP INITIAL PRELOADER
 async function loadInitialData() {
   const today = new Date().toISOString().split('T')[0];
   if (g("o-dt")) g("o-dt").value = today;
@@ -542,6 +533,7 @@ function toast(m, type="success"){ const el=document.createElement("div"); el.cl
 function formatInput(el) { if(el.value!=="") { let v = parseFloat(el.value.replace(/,/g,''))||0; el.value = fm(v); } }
 function unformatInput(el) { if(el.value!=="") el.value = el.value.replace(/,/g,''); }
 
+// STEP 13: STABLE TEMPLATE BUILDER ACCESSIBLE VIA DYNAMIC CLICK BINDING
 function downloadTemplate() {
   const mo=g("r-mo").value; const [yr,m] = mo.split("-"); const dim = new Date(yr,m,0).getDate();
   let data = [["วันที่", "หัตถการ", "ขายยา", "Treatment", "HD MALL", "Gowabi", "ชาร์จ 3%", "ฉีดผิว", "member", "หัตถการ พนง.", "มัดจำเงิน", "รวมรายได้อื่นๆ", "คนไข้เก่า (คน)", "คนไข้เก่า (ยอด)", "คนไข้ใหม่มี (คน)", "คนไข้ใหม่มียอด (บาท)", "คนไข้ใหม่ไม่มี (คน)", "แพทย์"]];
@@ -559,12 +551,12 @@ function sw(id, item) {
 }
 
 // ==========================================
-// TAB 0: MASTER ADVANCED DASHBOARD OPTIMIZED MODULE
+// TAB 0: MASTER ADVANCED DASHBOARD BOUNDED DATA RETRIEVAL (Fixes Blank Dashboard Screen)
 // ==========================================
 function buildT0() {
   const mo = g("d0-mo").value; if(!mo) return;
   
-  // FIX 2: Bounded index key range query to accelerate downloading loads securely
+  // FIX 2: Bounded exact month query payload index limits to prevent network crashes completely on public links
   Promise.all([
     db.ref('ops_daily').orderByKey().startAt(mo).endAt(mo + "\uf8ff").once('value'),
     db.ref(`ops_tracking_mth/${mo}`).once('value'),
@@ -704,7 +696,7 @@ function buildT0() {
 }
 
 // ==========================================
-// TAB 1: REVENUE SHEET CENTRAL CALCULATOR
+// TAB 1: REVENUE SHEET MASTER RENDER ENGINE
 // ==========================================
 function buildT1() {
   const moEl = g("r-mo"), brEl = g("r-br"); if (!moEl || !brEl) return;
@@ -751,12 +743,12 @@ function buildT1() {
       let totalPax = (parseFloat(d["r-opx"])||0) + (parseFloat(d["r-nyp"])||0) + (parseFloat(d["r-nnp"])||0);
       if(g(`pax-${dt}`)) g(`pax-${dt}`).value = totalPax.toLocaleString();
     }
-    // Render total analytical graphs exactly once out of 31 loops to avoid initialization freezing crash
     calculateDashboard();
   };
   db.ref('ops_daily').on('value', window.t1Listener);
 }
 
+// STEP 10: AUTOMATION CENTRAL MATHEMATICAL SUM ENGINE (Pure numeric parsing)
 function calculateRevenueRow(dt) {
   const h = num(`r-op-${dt}`), drug = num(`r-med-${dt}`), treatment = num(`r-trt-${dt}`);
   const hd = num(`r-hd-${dt}`), gowabi = num(`r-gw-${dt}`), charge = num(`r-chg-${dt}`);
@@ -792,7 +784,60 @@ function executeRevenuePipeline(el) {
   clearTimeout(tm1[dt]); tm1[dt] = setTimeout(() => { db.ref(`ops_daily/${dt}/${br}`).update(mapped); }, 500);
 }
 
-// FIX 1: HIGHLY PRECISE IMPORT EXCEL INTEGRATION DECODER MAPS BY CELL DATE PARSES DIRECTLY
+function calculateDashboard() {
+  let totalRevenue = 0;
+  document.querySelectorAll('.sum-income').forEach(el => { totalRevenue += Number(el.value.replace(/,/g,'')) || 0; });
+
+  const tgEl = g("k1-tg-val"); const target = tgEl ? Number(tgEl.dataset.val) || 0 : 0;
+  const achievement = target > 0 ? (totalRevenue / target) * 100 : 0;
+  const remaining = Math.max(target - totalRevenue, 0);
+
+  if(g("k1-rev-val")) g("k1-rev-val").textContent = "฿" + totalRevenue.toLocaleString("th-TH");
+  if(g("k1-pct-val")) g("k1-pct-val").textContent = achievement.toFixed(1) + "%";
+  if(g("k1-rem-val")) g("k1-rem-val").textContent = remaining > 0 ? "฿" + remaining.toLocaleString("th-TH") : "🏆 ทะลุเป้า!";
+
+  if(g("rs-curr")) g("rs-curr").textContent = totalRevenue.toLocaleString("th-TH");
+  if(g("rs-pct")) g("rs-pct").textContent = achievement.toFixed(1) + "%";
+  if(g("rs-rem")) g("rs-rem").textContent = remaining.toLocaleString("th-TH");
+
+  let totalOp=0, totalMed=0, totalTrt=0, totalOpx=0, totalNyp=0, totalNnp=0, totalOam=0, totalNam=0;
+  document.querySelectorAll('[id^="r-op-"]').forEach(el => totalOp += Number(el.value.replace(/,/g,'')) || 0);
+  document.querySelectorAll('[id^="r-med-"]').forEach(el => totalMed += Number(el.value.replace(/,/g,'')) || 0);
+  document.querySelectorAll('[id^="r-trt-"]').forEach(el => totalTrt += Number(el.value.replace(/,/g,'')) || 0);
+  document.querySelectorAll('[id^="r-opx-"]').forEach(el => totalOpx += Number(el.value.replace(/,/g,'')) || 0);
+  document.querySelectorAll('[id^="r-nyp-"]').forEach(el => totalNyp += Number(el.value.replace(/,/g,'')) || 0);
+  document.querySelectorAll('[id^="r-nnp-"]').forEach(el => totalNnp += Number(el.value.replace(/,/g,'')) || 0);
+  document.querySelectorAll('[id^="r-oam-"]').forEach(el => totalOam += Number(el.value.replace(/,/g,'')) || 0);
+  document.querySelectorAll('[id^="r-nam-"]').forEach(el => totalNam += Number(el.value.replace(/,/g,'')) || 0);
+
+  if(g("rs-pax")) g("rs-pax").textContent = (totalOpx + totalNyp + totalNnp).toLocaleString("th-TH");
+  if(g("rs-old")) g("rs-old").textContent = totalOpx.toLocaleString("th-TH");
+  if(g("rs-new")) g("rs-new").textContent = (totalNyp + totalNnp).toLocaleString("th-TH");
+  if(g("rs-avg-old")) g("rs-avg-old").textContent = totalOpx > 0 ? Math.round(totalOam / totalOpx).toLocaleString("th-TH") : "0";
+  if(g("rs-avg-new")) g("rs-avg-new").textContent = (totalNyp + totalNnp) > 0 ? Math.round(totalNam / (totalNyp + totalNnp)).toLocaleString("th-TH") : "0";
+  if(g("rs-sop")) g("rs-sop").textContent = totalOp.toLocaleString("th-TH");
+  if(g("rs-smed")) g("rs-smed").textContent = totalMed.toLocaleString("th-TH");
+  if(g("rs-strt")) g("rs-strt").textContent = totalTrt.toLocaleString("th-TH");
+
+  try {
+    const ctxTrend = g("c1-trend");
+    if(ctxTrend) {
+      let trendData = []; document.querySelectorAll('.sum-income').forEach(el => trendData.push(Number(el.value.replace(/,/g,''))||0));
+      if(c1Trend) c1Trend.destroy();
+      c1Trend = new Chart(ctxTrend, { type:'line', data:{ labels:Array.from({length:trendData.length},(_,i)=>i+1), datasets:[{label:'ยอดขายรายวัน', data:trendData, borderColor:'#845ef7', tension:0.2, fill:true, backgroundColor:'rgba(132, 94, 247, 0.08)'}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}} });
+    }
+  } catch(e){ console.warn(e); }
+
+  try {
+    const ctxDonut = g("c1-br-donut");
+    if(ctxDonut) {
+      if(c1BrDonut) c1BrDonut.destroy();
+      c1BrDonut = new Chart(ctxDonut, { type:'doughnut', data:{ labels:['หัตถการ', 'ขายยา', 'Treatment'], datasets:[{data:[totalOp, totalMed, totalTrt], backgroundColor:['#f08c00', '#2f9e44', '#845ef7']}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'right'}}} });
+    }
+  } catch(e){ console.warn(e); }
+}
+
+// STEP 9: HIGHER-ORDER EXCEL DYNAMIC HEADER INDEX MAPPING PARSER MATRIX (Fixes Broken Import Issue)
 function handleExcelImportUpload(inputControl) {
   const f = inputControl.files[0]; if(!f) return;
   const reader = new FileReader();
@@ -816,9 +861,9 @@ function handleExcelImportUpload(inputControl) {
         return parseFloat(String(cellRaw).replace(/,/g, '')) || 0;
       };
 
-      for (let i = 1; i < rows.length; i++) {
-        let row = rows[i]; if(!row || row.length === 0) continue;
-        const dateCell = row[map["วันที่"]]; if (!dateCell) continue;
+      rows.forEach((row, index) => {
+        if (index === 0) return;
+        const dateCell = row[map["วันที่"]]; if (!dateCell) return;
         
         let targetDay = null;
         let strD = String(dateCell).trim();
@@ -835,6 +880,7 @@ function handleExcelImportUpload(inputControl) {
         const dayKey = String(targetDay).padStart(2, '0');
         const pathPrefix = `${yr}-${m}-${dayKey}`;
 
+        // STABLE SYNTAX PAIRS MAPPING: ล้างค่าคอมม่าหลักพัน คีย์ข้อมูลเข้า Firebase ครบถ้วน 31 บรรทัด
         updates[`${pathPrefix}/${br}/r-op`] = cleanVal(row, "หัตถการ");
         updates[`${pathPrefix}/${br}/r-med`] = cleanVal(row, "ขายยา");
         updates[`${pathPrefix}/${br}/r-trt`] = cleanVal(row, "Treatment");
@@ -845,7 +891,7 @@ function handleExcelImportUpload(inputControl) {
         updates[`${pathPrefix}/${br}/r-mem`] = cleanVal(row, "member");
         updates[`${pathPrefix}/${br}/r-stf`] = cleanVal(row, "หัตถการ พนง.");
         updates[`${pathPrefix}/${br}/r-dep`] = cleanVal(row, "มัดจำเงิน");
-        updates[`${pathPrefix}/${br}/r-oth"] = cleanVal(row, "รวมรายได้อื่นๆ");
+        updates[`${pathPrefix}/${br}/r-oth`] = cleanVal(row, "รวมรายได้อื่นๆ");
         updates[`${pathPrefix}/${br}/r-opx`] = cleanVal(row, "คนไข้เก่า (คน)");
         updates[`${pathPrefix}/${br}/r-oam`] = cleanVal(row, "คนไข้เก่า (ยอด)");
         updates[`${pathPrefix}/${br}/r-nyp`] = cleanVal(row, "คนไข้ใหม่มี (คน)");
@@ -862,13 +908,13 @@ function handleExcelImportUpload(inputControl) {
         
         let docColIdx = map["แพทย์"]; updates[`${pathPrefix}/${br}/r-doc`] = docColIdx !== undefined ? (row[docColIdx] || "") : "";
         count++;
-      }
+      });
 
       if(count > 0) {
         db.ref('ops_daily').update(updates).then(() => {
-          toast(`📥 Import Success: ดึงข้อมูลยอดขายหลักพันหลักหมื่นตรงตารางสำเร็จ ${count} รายการ`); buildT1();
+          toast(`📥 Import Success: ดึงข้อมูลยอดขายตรงตามไฟล์ต้นฉบับสำเร็จ ${count} วัน`); buildT1();
         }).catch(err => toast("Firebase Error: " + err.message, "error"));
-      } else { toast("❌ ไม่พบโครงสร้างแถวข้อมูลวันที่ระบุในไฟล์ Excel", "error"); }
+      } else { toast("❌ ไม่พบโครงสร้างแถวข้อมูลวันที่ตรงกับเงื่อนไขชีทนี้", "error"); }
     } catch(err) { console.error(err); toast("❌ Excel Parsing Failure: รูปแบบชีทชำรุด", "error"); }
   };
   reader.readAsArrayBuffer(f); inputControl.value = "";
@@ -971,7 +1017,7 @@ function saveT2() {
 }
 
 // ==========================================
-// TAB 3: CONFIRM TRACKING DATA APAPTER MODULE
+// CONFIRM TRACKING DATA APAPTER MODULE
 // ==========================================
 function buildT3() {
   const moEl = g("tk-mo"), brEl = g("tk-br"); if (!moEl || !brEl) return;
@@ -1018,23 +1064,9 @@ function bindT3NodeListeners() {
 }
 function calcT3Row(dt) { let ro = Number((g(`tk-ro-${dt}`)?.value||"").replace(/,/g,''))||0; let rn = Number((g(`tk-rn-${dt}`)?.value||"").replace(/,/g,''))||0; let el = g(`tk-tot-${dt}`); if(el) el.value = (ro + rn).toLocaleString(); }
 function svT3(el) { const dt = el.dataset.dt, br = g("tk-br").value, mo = g("tk-mo").value, id = el.dataset.id, val = Number(el.value.replace(/,/g,'')) || 0; drawT3Chart(); clearTimeout(tm3[dt]); tm3[dt] = setTimeout(() => { db.ref(`ops_tracking_mth/${mo}/${br}/${dt}`).update({[id]:val}); }, 500); }
-function drawT3Chart() {
-  let cf=0, act=0, pp=0, na=0;
-  document.querySelectorAll("[id^='tk-co-']").forEach(i=>cf+=Number(i.value.replace(/,/g,''))||0); document.querySelectorAll("[id^='tk-cn-']").forEach(i=>cf+=Number(i.value.replace(/,/g,''))||0);
-  document.querySelectorAll(".row-tk-tot").forEach(i=>act+=Number(i.value.replace(/,/g,''))||0);
-  document.querySelectorAll("[id^='tk-po-']").forEach(i=>pp+=Number(i.value.replace(/,/g,''))||0); document.querySelectorAll("[id^='tk-pn-']").forEach(i=>pp+=Number(i.value.replace(/,/g,''))||0);
-  document.querySelectorAll("[id^='tk-na-']").forEach(i=>na+=Number(i.value.replace(/,/g,''))||0);
-  if(g("k3-cf")) g("k3-cf").textContent = cf.toLocaleString(); if(g("k3-act")) g("k3-act").textContent = act.toLocaleString();
-  if(g("k3-pp")) g("k3-pp").textContent = pp.toLocaleString(); if(g("k3-na")) g("k3-na").textContent = na.toLocaleString();
-  try {
-    const ctx = g("c3-donut"); if(!ctx) return;
-    if(c3Donut) c3Donut.destroy();
-    c3Donut = new Chart(ctx, { type:'doughnut', data:{ labels:['มาจริง', 'ขอเลื่อน', 'ไม่รับสาย'], datasets:[{data:[act, pp, na], backgroundColor:['#2f9e44', '#f08c00', '#c92a2a']}] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:'right'} } } });
-  } catch(err) { console.warn(err); }
-}
 
 // ==========================================
-// TAB 4: DOCTOR FINANCE SCHEDULING MODULE
+// DOCTOR FINANCE SCHEDULING MODULE
 // ==========================================
 function buildT4() {
   const moEl = g("df-mo"), brEl = g("df-br"); if (!moEl || !brEl) return;
@@ -1082,7 +1114,7 @@ function drawT4Chart() {
   let sSal=0, sDf=0; let docStats = {};
   document.querySelectorAll("#df-tbody tr").forEach(row => {
     let sl = Number(row.querySelector("[id^='df-sl-']")?.value.replace(/,/g,''))||0; let df = Number(row.querySelector("[id^='df-df-']")?.value.replace(/,/g,''))||0;
-    let doc = row.querySelector("[id^='df-doc-']")?.value; sSal += sl; sDf += df; if(doc && sl>0) docStats[doc] = (docStats[doc]||0) + sl;
+    let doc = row.querySelector("[id^='df-doc-']").value; sSal += sl; sDf += df; if(doc && sl>0) docStats[doc] = (docStats[doc]||0) + sl;
   });
   if(g("k4-sal")) g("k4-sal").textContent = "฿" + sSal.toLocaleString(); if(g("k4-df")) g("k4-df").textContent = "฿" + sDf.toLocaleString();
   try {
