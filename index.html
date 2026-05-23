@@ -364,8 +364,8 @@ select.r-inp { background:#ffffff !important; text-align-last: center; padding:2
                   <tr>
                     <th style="width:22%;">ยอดหน้าร้าน</th>
                     <th class="tl" style="width:34%;">Program</th>
-                    <th style="width:22%;">ยอดหักบัตร<br>(VIP+VOUCHER)</th>
                     <th style="width:22%;">จำนวนเงิน</th>
+                    <th style="width:22%;">ยอดหักบัตร<br>(VIP+VOUCHER)</th>
                   </tr>
                 </thead>
                 <tbody id="o-tbody"></tbody>
@@ -751,16 +751,20 @@ async function loadInitialData() {
       SETTINGS.tgs = d.tgs || SETTINGS.tgs;
     }
 
-    // โหลดแพทย์จาก Firestore doctors collection
-    const fsDocsSnap = await fstore.collection('doctors').get();
-    const docs = [];
-    fsDocsSnap.forEach(doc => {
-      const v = doc.data();
-      if (v && v.name && v.name !== 'Admin Doctor' && !doc.id.includes('test') && v.status !== 'inactive') {
-        docs.push(v.name);
-      }
-    });
-    if (docs.length > 0) SETTINGS.docs = docs;
+    // โหลดแพทย์: ถ้า ops_system_settings มี docs ให้ใช้เลย (user แก้จาก Custom Settings)
+    // ถ้าไม่มีค่อยดึงจาก Firestore
+    const hasSavedDocs = snapSettings.exists() && snapSettings.val().docs && snapSettings.val().docs.length > 0;
+    if (!hasSavedDocs) {
+      const fsDocsSnap = await fstore.collection('doctors').get();
+      const docs = [];
+      fsDocsSnap.forEach(doc => {
+        const v = doc.data();
+        if (v && v.name && v.name !== 'Admin Doctor' && !doc.id.includes('test') && v.status !== 'inactive') {
+          docs.push(v.name);
+        }
+      });
+      if (docs.length > 0) SETTINGS.docs = docs;
+    }
 
     // โหลด cashier/manager จาก branches/{bid}/emps
     if (snapBranches.exists()) {
@@ -981,7 +985,8 @@ function buildT1() {
         ht += `<td class="${f.cls}"><input type="text" class="r-inp core-calc-node" id="${f.id}-${dt}" data-dt="${dt}" data-id="${f.id}"></td>`;
       });
       ht += `<td class="bg-sum"><input type="text" class="r-inp" style="text-align:center;" id="pax-${dt}" readonly value="0"></td>
-                 <td class="bg-date"><select class="r-inp bg-date sync-doc-node" id="r-doc-${dt}" data-dt="${dt}" data-id="r-doc"></select></td></tr>`;
+                 <td class="bg-date"><select class="r-inp bg-date sync-doc-node" id="r-doc-${dt}" data-dt="${dt}" data-id="r-doc"></select>
+                 <select class="r-inp bg-date sync-doc-node" id="r-doc2-${dt}" data-dt="${dt}" data-id="r-doc2" style="margin-top:2px;"></select></td></tr>`;
     }
     const tbody = g("r-tbody"); if(tbody) tbody.innerHTML = ht;
     updateSelects(); bindDynamicTableEvents();
@@ -999,7 +1004,7 @@ function buildT1() {
         let el = g(`${f.id}-${dt}`);
         if (el && document.activeElement !== el) el.value = d[f.id] !== undefined && d[f.id] !== "" ? Number(d[f.id]).toLocaleString() : "";
       });
-      let dSel = g(`r-doc-${dt}`); if (dSel && document.activeElement !== dSel) dSel.value = d["r-doc"] || "";
+      let dSel = g(`r-doc-${dt}`); if (dSel && document.activeElement !== dSel) dSel.value = d["r-doc"] || ""; let dSel2 = g(`r-doc2-${dt}`); if (dSel2 && document.activeElement !== dSel2) dSel2.value = d["r-doc2"] || "";
       
       let rTot = 0;
       R_COLS.forEach(f => {
@@ -1049,6 +1054,23 @@ function executeRevenuePipeline(el) {
   if(id === "r-hd") mapped["a-hdmall"] = val; if(id === "r-gw") mapped["a-gowabi"] = val; 
   if(id === "r-chg") mapped["p-charge"] = val; if(id === "r-drp") mapped["p-drip"] = val;
   
+  // Auto-sync รายได้รวม → Doctor Finance (df-sl)
+  if(['r-op','r-med','r-trt','r-hd','r-gw','r-chg','r-drp','r-mem','r-stf','r-dep','r-oth'].includes(id)) {
+    const moKey = dt.slice(0,7);
+    setTimeout(() => {
+      db.ref(`ops_daily/${dt}/${br}`).once('value').then(s => {
+        if(!s.exists()) return;
+        const dd = s.val();
+        const rTot = ['r-op','r-med','r-trt','r-hd','r-gw','r-chg','r-drp','r-mem','r-stf','r-dep','r-oth']
+          .reduce((sum,k) => sum + (parseFloat(dd[k])||0), 0);
+        const doc1 = dd['r-doc'] || ''; const doc2 = dd['r-doc2'] || '';
+        const dfUpdate = { 'df-sl': rTot };
+        if(doc1) dfUpdate['df-doc'] = doc1;
+        if(doc2) dfUpdate['df-doc2'] = doc2;
+        db.ref(`ops_docfin_mth/${moKey}/${br}/${dt}`).update(dfUpdate);
+      });
+    }, 600);
+  }
   clearTimeout(tm1[dt]); tm1[dt] = setTimeout(() => { db.ref(`ops_daily/${dt}/${br}`).update(mapped); }, 500);
 }
 
@@ -1064,6 +1086,16 @@ function calculateDashboard() {
   if(g("k1-pct-val")) g("k1-pct-val").textContent = achievement.toFixed(1) + "%";
   if(g("k1-rem-val")) g("k1-rem-val").textContent = remaining > 0 ? "฿" + remaining.toLocaleString("th-TH") : "🏆 ทะลุเป้า!";
 
+  // คำนวณวันเหลือในเดือน
+  const moEl2 = g("r-mo");
+  if(moEl2 && moEl2.value) {
+    const [yr2, m2] = moEl2.value.split("-");
+    const lastDay = new Date(parseInt(yr2), parseInt(m2), 0).getDate();
+    const today = new Date();
+    const isSameMonth = today.getFullYear() === parseInt(yr2) && (today.getMonth()+1) === parseInt(m2);
+    const daysLeft = isSameMonth ? Math.max(lastDay - today.getDate() + 1, 0) : 0;
+    if(g("rs-days")) g("rs-days").textContent = daysLeft;
+  }
   if(g("rs-curr")) g("rs-curr").textContent = totalRevenue.toLocaleString("th-TH");
   if(g("rs-pct")) g("rs-pct").textContent = achievement.toFixed(1) + "%";
   if(g("rs-rem")) g("rs-rem").textContent = remaining.toLocaleString("th-TH");
@@ -1241,8 +1273,8 @@ function buildT2() {
     ht += `<tr>
       ${frontCell}
       <td style="padding:5px 7px;vertical-align:middle;">${progCell}</td>
-      <td class="ti ti-red"><input type="text" id="${r.vid}" class="ops-node-inp v-val" style="color:#c92a2a;"></td>
       <td class="ti"><input type="text" id="${r.oid}" class="ops-node-inp o-val"${flowAttr}></td>
+      <td class="ti ti-red"><input type="text" id="${r.vid}" class="ops-node-inp v-val" style="color:#c92a2a;"></td>
     </tr>`;
   });
   // subtotal row
@@ -1506,14 +1538,23 @@ function drawT4Chart() {
 // TAB 5: SYSTEM GLOBAL CONFIGURATION RENDER
 // ==========================================
 function loadT5() {
-  let ht = ""; bKeys.forEach(k => { ht += `<div style="display:flex;justify-content:space-between;margin-bottom:10px;"><label>${BKS[k]}</label><input type="text" id="tg-${k}" value="${SETTINGS.tgs[k].toLocaleString()}" style="text-align:right;"></div>`; });
-  if(g("s-tg")) g("s-tg").innerHTML = ht;
-  g("s-tg").querySelectorAll('input').forEach(el => {
-    el.addEventListener('blur', (e) => { if(e.target.value!=="") e.target.value = Number(e.target.value.replace(/,/g,'')).toLocaleString(); });
-    el.addEventListener('focus', (e) => { e.target.value = e.target.value.replace(/,/g,''); });
+  // โหลดจาก Firebase ops_system_settings ก่อนแสดง (ไม่ใช่ค่า cache)
+  db.ref('ops_system_settings').once('value').then(snap => {
+    if(snap.exists()) {
+      const d = snap.val();
+      if(d.docs && d.docs.length) SETTINGS.docs = d.docs;
+      if(d.cas && d.cas.length) SETTINGS.cas = d.cas;
+      if(d.mgs && d.mgs.length) SETTINGS.mgs = d.mgs;
+      if(d.tgs) SETTINGS.tgs = d.tgs;
+    }
+    // แสดงค่าใน textarea
+    if(g("s-dr")) g("s-dr").value = SETTINGS.docs.join(", ");
+    if(g("s-ca")) g("s-ca").value = SETTINGS.cas.join(", ");
+    if(g("s-mg")) g("s-mg").value = SETTINGS.mgs.join(", ");
+    // โหลด targets
+    bKeys.forEach(k => { const el = g(`tg-${k}`); if(el) el.value = (SETTINGS.tgs[k]||0).toLocaleString(); });
   });
-  if(g("s-dr")) g("s-dr").value = SETTINGS.docs.join(", "); if(g("s-ca")) g("s-ca").value = SETTINGS.cas.join(", "); if(g("s-mg")) g("s-mg").value = SETTINGS.mgs.join(", ");
-}
+
 function saveT5() {
   bKeys.forEach(k => { let el = g(`tg-${k}`); if(el) SETTINGS.tgs[k] = parseFloat(el.value.replace(/,/g,''))||0; });
 
@@ -1542,15 +1583,19 @@ function saveT5() {
     if (newCas.length || newMgs.length) writes.push(db.ref('staff_registry').set(staffUpdates));
 
     Promise.all(writes).then(() => {
-      toast("✅ บันทึกการตั้งค่าแล้ว");
-      setTimeout(() => location.reload(), 1000);
+      // อัพเดท SETTINGS ทันทีโดยไม่ reload
+      SETTINGS.docs = newDocs; SETTINGS.cas = newCas; SETTINGS.mgs = newMgs;
+      updateSelects();
+      // rebuild หน้าปัจจุบัน
+      curT1 = ""; curT3 = "";
+      toast("✅ บันทึกการตั้งค่าแล้ว — dropdown อัพเดทแล้ว");
     });
   });
 }
 
 function updateSelects() {
   const dOpt = "<option value=''>-</option>"+SETTINGS.docs.map(x=>`<option value="${x}">${x}</option>`).join("");
-  document.querySelectorAll('select[id^="r-doc-"], select[id^="df-doc-"], #o-doc, #o-doc2').forEach(el=>{let val=el.value; el.innerHTML=dOpt; el.value=val;});
+  document.querySelectorAll('select[id^="r-doc-"], select[id^="r-doc2-"], select[id^="df-doc-"], #o-doc, #o-doc2').forEach(el=>{let val=el.value; el.innerHTML=dOpt; el.value=val;});
   if(g("o-ca")) { let v=g("o-ca").value; g("o-ca").innerHTML="<option value=''>-</option>"+SETTINGS.cas.map(x=>`<option value="${x}">${x}</option>`).join(""); g("o-ca").value=v; }
   if(g("o-mg")) { let v=g("o-mg").value; g("o-mg").innerHTML="<option value=''>-</option>"+SETTINGS.mgs.map(x=>`<option value="${x}">${x}</option>`).join(""); g("o-mg").value=v; }
 }
@@ -1621,23 +1666,44 @@ async function openGSheet(tab) {
   const sheetUrl = GSHEET_URLS[tab];
   if (!gasUrl) { if(sheetUrl) window.open(sheetUrl,'_blank'); return; }
 
-  // ดึง branch และ month จากหน้าปัจจุบัน
   const brMap = {t1:'r-br', t3:'tk-br', t4:'df-br'};
   const moMap = {t1:'r-mo', t3:'tk-mo', t4:'df-mo'};
   const br = g(brMap[tab])?.value || 'all';
   const mo = g(moMap[tab])?.value || new Date().toISOString().slice(0,7);
 
-  toast('⏳ กำลัง Generate ไป Google Sheet...');
+  toast('⏳ กำลัง sync ไป Google Sheet...');
 
-  try {
-    const url = `${gasUrl}?month=${mo}&branch=${br}`;
-    const resp = await fetch(url, {method:'GET', mode:'no-cors'});
-    // no-cors ไม่ return body แต่ request ส่งไปถึงแล้ว
-    toast('✅ Generate สำเร็จ! เปิด Sheet...');
-    setTimeout(() => { if(sheetUrl) window.open(sheetUrl,'_blank'); }, 800);
-  } catch(err) {
-    toast('❌ Generate ล้มเหลว: ' + err.message);
-  }
+  // ใช้ JSONP approach (script tag) — ผ่าน CORS ได้ 100%
+  const callbackName = 'gasCallback_' + Date.now();
+  const url = `${gasUrl}?month=${mo}&branch=${br}&callback=${callbackName}`;
+
+  const timeout = setTimeout(() => {
+    delete window[callbackName];
+    // timeout แต่ request อาจไปถึงแล้ว — เปิด sheet เลย
+    toast('⚠️ Sync อาจสำเร็จแล้ว กำลังเปิด Sheet...');
+    if(sheetUrl) window.open(sheetUrl,'_blank');
+  }, 8000);
+
+  window[callbackName] = function(result) {
+    clearTimeout(timeout);
+    delete window[callbackName];
+    if(result && result.ok) {
+      toast(`✅ Sync สำเร็จ! อัพเดท ${result.updated || 0} แถว`);
+    } else {
+      toast('⚠️ Sync เสร็จแล้ว (ไม่มี response)');
+    }
+    setTimeout(() => { if(sheetUrl) window.open(sheetUrl,'_blank'); }, 500);
+  };
+
+  const script = document.createElement('script');
+  script.src = url;
+  script.onerror = () => {
+    clearTimeout(timeout);
+    delete window[callbackName];
+    toast('❌ ไม่สามารถเชื่อมต่อ Apps Script ได้');
+  };
+  document.head.appendChild(script);
+  setTimeout(() => { try{ document.head.removeChild(script); }catch(e){} }, 10000);
 }
 
 </script>
