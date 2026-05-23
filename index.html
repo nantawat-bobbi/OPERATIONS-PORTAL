@@ -462,28 +462,15 @@ function initEvents() {
 
   g('downloadTemplateBtn')?.addEventListener('click', downloadImportTemplate);
   g('btn-trigger-import')?.addEventListener('click', () => g('ex-file').click());
-  g('ex-file')?.addEventListener('change', (e) => importT1(e.target));
+  g('ex-file')?.addEventListener('change', (e) => handleExcelImportUpload(e.target));
   g('btn-export-t1')?.addEventListener('click', exportT1);
   g('btn-save-t2')?.addEventListener('click', saveT2);
-  g('btn-save-t5')?.addEventListener('click', saveT5);
 
   g('r-br')?.addEventListener('change', buildT1); g('r-mo')?.addEventListener('change', buildT1);
   g('o-br')?.addEventListener('change', loadT2); g('o-dt')?.addEventListener('change', loadT2);
   g('tk-br')?.addEventListener('change', buildT3); g('tk-mo')?.addEventListener('change', buildT3);
   g('df-br')?.addEventListener('change', buildT4); g('df-mo')?.addEventListener('change', buildT4);
   g('d0-mo')?.addEventListener('change', buildT0);
-
-  g('btn-exp-t0')?.addEventListener('click', () => expPNG('t0-cap', 'Master_Dashboard'));
-  g('btn-exp-t1')?.addEventListener('click', () => expPNG('t1-cap', 'Revenue_Sheet'));
-  g('btn-exp-t2')?.addEventListener('click', () => expPNG('t2-content', 'OpsCore'));
-  g('btn-print-t2')?.addEventListener('click', () => window.print());
-  g('btn-exp-t3')?.addEventListener('click', () => expPNG('t3-cap', 'Tracking'));
-  g('btn-exp-t4')?.addEventListener('click', () => expPNG('t4-cap', 'DoctorFin'));
-
-  g('btn-gsync-t1')?.addEventListener('click', () => triggerGoogleSheetSync('revenue'));
-  g('btn-gsync-t2')?.addEventListener('click', () => triggerGoogleSheetSync('dailyops'));
-  g('btn-gsync-t3')?.addEventListener('click', () => triggerGoogleSheetSync('tracking'));
-  g('btn-gsync-t4')?.addEventListener('click', () => triggerGoogleSheetSync('doctor'));
 }
 
 // STEP 5: ROBUST SECURE LOGIN INTERACTION ENGINE
@@ -565,6 +552,15 @@ function downloadImportTemplate() { downloadTemplate(); }
 // ==========================================
 // TAB 1: REVENUE SHEET MODULE (Strict Recalculations Engine)
 // ==========================================
+function sw(id, item) {
+  document.querySelectorAll(".tp").forEach(p => p.style.setProperty('display', 'none', 'important'));
+  const target = g(id); if (target) target.style.setProperty('display', 'block', 'important');
+  document.querySelectorAll(".ni").forEach(n => n.classList.remove("active"));
+  if(item) item.classList.add("active");
+
+  if(id==='t0') buildT0(); if(id==='t1') buildT1(); if(id==='t2') buildT2(); if(id==='t3') buildT3(); if(id==='t4') buildT4(); if(id==='t5') loadT5();
+}
+
 function buildT1() {
   const moEl = g("r-mo"), brEl = g("r-br"); if (!moEl || !brEl) return;
   const mo = moEl.value, br = brEl.value; if (!mo) return;
@@ -606,7 +602,7 @@ function buildT1() {
   db.ref('ops_daily').on('value', window.t1Listener);
 }
 
-// STEP 10: MATH RECALCULATE CORE (Sums exclusively income fields only)
+// STEP 10: AUTOMATION MATHEMATICAL ROW CALCULATION CORE ENGINE
 function calculateRevenueRow(dt) {
   const h = num(`r-op-${dt}`), drug = num(`r-med-${dt}`), treatment = num(`r-trt-${dt}`);
   const hd = num(`r-hd-${dt}`), gowabi = num(`r-gw-${dt}`), charge = num(`r-chg-${dt}`);
@@ -695,7 +691,7 @@ function calculateDashboard() {
   } catch(e){ console.warn(e); }
 }
 
-// STEP 9: HIGHER-ORDER EXCEL DYNAMIC HEADER INDEX MAPPING (100% Correct Comma Trimming)
+// STEP 9: HIGHER-ORDER EXCEL DYNAMIC HEADER INDEX MAPPING (Fixed Mismatched Backtick Syntax)
 function handleExcelImportUpload(inputControl) {
   const f = inputControl.files[0]; if(!f) return;
   const reader = new FileReader();
@@ -721,7 +717,7 @@ function handleExcelImportUpload(inputControl) {
 
       rows.forEach((row, index) => {
         if (index === 0) return;
-        const dateCell = row[map["官方日期"] || map["วันที่"]]; if (!dateCell) return;
+        const dateCell = row[map["วันที่"]]; if (!dateCell) return;
         let parsedDate = new Date(dateCell);
         
         if (isNaN(parsedDate.getTime())) {
@@ -754,6 +750,7 @@ function handleExcelImportUpload(inputControl) {
         updates[`${pathPrefix}/${br}/a-gowabi`] = rVals["r-gw"];
         updates[`${pathPrefix}/${br}/p-charge`] = rVals["r-chg"];
         updates[`${pathPrefix}/${br}/p-drip`] = rVals["r-drp"];
+        updates[`${pathPrefix}/${br}/r-mem`] = rVals["r-mem"];
         
         let docColIdx = map["แพทย์"]; updates[`${pathPrefix}/${br}/r-doc`] = docColIdx !== undefined ? (row[docColIdx] || "") : "";
         count++;
@@ -763,7 +760,7 @@ function handleExcelImportUpload(inputControl) {
         db.ref('ops_daily').update(updates).then(() => {
           toast(`📥 Import Success: ดึงข้อมูลยอดขายตรงตามไฟล์ต้นฉบับสำเร็จ ${count} วัน`); buildT1();
         }).catch(err => toast("Firebase Error: " + err.message, "error"));
-      } else { toast("❌ โครงสร้างแถวข้อมูลวันที่ระบุในไฟล์ Excel คัดกรองแล้วไม่ถูกต้อง", "error"); }
+      } else { toast("❌ ไม่พบโครงสร้างแถวข้อมูลวันที่ตรงกับเงื่อนไขชีทนี้", "error"); }
     } catch(err) { toast("❌ ไม่สามารถประมวลผลไฟล์ตารางสรุป Excel แผ่นนี้ได้", "error"); }
   };
   reader.readAsArrayBuffer(f); inputControl.value = "";
@@ -821,7 +818,7 @@ function buildT2() {
 function bindT2InputNodeListeners() {
   document.querySelectorAll('.ops-node-inp').forEach(el => {
     el.addEventListener('input', () => cT2());
-    el.addEventListener('blur', (e) => { if(e.target.value!=="" && e.target.id!=="o-dt") e.target.value = Number(e.target.value.replace(/,/g,'')).toLocaleString(); });
+    el.addEventListener('blur', (e) => { if(e.target.value!=="") e.target.value = Number(e.target.value.replace(/,/g,'')).toLocaleString(); });
     el.addEventListener('focus', (e) => { e.target.value = e.target.value.replace(/,/g,''); });
   });
   document.querySelectorAll('.ops-lbl-node').forEach(el => { el.addEventListener('input', (e) => saveT2Quick(e.target.id, e.target.value)); });
@@ -866,7 +863,7 @@ function saveT2() {
 }
 
 // ==========================================
-// TAB 3: CONFIRM TRACKING DATA APAPTER MODULE
+// CONFIRM TRACKING DATA APAPTER MODULE
 // ==========================================
 function buildT3() {
   const moEl = g("tk-mo"), brEl = g("tk-br"); if (!moEl || !brEl) return;
@@ -929,7 +926,7 @@ function drawT3Chart() {
 }
 
 // ==========================================
-// TAB 4: DOCTOR FINANCE SCHEDULING MODULE
+// DOCTOR FINANCE SCHEDULING MODULE
 // ==========================================
 function buildT4() {
   const moEl = g("df-mo"), brEl = g("df-br"); if (!moEl || !brEl) return;
@@ -977,7 +974,7 @@ function drawT4Chart() {
   let sSal=0, sDf=0; let docStats = {};
   document.querySelectorAll("#df-tbody tr").forEach(row => {
     let sl = Number(row.querySelector("[id^='df-sl-']")?.value.replace(/,/g,''))||0; let df = Number(row.querySelector("[id^='df-df-']")?.value.replace(/,/g,''))||0;
-    let doc = row.querySelector("[id^='df-doc-']").value; sSal += sl; sDf += df; if(doc && sl>0) docStats[doc] = (docStats[doc]||0) + sl;
+    let doc = row.querySelector("[id^='df-doc-']")?.value; sSal += sl; sDf += df; if(doc && sl>0) docStats[doc] = (docStats[doc]||0) + sl;
   });
   if(g("k4-sal")) g("k4-sal").textContent = "฿" + sSal.toLocaleString(); if(g("k4-df")) g("k4-df").textContent = "฿" + sDf.toLocaleString();
   try {
@@ -1011,6 +1008,150 @@ function updateSelects() {
   document.querySelectorAll('select[id^="r-doc-"], select[id^="df-doc-"], #o-doc').forEach(el=>{let val=el.value; el.innerHTML=dOpt; el.value=val;});
   if(g("o-ca")) { let v=g("o-ca").value; g("o-ca").innerHTML="<option value=''>-</option>"+SETTINGS.cas.map(x=>`<option value="${x}">${x}</option>`).join(""); g("o-ca").value=v; }
   if(g("o-mg")) { let v=g("o-mg").value; g("o-mg").innerHTML="<option value=''>-</option>"+SETTINGS.mgs.map(x=>`<option value="${x}">${x}</option>`).join(""); g("o-mg").value=v; }
+}
+
+// ==========================================
+// TAB 0: ADVANCED MASTER DASHBOARD MODULES
+// ==========================================
+function buildT0() {
+  const mo = g("d0-mo").value; if(!mo) return;
+  
+  Promise.all([
+    db.ref('ops_daily').once('value'),
+    db.ref(`ops_tracking_mth/${mo}`).once('value'),
+    db.ref(`ops_docfin_mth/${mo}`).once('value')
+  ]).then(([snapDaily, snapTrack, snapDoc]) => {
+    
+    const allD = snapDaily.val()||{};
+    let bRev={}, bTg={}, totRev=0, totTg=0, totPax=0, tCash=0, tApp=0, tTrans=0, tCrd=0;
+    let tOp=0, tMed=0, tTrt=0, tCo2=0, tPico=0, tVb=0;
+    let tP_PP=0, tP_NA=0, tP_Old=0, tP_New=0;
+
+    bKeys.forEach(k => { bRev[k]=0; bTg[k] = SETTINGS.tgs[k]||0; totTg+=bTg[k]; });
+
+    for(let dt in allD) {
+      if(dt.startsWith(mo)) {
+        bKeys.forEach(br => {
+          if(allD[dt][br]) {
+            let d = allD[dt][br];
+            let rTot = (parseFloat(d["r-op"])||0)+(parseFloat(d["r-med"])||0)+(parseFloat(d["r-trt"])||0)+(parseFloat(d["r-hd"])||0)+(parseFloat(d["r-gw"])||0)+(parseFloat(d["r-chg"])||0)+(parseFloat(d["r-drp"])||0)+(parseFloat(d["r-mem"])||0)+(parseFloat(d["r-stf"])||0)+(parseFloat(d["r-dep"])||0)+(parseFloat(d["r-oth"])||0);
+            bRev[br] += rTot; totRev += rTot;
+            totPax += (parseFloat(d["r-opx"])||0)+(parseFloat(d["r-nyp"])||0)+(parseFloat(d["r-nnp"])||0);
+            
+            tCash += parseFloat(d["pay-cash"])||0;
+            tApp += (parseFloat(d["a-hdmall"])||0) + (parseFloat(d["a-gowabi"])||0);
+            tTrans += parseFloat(d["pay-trans"])||0;
+            tCrd += (parseFloat(d["c-kbank"])||0) + (parseFloat(d["c-crd"])||0) + (parseFloat(d["c-kbsc"])||0) + (parseFloat(d["c-ktc"])||0) + (parseFloat(d["c-bay"])||0) + (parseFloat(d["c-scb"])||0) + (parseFloat(d["c-oth"])||0);
+
+            tOp += parseFloat(d["r-op"])||0; tMed += parseFloat(d["r-med"])||0; tTrt += parseFloat(d["r-trt"])||0;
+            tCo2 += parseFloat(d["p0"])||0; tPico += parseFloat(d["p1"])||0; tVb += parseFloat(d["p2"])||0;
+          }
+        });
+      }
+    }
+    
+    let tkCall=0, tkConf=0, tkAct=0;
+    snapTrack.forEach(brSnap => {
+      brSnap.forEach(dtSnap => {
+        let tk = dtSnap.val()||{};
+        tkCall += parseFloat(tk["tk-tc"])||0;
+        tkConf += (parseFloat(tk["tk-co"])||0) + (parseFloat(tk["tk-cn"])||0);
+        tkAct += (parseFloat(tk["tk-ro"])||0) + (parseFloat(tk["tk-rn"])||0);
+        tP_PP += (parseFloat(tk["tk-po"])||0) + (parseFloat(tk["tk-pn"])||0);
+        tP_NA += parseFloat(tk["tk-na"])||0;
+        tP_Old += parseFloat(tk["tk-ro"])||0;
+        tP_New += parseFloat(tk["tk-rn"])||0;
+      });
+    });
+
+    let tDf = 0; let docStats = {};
+    snapDoc.forEach(brSnap => { 
+      brSnap.forEach(dtSnap => { 
+        let d = dtSnap.val()||{};
+        let df = parseFloat(d["df-df"])||0; let sl = parseFloat(d["df-sl"])||0; let doc = d["df-doc"];
+        tDf += df; if(doc && sl>0) docStats[doc] = (docStats[doc]||0) + sl;
+      }); 
+    });
+
+    let gtHtml = "";
+    bKeys.forEach(k => {
+      let current = bRev[k]; let target = bTg[k];
+      let pct = target > 0 ? ((current / target) * 100).toFixed(1) : "0";
+      let rem = target > current ? `฿${fm(target - current)}` : `<span style="color:var(--grn); font-weight:bold;">🏆 ทะลุเป้า!</span>`;
+      gtHtml += `<tr><td style="text-align:left; font-weight:700;">📍 ${BKS[k]}</td><td style="color:#1D4ED8; font-weight:700;">฿${fm(current)}</td><td>฿${fm(target)}</td><td style="color:var(--amb); font-weight:700;">${pct}%</td><td style="color:var(--red); font-weight:700;">${rem}</td></tr>`;
+    });
+    g("gt-tbody").innerHTML = gtHtml;
+
+    g("k0-rev").textContent = "฿"+fm(totRev); g("k0-tg").textContent = "฿"+fm(totTg);
+    g("k0-pax").textContent = fmI(totPax)+" คน"; g("k0-df").textContent = "฿"+fm(tDf);
+
+    const donutTooltipOption = { callbacks: { label: function(ctx) { let total = ctx.dataset.data.reduce((a,b)=>a+b,0); let pct = total > 0 ? ((ctx.raw/total)*100).toFixed(1) : 0; return `${ctx.label}: ฿${fm(ctx.raw)} (${pct}%)`; } } };
+
+    try {
+      const c1El = g("c0-bar");
+      if(c1El) {
+        if(c0Bar) c0Bar.destroy();
+        c0Bar = new Chart(c1El, { type:'bar', data:{ labels:bKeys.map(k=>BKS[k]), datasets:[{label:'รายได้จริง', data:bKeys.map(k=>bRev[k]), backgroundColor:'#1971c2'}, {label:'เป้าหมาย', data:bKeys.map(k=>bTg[k]), backgroundColor:'#ced4da'}] }, options:{responsive:true, maintainAspectRatio:false} });
+      }
+    } catch(e){ console.error(e); }
+
+    try {
+      const c2El = g("c0-funnel");
+      if(c2El) {
+        if(c0Funnel) c0Funnel.destroy();
+        c0Funnel = new Chart(c2El, { type:'bar', data:{ labels:['📞 โทรทั้งหมด', '✅ คอนเฟิร์มจะมา', '🏥 มาจริง (Success)'], datasets:[{label:'จำนวนคนไข้', data:[tkCall, tkConf, tkAct], backgroundColor:['#f08c00', '#1971c2', '#2f9e44'], borderRadius:4}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}} });
+      }
+    } catch(e){ console.error(e); }
+
+    try {
+      const c3El = g("c0-pie");
+      if(c3El) {
+        if(c0Pie) c0Pie.destroy();
+        c0Pie = new Chart(c3El, { type:'doughnut', data:{ labels:['เงินสด', 'แอปพลิเคชัน', 'เงินโอน', 'บัตรเครดิต'], datasets:[{data:[tCash, tApp, tTrans, tCrd], backgroundColor:['#2f9e44', '#845ef7', '#f08c00', '#1971c2']}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{tooltip: donutTooltipOption}} });
+      }
+    } catch(e){ console.error(e); }
+
+    try {
+      const c4El = g("c0-doc");
+      if(c4El) {
+        let sortedDocs = Object.keys(docStats).sort((a,b)=>docStats[b]-docStats[a]).slice(0,5);
+        if(c0Doc) c0Doc.destroy();
+        c0Doc = new Chart(c4El, { type:'bar', data:{ labels:sortedDocs, datasets:[{label:'ยอดขายแพทย์รวม (บาท)', data:sortedDocs.map(d=>docStats[d]), backgroundColor:'#e64980', borderRadius:4}] }, options:{responsive:true, maintainAspectRatio:false, indexAxis:'y'} });
+      }
+    } catch(e){ console.error(e); }
+
+    try {
+      const c5El = g("c0-track1");
+      if(c5El) {
+        if(c0Track1) c0Track1.destroy();
+        c0Track1 = new Chart(c5El, { type:'doughnut', data:{ labels:['ขอเลื่อนนัด', 'ไม่รับสาย/ปิดเครื่อง'], datasets:[{data:[tP_PP, tP_NA], backgroundColor:['#f08c00', '#c92a2a']}] }, options:{responsive:true, maintainAspectRatio:false} });
+      }
+    } catch(e){ console.error(e); }
+
+    try {
+      const c6El = g("c0-track2");
+      if(c6El) {
+        if(c0Track2) c0Track2.destroy();
+        c0Track2 = new Chart(c6El, { type:'doughnut', data:{ labels:['คนไข้เก่า', 'คนไข้ใหม่'], datasets:[{data:[tP_Old, tP_New], backgroundColor:['#1971c2', '#20c997']}] }, options:{responsive:true, maintainAspectRatio:false} });
+      }
+    } catch(e){ console.error(e); }
+
+    try {
+      const c7El = g("c0-d1");
+      if(c7El) {
+        if(c0D1) c0D1.destroy();
+        c0D1 = new Chart(c7El, { type:'doughnut', data:{ labels:['หัตถการ', 'ขายยา', 'Treatment'], datasets:[{data:[tOp, tMed, tTrt], backgroundColor:['#f08c00', '#2f9e44', '#845ef7']}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{tooltip: donutTooltipOption}} });
+      }
+    } catch(e){ console.error(e); }
+
+    try {
+      const c8El = g("c0-d2");
+      if(c8El) {
+        if(c0D2) c0D2.destroy();
+        c0D2 = new Chart(c8El, { type:'doughnut', data:{ labels:['Co2', 'Pico', 'Vbeam'], datasets:[{data:[tCo2, tPico, tVb], backgroundColor:['#1971c2', '#e64980', '#20c997']}] }, options:{responsive:true, maintainAspectRatio:false, plugins:{tooltip: donutTooltipOption}} });
+      }
+    } catch(e){ console.error(e); }
+  });
 }
 </script>
 </body>
