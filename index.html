@@ -4930,7 +4930,16 @@
           #sales-staff .sb-num{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums} #sales-staff table input{width:105px} #sales-staff table select{width:150px}
           #sales-staff .sb-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:14px;margin-bottom:18px} #sales-staff .sb-kpi{background:#fff;border:1px solid #dbe4ef;border-radius:12px;padding:18px}
           #sales-staff .sb-kpi strong{display:block;font-size:25px;margin-top:10px;font-variant-numeric:tabular-nums;color:#1d4ed8}
-          #sales-staff .sb-catalog{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:8px;max-height:330px;overflow:auto;margin:14px 0}
+          #sales-staff .sb-catalog{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:18px 0}
+          #sales-staff .sb-price-group{border:1px solid #dbe4ef;border-radius:12px;overflow:hidden;min-width:0}
+          #sales-staff .sb-price-group h3{margin:0;padding:13px 16px;background:#eef4ff;font-size:16px;border-left:5px solid var(--sb-category-color)}
+          #sales-staff .sb-price-table{min-width:550px} #sales-staff .sb-price-table th,#sales-staff .sb-price-table td{padding:10px 8px;font-size:13px}
+          #sales-staff .sb-price-table .sb-chosen{background:#eff6ff} #sales-staff .sb-price-table label{flex-direction:row;align-items:center;gap:8px;font-size:13px;cursor:pointer}
+          #sales-staff .sb-price-table input[type=checkbox]{width:18px;height:18px;flex-shrink:0;accent-color:#2563eb}
+          #sales-staff .sb-price-table input[type=number]{width:72px;padding:8px} #sales-staff .sb-price-table select{width:110px;padding:8px}
+          #sales-staff .sb-price-table small{display:block;font-size:11px;color:#64748b;margin-top:4px}
+          #sales-staff .sb-price-table input:disabled,#sales-staff .sb-price-table select:disabled{background:#f1f5f9;color:#94a3b8}
+          @media(max-width:1250px){#sales-staff .sb-catalog{grid-template-columns:1fr}}
           #sales-staff .sb-pick{display:flex;flex-direction:row;align-items:center;gap:12px;padding:12px;border:1px solid #e2e8f0;border-radius:9px;font-weight:500;background:#f8fafc;cursor:pointer}
           #sales-staff .sb-pick input{width:18px;height:18px;flex-shrink:0} #sales-staff .sb-pick small{display:block;margin-top:5px;color:#64748b}
           #sales-staff .sb-notice{padding:12px 15px;border-radius:9px;background:#eff6ff;color:#1e40af;line-height:1.6;margin:12px 0}
@@ -4972,8 +4981,8 @@
                 <p class="sb-muted" id="sb-bc-source" aria-live="polite"></p>
                 <p class="sb-muted">หนึ่งบิลมีเซลล์ผู้ขายหนึ่งคน ยอดนี้ไม่บวกซ้ำในยอดร้าน · บิลเปล่าที่ยกเลิก: เลือก “ยกเลิกบิล” กรอกยอด 0 และเหตุผล ไม่ต้องติ๊กสินค้า</p>
               </div>
-              <div class="sb-card"><h2>ติ๊กรายการที่ขาย</h2><div class="sb-flex"><label>หมวด<select id="sb-category-filter"><option value="">ทุกหมวด</option></select></label><label>ค้นหารายการ<input id="sb-search" placeholder="ชื่อบริการ / สินค้า"></label></div><p class="sb-muted">รายการที่ยังไม่มีราคายืนยัน ต้องตั้งราคาที่แท็บ 3 ก่อน · บิลใช้คอร์สเดิมหรือฟรีคิดยอดขายใหม่เป็น 0 บาท</p><div id="sb-catalog-picker" class="sb-catalog"></div>
-                <div class="sb-table-wrap"><table><thead><tr><th>รายการ / หมวด</th><th>ประเภท</th><th>จำนวน</th><th>ราคา / หน่วย (บาท)</th><th>รวม (บาท)</th><th></th></tr></thead><tbody id="sb-lines"></tbody></table></div>
+              <div class="sb-card"><h2>ตารางราคา · ติ๊กตามบิล</h2><div class="sb-flex"><label>หมวด<select id="sb-category-filter"><option value="">ทุกหมวด</option></select></label><label>ค้นหารายการ<input id="sb-search" placeholder="ชื่อบริการ / สินค้า / ขนาด / Shot"></label></div><p class="sb-muted">① ติ๊กรายการ ② เลือกประเภท ③ ใส่จำนวน — ระบบรวมยอดอัตโนมัติ · แต่ละขนาด / รุ่นใช้รายการราคาที่ตั้งไว้ในแท็บ 3</p><div class="sb-notice">ใช้เฉพาะราคาที่ผู้จัดการยืนยันแล้ว ไม่ใช้ราคาเก่าจากรูป · รายการที่ยังไม่ยืนยันราคาแสดงให้เห็นแต่ยังติ๊กไม่ได้ · ใช้คอร์สเดิม / ฟรี = 0 บาท</div><div id="sb-catalog-picker" class="sb-catalog"></div>
+                <details><summary style="cursor:pointer;font-weight:700;padding:12px 0">ดูเฉพาะรายการที่เลือก / ราคาเดิมในบิล</summary><div class="sb-table-wrap"><table><thead><tr><th>รายการ / หมวด</th><th>ประเภท</th><th>จำนวน</th><th>ราคา / หน่วย (บาท)</th><th>รวม (บาท)</th><th></th></tr></thead><tbody id="sb-lines"></tbody></table></div></details>
               </div>
               <div class="sb-card"><h2>ตรวจยอด 2 ทาง</h2><div class="sb-grid"><label>ส่วนลด (บาท)<input id="sb-discount" type="number" min="0" step="0.01" value="0" required></label><label>โปรโมชั่น / เหตุผลส่วนลด<input id="sb-promotion" maxlength="300" placeholder="ต้องระบุเมื่อมีส่วนลด"></label><label>ยอดสุทธิที่คิดจริงตามบิล (บาท)<input id="sales-staff-amount" type="number" min="0" step="0.01" required placeholder="กรอกแยกจากยอดคำนวณ"></label></div>
                 <div class="sb-kpis" style="margin-top:18px"><div class="sb-kpi">ยอดก่อนส่วนลด<strong id="sb-gross">0.00 บาท</strong></div><div class="sb-kpi">ยอดที่ระบบคำนวณ<strong id="sb-expected">0.00 บาท</strong></div><div class="sb-kpi">ส่วนต่าง: บิล − คำนวณ<strong id="sb-difference">—</strong></div></div><div id="sb-check-result" class="sb-notice" role="status"></div>
@@ -5848,9 +5857,18 @@
       function categoryOptions(selected = '') { return Object.entries(categories).map(([key, item]) => `<option value="${key}"${selected === key ? ' selected' : ''}>${esc(item.label)}</option>`).join(''); }
       function renderPicker() {
         const search = $('sb-search').value.trim().toLocaleLowerCase('th-TH'), filter = $('sb-category-filter').value;
-        const selected = new Set(state.lines.map(line => line.itemId));
-        const items = Object.values(state.catalog).filter(item => (!filter || item.category === filter) && item.name.toLocaleLowerCase('th-TH').includes(search));
-        $('sb-catalog-picker').innerHTML = items.map(item => `<label class="sb-pick"><input type="checkbox" data-sb-pick="${esc(item.id)}"${selected.has(item.id) ? ' checked' : ''}${item.priceCents == null ? ' disabled' : ''}><span>${esc(item.name)}<small>${esc(categories[item.category]?.label || 'อื่น ๆ')} · ${item.priceCents == null ? 'ยังไม่ยืนยันราคา' : money(item.priceCents) + ' บาท / ' + esc(item.unit)}</small></span></label>`).join('') || '<p class="sb-muted">ไม่มีรายการที่ตรงกับการค้นหา</p>';
+        const catalog = { ...state.catalog };
+        state.lines.forEach(line => { if (!catalog[line.itemId]) catalog[line.itemId] = { ...line, id: line.itemId }; });
+        const items = Object.values(catalog).filter(item => (!filter || item.category === filter) && item.name.toLocaleLowerCase('th-TH').includes(search));
+        $('sb-catalog-picker').innerHTML = Object.entries(categories).map(([key, category]) => {
+          const rows = items.filter(item => item.category === key);
+          if (!rows.length) return '';
+          return `<section class="sb-price-group" style="--sb-category-color:${category.color}"><h3>${esc(category.label)} · ${rows.length} รายการ</h3><div class="sb-table-wrap"><table class="sb-price-table"><thead><tr><th>ติ๊ก / รายการ</th><th>ราคา (บาท)</th><th>ประเภท</th><th>จำนวน</th><th>รวม (บาท)</th></tr></thead><tbody>` + rows.map(item => {
+            const line = state.lines.find(line => line.itemId === item.id), selected = !!line;
+            const price = line ? line.priceCents : item.priceCents;
+            return `<tr class="${selected ? 'sb-chosen' : ''}"><td><label><input type="checkbox" data-sb-pick="${esc(item.id)}" aria-label="เลือก ${esc(item.name)}"${selected ? ' checked' : ''}${price == null ? ' disabled' : ''}><span>${esc(line?.name || item.name)}<small>${esc(line?.unit || item.unit)}${line && line.priceCents !== item.priceCents ? ' · ราคาเดิมในบิล' : ''}</small></span></label></td><td class="sb-num">${price == null ? '<small>ยังไม่ยืนยัน</small>' : money(price)}</td><td><select data-sb-pick-kind="${esc(item.id)}" aria-label="ประเภท ${esc(item.name)}"${selected ? '' : ' disabled'}>${Object.entries(kinds).map(([kind, label]) => `<option value="${kind}"${(line?.kind || 'new') === kind ? ' selected' : ''}>${label}</option>`).join('')}</select></td><td><input type="number" min="0.01" max="1000000" step="0.01" value="${selected ? line.quantity : 1}" data-sb-pick-qty="${esc(item.id)}" aria-label="จำนวน ${esc(item.name)}"${selected ? ' required' : ' disabled'}></td><td class="sb-num" id="sb-pick-total-${esc(item.id)}">${selected ? money(['new', 'course'].includes(line.kind) ? Math.round(line.priceCents * Number(line.quantity)) : 0) : '—'}</td></tr>`;
+          }).join('') + '</tbody></table></div></section>';
+        }).join('') || '<p class="sb-muted">ไม่มีรายการที่ตรงกับการค้นหา</p>';
       }
       function renderLines() {
         $('sb-lines').innerHTML = state.lines.map((line, index) => `<tr><td><strong>${esc(line.name)}</strong><div class="sb-muted">${esc(categories[line.category].label)} · ${esc(line.unit)}</div></td><td><select data-sb-line-kind="${index}">${Object.entries(kinds).map(([key, label]) => `<option value="${key}"${line.kind === key ? ' selected' : ''}>${label}</option>`).join('')}</select></td><td><input type="number" min="0.01" max="1000000" step="0.01" value="${line.quantity}" data-sb-line-qty="${index}" aria-label="จำนวน ${esc(line.name)}" required></td><td class="sb-num">${money(line.priceCents)}</td><td class="sb-num" id="sb-line-total-${index}">—</td><td><button type="button" class="btn" data-sb-remove="${index}" aria-label="ลบ ${esc(line.name)}">ลบ</button></td></tr>`).join('') || '<tr><td colspan="6">ติ๊กรายการด้านบนเพื่อเริ่มตรวจบิล</td></tr>';
@@ -5861,11 +5879,13 @@
           $('sb-gross').textContent = money(result.gross) + ' บาท'; $('sb-expected').textContent = money(result.expected) + ' บาท';
           $('sb-difference').textContent = result.difference == null ? '—' : (result.difference > 0 ? '+' : '') + money(result.difference) + ' บาท';
           state.lines.forEach((line, index) => { const el = $(`sb-line-total-${index}`); if (el) el.textContent = money(['new', 'course'].includes(line.kind) ? Math.round(line.priceCents * Number(line.quantity)) : 0); });
+          state.lines.forEach(line => { const el = $(`sb-pick-total-${line.itemId}`); if (el) el.textContent = money(['new', 'course'].includes(line.kind) ? Math.round(line.priceCents * Number(line.quantity)) : 0); });
           const matched = result.difference === 0;
           $('sb-check-result').textContent = result.actual == null ? 'กรอกยอดตามบิลแยกต่างหาก เพื่อเทียบกับยอดที่ระบบคำนวณ' : matched ? '✓ ยอดตรงกัน ตรวจรายการ ส่วนลด และผู้ขายก่อนเลือก “ตรวจผ่าน”' : `ยอดไม่ตรง: ตามบิล${result.difference > 0 ? 'มากกว่า' : 'น้อยกว่า'}ยอดคำนวณ ${money(Math.abs(result.difference))} บาท กรุณาตรวจราคา / โปรโมชั่น`;
           $('sb-check-result').dataset.tone = matched ? 'ok' : result.actual == null ? '' : 'error';
           return result;
         } catch (error) {
+          state.lines.forEach((line, index) => { [$(`sb-line-total-${index}`), $(`sb-pick-total-${line.itemId}`)].forEach(el => { if (el) el.textContent = 'ตรวจข้อมูล'; }); });
           $('sb-expected').textContent = 'ตรวจข้อมูล'; $('sb-difference').textContent = '—';
           $('sb-check-result').textContent = error.message; $('sb-check-result').dataset.tone = 'error';
           return null;
@@ -6088,19 +6108,28 @@
         $('sb-performance-period').addEventListener('change', renderPerformance);
         $('sb-search').addEventListener('input', renderPicker); $('sb-category-filter').addEventListener('change', renderPicker);
         $('sb-catalog-picker').addEventListener('change', event => {
+          if (state.busy) return;
+          const kindId = event.target.dataset.sbPickKind;
+          if (kindId) { const line = state.lines.find(line => line.itemId === kindId); if (line) { line.kind = event.target.value; markDirty(); renderLines(); recalculate(); } return; }
           const id = event.target.dataset.sbPick; if (!id || state.busy) return;
-          const item = state.catalog[id]; if (!item || item.priceCents == null) return;
+          const item = state.catalog[id];
+          if (event.target.checked && (!item || item.priceCents == null)) return;
           if (event.target.checked && !state.lines.some(line => line.itemId === id)) state.lines.push({ itemId: id, name: item.name, category: item.category, unit: item.unit, priceCents: item.priceCents, catalogRevision: item.revision || 0, catalogConfirmedAt: item.updatedAt || null, quantity: 1, kind: 'new' });
           else if (!event.target.checked) state.lines = state.lines.filter(line => line.itemId !== id);
-          markDirty(); renderLines(); recalculate();
+          markDirty(); renderLines(); renderPicker(); recalculate();
+        });
+        $('sb-catalog-picker').addEventListener('input', event => {
+          const id = event.target.dataset.sbPickQty; if (!id || state.busy) return;
+          const line = state.lines.find(line => line.itemId === id);
+          if (line) { line.quantity = Number(event.target.value); markDirty(); renderLines(); recalculate(); }
         });
         $('sb-lines').addEventListener('input', event => {
           if (event.target.dataset.sbLineQty == null) return;
-          const line = state.lines[Number(event.target.dataset.sbLineQty)]; if (line) { line.quantity = Number(event.target.value); markDirty(); recalculate(); }
+          const line = state.lines[Number(event.target.dataset.sbLineQty)]; if (line) { line.quantity = Number(event.target.value); markDirty(); renderPicker(); recalculate(); }
         });
         $('sb-lines').addEventListener('change', event => {
           if (event.target.dataset.sbLineKind == null) return;
-          const line = state.lines[Number(event.target.dataset.sbLineKind)]; if (line) { line.kind = event.target.value; markDirty(); recalculate(); }
+          const line = state.lines[Number(event.target.dataset.sbLineKind)]; if (line) { line.kind = event.target.value; markDirty(); renderPicker(); recalculate(); }
         });
         $('sb-lines').addEventListener('click', event => { const button = event.target.closest('[data-sb-remove]'); if (!button) return; state.lines.splice(Number(button.dataset.sbRemove), 1); markDirty(); renderLines(); renderPicker(); recalculate(); });
         $('sales-staff-entry-form').addEventListener('input', event => { if (event.target.id !== 'sb-receipt') { markDirty(); recalculate(); } });
