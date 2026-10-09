@@ -4951,12 +4951,25 @@
         <div id="sales-staff-workspace" hidden>
           <div class="sb-card sb-flex"><label>สาขา<select id="sales-staff-branch"></select></label><label>วันที่ตรวจบิล<input id="sales-staff-date" type="date" required></label><button id="sales-staff-refresh" class="btn" type="button">↻ โหลดข้อมูล</button><button id="sales-staff-relock" class="btn" type="button">🔒 ล็อกหน้า</button></div>
           <div id="sales-staff-status" class="sb-notice" role="status" aria-live="polite">พร้อมตรวจบิล</div>
+          <div class="sb-card">
+            <h2>ติดตามจำนวนบิล · วันที่และสาขาที่เลือก</h2>
+            <p id="sb-bill-source" class="sb-muted">กำลังอ่านจำนวนบิลจาก Daily Ops Core</p>
+            <div class="sb-kpis">
+              <div class="sb-kpi">ต้องตรวจทั้งหมด · Daily Ops<strong id="sb-bills-expected">—</strong></div>
+              <div class="sb-kpi">บันทึกในหน้านี้แล้ว<strong id="sb-bills-recorded">—</strong></div>
+              <div class="sb-kpi">ตรวจเสร็จ · ผ่าน / ยกเลิก<strong id="sb-bills-finished">—</strong></div>
+              <div class="sb-kpi">ยังไม่ตรวจเสร็จ<strong id="sb-bills-remaining">—</strong></div>
+            </div>
+            <div id="sb-bill-progress-message" class="sb-notice" role="status" aria-live="polite"></div>
+            <p class="sb-muted">ตรวจครบเมื่อทุกเลขบิลในช่วง Daily Ops มีผลตรวจผ่านหรือยกเลิกพร้อมเหตุผล บิลรอตรวจ / ต้องแก้ไขยังไม่ถือว่าตรวจเสร็จ · กด “โหลดข้อมูล” เพื่ออ่านชุดบิลล่าสุด</p>
+            <details><summary style="cursor:pointer;font-weight:700;padding:12px 0">รายการที่ต้องตรวจครบทุกเลขบิล</summary><div class="sb-table-wrap"><table><thead><tr><th>เลขบิลจาก Daily Ops</th><th>สถานะ</th><th>เซลล์</th><th>ตรวจบิล</th></tr></thead><tbody id="sb-receipt-checklist"></tbody></table></div></details>
+          </div>
           <div class="sb-tabs" role="tablist" aria-label="งานตรวจบิล"><button class="sb-tab" data-sb-tab="review" role="tab" aria-selected="true">1. ตรวจบิล</button><button class="sb-tab" data-sb-tab="performance" role="tab" aria-selected="false">2. ผลงานเซลล์</button><button class="sb-tab" data-sb-tab="catalog" role="tab" aria-selected="false">3. รายการ / ราคามาตรฐาน</button></div>
           <div id="sb-panel-review" role="tabpanel">
             <form id="sales-staff-entry-form">
               <div class="sb-card"><div class="sb-header"><h2 id="sb-editor-title">ตรวจบิลใหม่</h2><button id="sb-new-bill" type="button" class="btn">+ บิลใหม่</button></div>
                 <div class="sb-grid"><label>เลขบิล<input id="sb-receipt" maxlength="80" required placeholder="เช่น A02/116067"></label><label>เซลล์ผู้ขาย<input id="sales-staff-name" list="sb-staff-options" maxlength="100" required placeholder="ชื่อเซลล์"><datalist id="sb-staff-options"></datalist></label><label>หมายเหตุบิล<input id="sales-staff-note" maxlength="500" placeholder="รายละเอียดเพิ่มเติม"></label></div>
-                <p class="sb-muted">หนึ่งบิลมีเซลล์ผู้ขายหนึ่งคน ยอดนี้ใช้ตรวจเทียบและวัดผลงาน โดยไม่บวกซ้ำในยอดร้าน</p>
+                <p class="sb-muted">หนึ่งบิลมีเซลล์ผู้ขายหนึ่งคน ยอดนี้ไม่บวกซ้ำในยอดร้าน · บิลเปล่าที่ยกเลิก: เลือก “ยกเลิกบิล” กรอกยอด 0 และเหตุผล ไม่ต้องติ๊กสินค้า</p>
               </div>
               <div class="sb-card"><h2>ติ๊กรายการที่ขาย</h2><div class="sb-flex"><label>หมวด<select id="sb-category-filter"><option value="">ทุกหมวด</option></select></label><label>ค้นหารายการ<input id="sb-search" placeholder="ชื่อบริการ / สินค้า"></label></div><p class="sb-muted">รายการที่ยังไม่มีราคายืนยัน ต้องตั้งราคาที่แท็บ 3 ก่อน · บิลใช้คอร์สเดิมหรือฟรีคิดยอดขายใหม่เป็น 0 บาท</p><div id="sb-catalog-picker" class="sb-catalog"></div>
                 <div class="sb-table-wrap"><table><thead><tr><th>รายการ / หมวด</th><th>ประเภท</th><th>จำนวน</th><th>ราคา / หน่วย (บาท)</th><th>รวม (บาท)</th><th></th></tr></thead><tbody id="sb-lines"></tbody></table></div>
@@ -5619,7 +5632,7 @@
       const normalizeName = value => String(value || '').normalize('NFKC').trim().replace(/\s+/g, ' ');
       const billKey = value => 'b_' + btoa(unescape(encodeURIComponent(normalizeName(value).toUpperCase().replace(/\s/g, '')))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
       const operationId = () => window.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-      const state = { version: 0, busy: false, dirty: false, catalog: {}, bills: {}, legacy: [], lines: [], editing: null, catalogEditing: null, catalogPending: null, pending: null, context: null, ready: false, tab: 'review' };
+      const state = { version: 0, busy: false, dirty: false, catalog: {}, bills: {}, legacy: [], dailySource: null, lines: [], editing: null, catalogEditing: null, catalogPending: null, pending: null, context: null, ready: false, tab: 'review' };
 
       function context() {
         const user = currentUserProfile();
@@ -5693,9 +5706,86 @@
       }
 
       function notify(message, tone = '') { $('sales-staff-status').textContent = message; $('sales-staff-status').dataset.tone = tone; }
+      function parseDailyBillSource(root = {}) {
+        const manual = root?.dailyOps?.manual || {};
+        const present = value => value !== undefined && value !== null && String(value).trim() !== '';
+        const field = key => present(manual[key]) ? manual[key] : root?.[key];
+        const raw = field('o-bc');
+        const start = String(field('o-bs') || '').trim(), end = String(field('o-be') || '').trim();
+        if (!present(raw)) return { status: 'missing', count: null, start, end };
+        const text = String(raw).trim().replace(/[๐-๙]/g, digit => String('๐๑๒๓๔๕๖๗๘๙'.indexOf(digit))).replace(/,/g, '');
+        const count = Number(text);
+        if (!/^\d+$/.test(text) || !Number.isSafeInteger(count) || count < 0) return { status: 'invalid', count: null, start, end };
+        return { status: 'ok', count, start, end };
+      }
+      function expectedReceiptSet(source) {
+        const problem = message => ({ verified: false, receipts: [], message });
+        if (source?.status !== 'ok') return problem('ยังไม่ทราบจำนวนบิลที่ถูกต้องจาก Daily Ops Core');
+        if (source.count === 0 && !source.start && !source.end) return { verified: true, receipts: [], message: '' };
+        const start = normalizeName(source.start).toUpperCase().replace(/\s/g, '').match(/^(.*?)(\d+)$/);
+        const end = normalizeName(source.end).toUpperCase().replace(/\s/g, '').match(/^(.*?)(\d+)$/);
+        if (!start || !end || start[1] !== end[1]) return problem('เลขบิลเริ่ม–ถึงยังไม่ครบหรือรหัสชุดบิลไม่ตรงกัน กรุณาตรวจ Daily Ops Core');
+        const first = Number(start[2]), last = Number(end[2]);
+        if (!Number.isSafeInteger(first) || !Number.isSafeInteger(last) || last < first) return problem('ช่วงเลขบิลไม่ถูกต้อง กรุณาตรวจเลขเริ่มและเลขท้ายใน Daily Ops Core');
+        const width = start[2].startsWith('0') ? start[2].length : 0;
+        if (width && end[2].length !== width) return problem('จำนวนหลักของเลขบิลเริ่ม–ถึงไม่ตรงกัน กรุณาตรวจเลขต้นทาง');
+        const count = last - first + 1;
+        if (count !== source.count) {
+          const suggested = first + source.count - 1;
+          const hint = source.count > 0 && Number.isSafeInteger(suggested) ? ` หากเลขเริ่มและจำนวน ${source.count} บิลถูกต้อง เลขท้ายควรเป็น ${start[1]}${String(suggested).padStart(width, '0')} (ต้องยืนยันและแก้ต้นทางเอง)` : '';
+          return problem(`ช่วงเลขบิลนับได้ ${count.toLocaleString('th-TH')} บิล แต่ Daily Ops ระบุ ${source.count.toLocaleString('th-TH')} บิล.${hint}`);
+        }
+        if (count > 5000) return problem('ช่วงบิลเกิน 5,000 บิลต่อวัน กรุณาตรวจความถูกต้องของเลขต้นทางก่อนสร้างรายการ');
+        return { verified: true, receipts: Array.from({ length: count }, (_, index) => start[1] + String(first + index).padStart(width, '0')), message: '' };
+      }
+      function dailyBillProgress(bills, date, source) {
+        const entries = Object.entries(bills).filter(([, bill]) => bill?.date === date);
+        const rows = entries.map(([, bill]) => bill);
+        const range = expectedReceiptSet(source);
+        const allowed = new Set(range.receipts.map(billKey));
+        const byReceipt = new Map();
+        entries.forEach(entry => { const key = billKey(entry[1].receipt); const matches = byReceipt.get(key) || []; matches.push(entry); byReceipt.set(key, matches); });
+        const checklist = range.receipts.map(receipt => {
+          const matches = byReceipt.get(billKey(receipt)) || [];
+          const [key, bill] = matches[0] || [];
+          return { receipt, key: key || null, staff: bill?.staff || '', status: matches.length > 1 ? 'duplicate' : bill?.status || 'missing', finished: matches.length === 1 && (bill?.status === 'pass' || (bill?.status === 'void' && !!String(bill.reviewReason || '').trim())) };
+        });
+        const recorded = rows.length;
+        const finished = range.verified ? checklist.filter(item => item.finished).length : null;
+        const pending = rows.filter(bill => bill.status === 'pending').length;
+        const needsFix = rows.filter(bill => bill.status === 'needs-fix').length;
+        const expected = source?.status === 'ok' ? source.count : null;
+        const outside = range.verified ? rows.filter(bill => !allowed.has(billKey(bill.receipt))) : [];
+        const extra = outside.filter(bill => bill.status !== 'void').length;
+        return { recorded, finished, pending, needsFix, expected, range, checklist, outside, unrecorded: range.verified ? checklist.filter(item => item.status === 'missing').length : null, remaining: range.verified ? checklist.filter(item => !item.finished).length : null, extra, complete: range.verified && checklist.every(item => item.finished) && extra === 0 };
+      }
+      function renderBillProgress() {
+        const date = $('sales-staff-date').value, source = state.dailySource;
+        const progress = dailyBillProgress(state.bills, date, source);
+        const format = value => value == null ? '—' : value.toLocaleString('th-TH') + ' บิล';
+        $('sb-bills-expected').textContent = source?.status === 'missing' ? 'ยังไม่บันทึก' : format(progress.expected);
+        $('sb-bills-recorded').textContent = format(progress.recorded);
+        $('sb-bills-finished').textContent = format(progress.finished);
+        $('sb-bills-remaining').textContent = format(progress.remaining);
+        const scope = `${BRANCHES[$('sales-staff-branch').value]} · ${date}`;
+        const range = source?.start || source?.end ? ` · เลขบิล ${source.start || '—'} ถึง ${source.end || '—'}` : ' · ยังไม่ระบุช่วงเลขบิล';
+        $('sb-bill-source').textContent = scope + range;
+        const message = $('sb-bill-progress-message');
+        message.dataset.tone = '';
+        $('sb-receipt-checklist').innerHTML = progress.range.verified ? progress.checklist.map(item => `<tr><td>${esc(item.receipt)}</td><td><span class="sb-tag ${esc(item.status)}">${item.status === 'missing' ? 'ยังไม่ตรวจ' : item.status === 'duplicate' ? 'เลขซ้ำ ต้องตรวจ' : statuses[item.status] || 'ต้องตรวจ'}</span></td><td>${esc(item.staff || '—')}</td><td><button type="button" class="btn" data-sb-check-receipt="${esc(item.receipt)}"${item.key ? ` data-sb-check-key="${esc(item.key)}"` : ''}>${item.key ? 'เปิดบิล' : 'เริ่มตรวจ'}</button></td></tr>`).join('') || '<tr><td colspan="4">Daily Ops ระบุ 0 บิล</td></tr>' : `<tr><td colspan="4">${esc(progress.range.message)}</td></tr>`;
+        if (!source || source.status === 'error') { message.textContent = 'อ่านจำนวนบิลจาก Daily Ops Core ไม่สำเร็จ กดโหลดข้อมูลเพื่อลองอีกครั้ง'; message.dataset.tone = 'error'; }
+        else if (source.status === 'missing') message.textContent = 'Daily Ops Core ยังไม่บันทึก “รวมบิลที่ใช้” ของวันและสาขานี้ จึงยังคำนวณจำนวนที่เหลือไม่ได้';
+        else if (source.status === 'invalid') { message.textContent = 'จำนวนบิลใน Daily Ops Core ไม่ใช่จำนวนเต็มตั้งแต่ 0 กรุณาตรวจค่าต้นทาง'; message.dataset.tone = 'error'; }
+        else if (!progress.range.verified) { message.textContent = progress.range.message + ' · ยังยืนยันว่าตรวจครบไม่ได้'; message.dataset.tone = 'error'; }
+        else if (progress.extra > 0) { message.textContent = `พบบิลนอกช่วง ${progress.extra.toLocaleString('th-TH')} บิล: ${progress.outside.filter(bill => bill.status !== 'void').map(bill => bill.receipt).join(', ')} · ยังยืนยันว่าตรวจครบไม่ได้`; message.dataset.tone = 'error'; }
+        else {
+          message.textContent = `ยังไม่บันทึกในหน้านี้ ${progress.unrecorded.toLocaleString('th-TH')} บิล · รอตรวจ ${progress.pending.toLocaleString('th-TH')} บิล · ต้องแก้ไข ${progress.needsFix.toLocaleString('th-TH')} บิล`;
+          if (progress.complete) { message.textContent += ' · ✓ ตรวจครบทุกเลขบิลตามช่วง Daily Ops Core แล้ว'; message.dataset.tone = 'ok'; }
+        }
+      }
       function clearDataView() {
-        ['sales-staff-day-total', 'sales-staff-month-total', 'sb-pass-count', 'sb-mismatch-count'].forEach(id => $(id).textContent = '—');
-        ['sales-staff-summary', 'sb-sales-chart', 'sb-average-chart', 'sb-performance-scope', 'sales-staff-entries', 'sb-catalog-picker', 'sb-catalog-table'].forEach(id => $(id).innerHTML = '');
+        ['sales-staff-day-total', 'sales-staff-month-total', 'sb-pass-count', 'sb-mismatch-count', 'sb-bills-expected', 'sb-bills-recorded', 'sb-bills-finished', 'sb-bills-remaining'].forEach(id => $(id).textContent = '—');
+        ['sales-staff-summary', 'sb-sales-chart', 'sb-average-chart', 'sb-performance-scope', 'sales-staff-entries', 'sb-catalog-picker', 'sb-catalog-table', 'sb-bill-source', 'sb-bill-progress-message', 'sb-receipt-checklist'].forEach(id => $(id).innerHTML = '');
       }
       function markDirty() { state.dirty = true; state.pending = null; }
       function setBusy(busy) {
@@ -5707,6 +5797,7 @@
       }
       function resetEditor() {
         $('sales-staff-entry-form').reset();
+        $('sales-staff-name').required = true;
         state.lines = []; state.editing = null; state.pending = null; state.dirty = false;
         $('sb-receipt').disabled = false;
         $('sb-editor-title').textContent = 'ตรวจบิลใหม่';
@@ -5715,7 +5806,7 @@
       }
       function lock() {
         salesStaffAccess = null; state.version++; state.ready = false; state.context = null;
-        state.bills = {}; state.catalog = {}; state.legacy = []; state.lines = []; state.editing = null; state.catalogEditing = null; state.catalogPending = null; state.pending = null; state.dirty = false;
+        state.bills = {}; state.catalog = {}; state.legacy = []; state.dailySource = null; state.lines = []; state.editing = null; state.catalogEditing = null; state.catalogPending = null; state.pending = null; state.dirty = false;
         $('sales-staff-workspace').hidden = true; $('sales-staff-lock').hidden = false;
         $('sales-staff-unlock-form').reset(); $('sales-staff-entry-form').reset(); $('sb-catalog-form').reset();
         ['sales-staff-entries', 'sales-staff-summary', 'sb-sales-chart', 'sb-average-chart', 'sb-history', 'sb-legacy', 'sb-catalog-table', 'sb-catalog-picker', 'sb-staff-options', 'sb-lines'].forEach(id => $(id).innerHTML = '');
@@ -5762,6 +5853,7 @@
         renderPicker();
       }
       function renderBills() {
+        renderBillProgress();
         const date = $('sales-staff-date').value;
         const rows = Object.entries(state.bills).filter(([, bill]) => bill.date === date).sort((a, b) => String(b[1].updatedAt).localeCompare(String(a[1].updatedAt)));
         $('sales-staff-entries').innerHTML = rows.map(([key, bill]) => `<tr><td>${esc(bill.receipt)}</td><td>${esc(bill.staff)}</td><td class="sb-num">${money(bill.expectedCents)}</td><td class="sb-num">${money(bill.actualCents)}</td><td class="sb-num">${money(bill.differenceCents)}</td><td><span class="sb-tag ${esc(bill.status)}">${statuses[bill.status] || 'รอตรวจ'}</span></td><td><button type="button" class="btn" data-sb-edit-bill="${esc(key)}">ดู / แก้ไข</button></td></tr>`).join('') || '<tr><td colspan="7">ยังไม่มีบิลตรวจของวันนี้</td></tr>';
@@ -5819,14 +5911,15 @@
             const date = scope.month + '-' + String(index + 1).padStart(2, '0');
             return window.db.ref(`ops_sales_staff/${date}/${scope.branch}/entries`).once('value').then(snapshot => Object.values(snapshot.val() || {}).map(entry => ({ ...entry, date })));
           })).then(parts => ({ rows: parts.flat(), error: false })).catch(() => ({ rows: [], error: true }));
-          const [catalogSnapshot, billsSnapshot, legacy] = await Promise.all([
+          const [catalogSnapshot, billsSnapshot, legacy, dailySource] = await Promise.all([
             window.db.ref(`ops_sales_staff_catalog/${scope.branch}/items`).once('value'),
             window.db.ref(`ops_sales_staff_bills/${scope.branch}`).orderByChild('date').startAt(scope.month + '-01').endAt(scope.month + '-31').once('value'),
-            legacyPromise
+            legacyPromise,
+            window.db.ref(`ops_daily/${scope.date}/${scope.branch}`).once('value').then(snapshot => parseDailyBillSource(snapshot.val() || {})).catch(() => ({ status: 'error', count: null, start: '', end: '' }))
           ]);
           if (version !== state.version || salesStaffAccess !== scope.access) return;
           state.catalog = { ...seedCatalog(), ...(catalogSnapshot.val() || {}) };
-          state.bills = billsSnapshot.val() || {}; state.legacy = legacy.rows; state.context = scope; state.ready = true;
+          state.bills = billsSnapshot.val() || {}; state.legacy = legacy.rows; state.dailySource = dailySource; state.context = scope; state.ready = true;
           renderCatalog(); renderBills(); renderPerformance();
           notify(`${BRANCHES[scope.branch]} · ${scope.date} · โหลดข้อมูลแล้ว${legacy.error ? ' (อ่านข้อมูลยอดเก่าไม่สำเร็จ)' : ''}`);
         } catch (error) { if (version === state.version) { state.ready = false; notify('โหลดไม่สำเร็จ: ' + error.message, 'error'); } }
@@ -5840,6 +5933,7 @@
         state.lines = bill.lines.map(line => ({ ...line }));
         $('sb-discount').value = (bill.discountCents / 100).toFixed(2); $('sb-promotion').value = bill.promotion || ''; $('sales-staff-amount').value = (bill.actualCents / 100).toFixed(2);
         $('sb-bill-status').value = bill.status; $('sb-review-reason').value = bill.reviewReason || ''; $('sb-difference-approved').checked = !!bill.differenceApproved;
+        $('sales-staff-name').required = bill.status !== 'void';
         $('sb-editor-title').textContent = 'ตรวจ / แก้ไขบิล ' + bill.receipt;
         $('sb-history-card').hidden = false;
         const history = Object.values(bill.history || {}).sort((a, b) => String(b.savedAt).localeCompare(String(a.savedAt)));
@@ -5850,11 +5944,14 @@
 
       function makePayload(scope) {
         const calculation = calculate(state.lines, $('sb-discount').value, $('sales-staff-amount').value);
-        if (!state.lines.length) throw new Error('กรุณาติ๊กอย่างน้อยหนึ่งรายการ');
-        const receipt = normalizeName($('sb-receipt').value), staff = normalizeName($('sales-staff-name').value);
+        const status = $('sb-bill-status').value;
+        if (!state.lines.length && status !== 'void') throw new Error('กรุณาติ๊กอย่างน้อยหนึ่งรายการ');
+        const receipt = normalizeName($('sb-receipt').value), staff = normalizeName($('sales-staff-name').value) || (status === 'void' ? 'ไม่มีผู้ขาย (ยกเลิก)' : '');
         if (!receipt || receipt.length > 80 || !staff || staff.length > 100) throw new Error('กรอกเลขบิลและชื่อเซลล์ให้ครบ');
         if (calculation.actual == null) throw new Error('กรอกยอดสุทธิที่คิดจริงตามบิล');
-        const promotion = $('sb-promotion').value.trim(), reviewReason = $('sb-review-reason').value.trim(), status = $('sb-bill-status').value;
+        const promotion = $('sb-promotion').value.trim(), reviewReason = $('sb-review-reason').value.trim();
+        const range = expectedReceiptSet(state.dailySource);
+        if (range.verified && !range.receipts.some(expected => billKey(expected) === billKey(receipt)) && (!state.editing || status !== 'void')) throw new Error('เลขบิลอยู่นอกช่วงที่ Daily Ops ระบุ กรุณาเลือกเลขจากรายการที่ต้องตรวจ');
         if (!statuses[status]) throw new Error('ผลตรวจไม่ถูกต้อง');
         if (calculation.discount > 0 && !promotion) throw new Error('ระบุโปรโมชั่นหรือเหตุผลส่วนลด');
         if (['needs-fix', 'void'].includes(status) && !reviewReason) throw new Error('ระบุเหตุผลที่ต้องแก้ไขหรือยกเลิกบิล');
@@ -5952,7 +6049,7 @@
           if (state.dirty && !window.confirm('มีบิลที่ยังไม่บันทึก ต้องการเปลี่ยนวัน / สาขาและทิ้งฟอร์มหรือไม่?')) {
             if (state.context) { $('sales-staff-branch').value = state.context.branch; $('sales-staff-date').value = state.context.date; } return;
           }
-          state.ready = false; state.bills = {}; state.catalog = {}; state.legacy = []; state.catalogEditing = null; state.catalogPending = null;
+          state.ready = false; state.bills = {}; state.catalog = {}; state.legacy = []; state.dailySource = null; state.catalogEditing = null; state.catalogPending = null;
           $('sb-catalog-form').reset(); resetEditor(); clearDataView(); return load();
         }));
         document.querySelectorAll('[data-sb-tab]').forEach(el => el.addEventListener('click', () => changeTab(el.dataset.sbTab)));
@@ -5976,16 +6073,23 @@
         $('sb-lines').addEventListener('click', event => { const button = event.target.closest('[data-sb-remove]'); if (!button) return; state.lines.splice(Number(button.dataset.sbRemove), 1); markDirty(); renderLines(); renderPicker(); recalculate(); });
         $('sales-staff-entry-form').addEventListener('input', () => { markDirty(); recalculate(); });
         $('sales-staff-entry-form').addEventListener('change', markDirty);
+        $('sb-bill-status').addEventListener('change', () => { $('sales-staff-name').required = $('sb-bill-status').value !== 'void'; });
         $('sales-staff-entry-form').addEventListener('submit', saveBill);
         ['sb-new-bill', 'sb-cancel-edit'].forEach(id => $(id).addEventListener('click', () => { if (!state.dirty || window.confirm('ล้างข้อมูลบิลที่ยังไม่บันทึกหรือไม่?')) resetEditor(); }));
         $('sales-staff-entries').addEventListener('click', event => { const button = event.target.closest('[data-sb-edit-bill]'); if (button) editBill(button.dataset.sbEditBill); });
+        $('sb-receipt-checklist').addEventListener('click', event => {
+          const button = event.target.closest('[data-sb-check-receipt]'); if (!button || state.busy) return;
+          if (button.dataset.sbCheckKey) { editBill(button.dataset.sbCheckKey); return; }
+          if (state.dirty && !window.confirm('เปลี่ยนไปตรวจเลขบิลนี้และทิ้งฟอร์มที่ยังไม่บันทึกหรือไม่?')) return;
+          resetEditor(); $('sb-receipt').value = button.dataset.sbCheckReceipt; markDirty(); changeTab('review'); $('sales-staff-name').focus();
+        });
         $('sb-catalog-table').addEventListener('click', event => { const button = event.target.closest('[data-sb-edit-item]'); if (button) editCatalog(button.dataset.sbEditItem); });
         $('sb-catalog-reset').addEventListener('click', () => { state.catalogEditing = null; $('sb-catalog-form').reset(); $('sb-catalog-message').textContent = ''; });
         $('sb-catalog-form').addEventListener('submit', saveCatalog);
         window.addEventListener('beforeunload', event => { if (state.dirty || state.busy) { event.preventDefault(); event.returnValue = ''; } });
       }
       function canLeave() { return !state.dirty || window.confirm('มีบิลที่ยังไม่บันทึก ต้องการออกจากหน้าและทิ้งฟอร์มหรือไม่?'); }
-      return { lock, load, bind, calculate, allocate, summarize, billKey, nextBill, canLeave };
+      return { lock, load, bind, calculate, allocate, summarize, billKey, nextBill, canLeave, parseDailyBillSource, dailyBillProgress, expectedReceiptSet };
     })();
     function lockSalesStaffPage() { salesBillReview.lock(); }
     function loadSalesStaffData() { return salesBillReview.load(); }
