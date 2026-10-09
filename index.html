@@ -4880,7 +4880,7 @@
             <h3>เป้าหมายรายเดือน (Target)</h3>
             <div id="settings-target-status" class="settings-note" style="margin-bottom:10px;"></div>
             <div id="settings-targets"></div>
-            <div class="settings-note">บันทึกแยกเดือนลง Firebase path <strong>ops_system_settings/targetsByMonth/{YYYY-MM}</strong> และเก็บสำรองในเครื่องเมื่อ Firebase ไม่พร้อมใช้งาน</div>
+            <div class="settings-note">บันทึก Target เดือนที่เริ่มใช้ลง Firebase path <strong>ops_system_settings/targetsByMonth/{YYYY-MM}</strong> และใช้ค่าล่าสุดต่อไปในเดือนถัดไปจนกว่าจะมีการเปลี่ยนใหม่</div>
           </div>
           <div class="settings-panel">
             <h3>Master Data Source</h3>
@@ -5271,18 +5271,26 @@
       return Boolean(monthKey && APP_SETTINGS.targetsByMonth?.[monthKey]);
     }
 
+    function latestTargetMonthFor(monthKey) {
+      const key = monthKey || currentTargetMonthKey();
+      const months = Object.keys(APP_SETTINGS.targetsByMonth || {})
+        .filter((targetMonth) => APP_SETTINGS.targetsByMonth?.[targetMonth])
+        .sort();
+      return months.filter((targetMonth) => targetMonth <= key).pop() || months.pop() || "";
+    }
+
     function targetsForMonth(monthKey) {
       const key = monthKey || currentTargetMonthKey();
       const explicit = APP_SETTINGS.targetsByMonth?.[key];
       if (explicit) {
         return Object.fromEntries(Object.keys(BRANCHES).map((branchKey) => [branchKey, Number(explicit[branchKey]) || 0]));
       }
-      // One-time compatibility: the old global target is a starting value only
-      // for the current month. It is never reused for past/future months.
-      if (key === currentTargetMonthKey()) {
-        return Object.fromEntries(Object.keys(BRANCHES).map((branchKey) => [branchKey, Number(APP_SETTINGS.tgs?.[branchKey]) || 0]));
+      const latestMonth = latestTargetMonthFor(key);
+      const latest = latestMonth ? APP_SETTINGS.targetsByMonth?.[latestMonth] : null;
+      if (latest) {
+        return Object.fromEntries(Object.keys(BRANCHES).map((branchKey) => [branchKey, Number(latest[branchKey]) || 0]));
       }
-      return Object.fromEntries(Object.keys(BRANCHES).map((branchKey) => [branchKey, 0]));
+      return Object.fromEntries(Object.keys(BRANCHES).map((branchKey) => [branchKey, Number(APP_SETTINGS.tgs?.[branchKey]) || 0]));
     }
 
 
@@ -6086,11 +6094,12 @@
       }
       const status = document.getElementById("settings-target-status");
       if (status) {
+        const latestMonth = latestTargetMonthFor(monthKey);
         status.textContent = hasMonthlyTargets(monthKey)
-          ? `กำลังแก้ไข Target ของเดือน ${monthKey} (บันทึกแยกจากเดือนอื่น)`
-          : (monthKey === currentTargetMonthKey()
-            ? `เดือน ${monthKey} ยังไม่ได้บันทึกแบบรายเดือน — แสดงค่า Target เดิมเป็นค่าเริ่มต้น กรุณากดบันทึกเพื่อยืนยันเดือนนี้`
-            : `เดือน ${monthKey} ยังไม่ได้ตั้ง Target — ค่าเริ่มต้นเป็น 0 และไม่กระทบเดือนอื่น`);
+          ? `กำลังแก้ไข Target ของเดือน ${monthKey} — ค่านี้จะเป็น Target ล่าสุดและใช้ต่อในเดือนถัดไปจนกว่าจะเปลี่ยนใหม่`
+          : (latestMonth
+            ? `เดือน ${monthKey} ยังไม่ได้ตั้งใหม่ — กำลังใช้ Target ล่าสุดจากเดือน ${latestMonth}`
+            : `เดือน ${monthKey} ยังไม่ได้ตั้งใหม่ — กำลังใช้ Target เริ่มต้นของระบบ`);
       }
     }
 
@@ -6142,6 +6151,7 @@
       });
       APP_SETTINGS = {
         ...APP_SETTINGS,
+        tgs: { ...next.tgs },
         targetsByMonth: { ...(APP_SETTINGS.targetsByMonth || {}), [monthKey]: next.tgs },
       };
       localStorage.setItem("lalizaPortalSettings", JSON.stringify(APP_SETTINGS));
@@ -6149,6 +6159,7 @@
         await Promise.all([
           window.db.ref(`ops_system_settings/targetsByMonth/${monthKey}`).update(next.tgs),
           window.db.ref("ops_system_settings").update({
+          tgs: next.tgs,
           targetsUpdatedMonth: monthKey,
           updatedAt: new Date().toISOString(),
           }),
@@ -7473,6 +7484,35 @@
       calculateDailyOpsPayments();
     }
 
+    function dailyOpsLegacyManualFromRoot(data = {}) {
+      const manual = {};
+      DAILY_MANUAL_FIELDS.forEach((id) => {
+        if (Object.prototype.hasOwnProperty.call(data || {}, id)) manual[id] = data[id];
+      });
+      return manual;
+    }
+
+    function mergeDailyOpsDraftWithLegacy(rootData = {}) {
+      const draft = rootData?.dailyOps && typeof rootData.dailyOps === "object" ? rootData.dailyOps : {};
+      const legacyManual = dailyOpsLegacyManualFromRoot(rootData);
+      const mergedManual = { ...(draft.manual || {}) };
+      Object.entries(legacyManual).forEach(([id, value]) => {
+        const current = mergedManual[id];
+        const isBlank = current === undefined || current === null || String(current).trim() === "";
+        if (isBlank) mergedManual[id] = value;
+      });
+      return { ...draft, manual: mergedManual };
+    }
+
+    function dailyOpsRootManualMirror(draft = {}) {
+      const manual = draft.manual || {};
+      const mirror = {};
+      DAILY_MANUAL_FIELDS.forEach((id) => {
+        if (Object.prototype.hasOwnProperty.call(manual, id)) mirror[id] = manual[id];
+      });
+      return mirror;
+    }
+
     function hasMeaningfulDailyOpsDraft(draft = {}) {
       if (!draft || typeof draft !== "object") return false;
       const manual = draft.manual || {};
@@ -7504,8 +7544,9 @@
       if (!br || !dt || !window.db || !canAccessBranch(br)) return;
       const draft = collectDailyOpsDraft();
       try {
-        await window.db.ref(`ops_daily/${dt}/${br}/dailyOps`).update(draft);
-        patchOpsDailyCache(dt, br, { dailyOps: { ...draft } });
+        const mirror = dailyOpsRootManualMirror(draft);
+        await window.db.ref(`ops_daily/${dt}/${br}`).update({ dailyOps: draft, ...mirror });
+        patchOpsDailyCache(dt, br, { dailyOps: { ...draft }, ...mirror });
         if (activeSectionId() === "daily" && window.__dailyLiveState?.billCounts) {
           window.__dailyLiveState.billCounts[br] = draft.manual?.["o-bc"];
           scheduleDailyBillOverviewRender(dt, window.__dailyLiveState.billCounts);
@@ -9749,8 +9790,9 @@
       if (document.getElementById("o-doc2")) document.getElementById("o-doc2").value = docIdFromValue(data["r-doc2"] || "");
 
       await syncDoctorFinanceSalesToDaily(dt, br, options.doctorData);
-      if (hasMeaningfulDailyOpsDraft(data.dailyOps || {})) {
-        applyDailyOpsDraft(data.dailyOps || {});
+      const dailyOpsDraft = mergeDailyOpsDraftWithLegacy(data);
+      if (hasMeaningfulDailyOpsDraft(dailyOpsDraft)) {
+        applyDailyOpsDraft(dailyOpsDraft);
       }
       calculateDailyOpsPayments();
       if (!silent) toast("Sync Revenue + Doctor Finance เข้า Daily Ops แล้ว");
