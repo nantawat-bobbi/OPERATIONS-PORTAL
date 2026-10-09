@@ -3842,6 +3842,7 @@
       <button class="nav-item" data-target="doctor">2. 👨‍⚕️ Doctor Finance</button>
       <button class="nav-item active" data-target="daily">3. 📋 Daily Ops Core</button>
       <button class="nav-item" data-target="tracking">4. ☎️ Confirm Tracking</button>
+      <button class="nav-item" data-target="sales-staff">5. 💼 ยอดขายเซลล์ 🔒</button>
       <button class="nav-item admin16698-nav" data-target="settings">⚙️ Custom Settings</button>
       <button class="nav-item admin16698-nav" data-target="log">🧾 Activity Log</button>
       <div style="height:1px;background:#2d3139;margin:42px 8px 12px;"></div>
@@ -4912,6 +4913,62 @@
           </table>
         </div>
       </section>
+      <section class="section" id="sales-staff">
+        <style>
+          #sales-staff [hidden] { display:none !important; }
+          #sales-staff label { display:flex;flex-direction:column;gap:8px;font-weight:700; }
+          #sales-staff input, #sales-staff select { padding:10px 12px;border:1px solid #cbd5e1;border-radius:8px;max-width:100%;font:inherit;background:white; }
+          #sales-staff table { border-collapse:collapse;min-width:520px; }
+          #sales-staff th, #sales-staff td { padding:12px;text-align:left;border-bottom:1px solid #e2e8f0; }
+          #sales-staff th { background:#f1f5f9; }
+          #sales-staff td:nth-child(2), #sales-staff-summary td:nth-child(3) { text-align:right;font-variant-numeric:tabular-nums; }
+          #sales-staff-status, #sales-staff-lock-message { overflow-wrap:anywhere; }
+        </style>
+        <h1>💼 ยอดขายเซลล์</h1>
+        <div class="card" id="sales-staff-lock" style="max-width:520px;padding:24px;margin:20px auto;">
+          <h2>สำหรับผู้จัดการสาขา</h2>
+          <p>ใส่รหัสผู้จัดการสาขาเดิมเพื่อเปิดหน้ากรอกยอดขายเซลล์</p>
+          <form id="sales-staff-unlock-form">
+            <label for="sales-staff-pin">รหัสผู้จัดการ</label>
+            <input id="sales-staff-pin" type="password" autocomplete="off" required style="width:100%;margin:12px 0;padding:12px;">
+            <button type="submit" class="btn">เปิดหน้ากรอกยอด</button>
+          </form>
+          <p id="sales-staff-lock-message" role="status"></p>
+        </div>
+        <div id="sales-staff-workspace" hidden>
+          <div class="card" style="padding:20px;margin:16px 0;">
+            <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:end;">
+              <label>สาขา <select id="sales-staff-branch"></select></label>
+              <label>วันที่ <input id="sales-staff-date" type="date" required></label>
+              <button id="sales-staff-refresh" type="button" class="btn">โหลดข้อมูล</button>
+              <button id="sales-staff-relock" type="button" class="btn">🔒 ล็อกหน้า</button>
+            </div>
+            <p id="sales-staff-status" role="status" aria-live="polite"></p>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin:16px 0;">
+            <div class="card" style="padding:20px;">ยอดรวมวันนี้ <h2 id="sales-staff-day-total">—</h2></div>
+            <div class="card" style="padding:20px;">ยอดรวมเดือนที่เลือก <h2 id="sales-staff-month-total">—</h2></div>
+          </div>
+          <div class="card" style="padding:20px;margin:16px 0;">
+            <h2>บันทึกยอดขาย</h2>
+            <form id="sales-staff-entry-form" style="display:flex;flex-wrap:wrap;gap:16px;align-items:end;">
+              <label>ชื่อเซลล์ <input id="sales-staff-name" maxlength="100" required placeholder="ชื่อ–นามสกุล / ชื่อเล่น"></label>
+              <label>ยอดขาย (บาท) <input id="sales-staff-amount" type="number" min="0.01" step="0.01" required></label>
+              <label>หมายเหตุ <input id="sales-staff-note" maxlength="500" placeholder="เช่น ยอดรายวัน / ยอดเพิ่มเติม"></label>
+              <button id="sales-staff-save" type="submit" class="btn">บันทึกยอด</button>
+            </form>
+            <p style="color:#64748b;">แต่ละครั้งที่บันทึกเป็นรายการเพิ่มเติม ยอดสรุปรวมทุกรายการของเซลล์แต่ละคน</p>
+          </div>
+          <div class="card" style="padding:20px;margin:16px 0;overflow:auto;">
+            <h2>สรุปยอดตามเซลล์ · เดือนที่เลือก</h2>
+            <table style="width:100%;"><thead><tr><th>เซลล์</th><th>วันนี้ (บาท)</th><th>เดือนนี้ (บาท)</th></tr></thead><tbody id="sales-staff-summary"></tbody></table>
+          </div>
+          <div class="card" style="padding:20px;margin:16px 0;overflow:auto;">
+            <h2>รายการของวันที่เลือก</h2>
+            <table style="width:100%;"><thead><tr><th>เซลล์</th><th>ยอดขาย (บาท)</th><th>หมายเหตุ</th><th>เวลาบันทึก</th><th>ผู้บันทึก</th></tr></thead><tbody id="sales-staff-entries"></tbody></table>
+          </div>
+        </div>
+      </section>
     </main>
   </div>
 
@@ -5510,6 +5567,141 @@
 
 
 
+    let salesStaffAccess = null;
+    let salesStaffLoadVersion = 0;
+    let salesStaffSaving = false;
+    let salesStaffPendingEntry = null;
+
+    function lockSalesStaffPage() {
+      salesStaffAccess = null;
+      salesStaffLoadVersion++;
+      salesStaffPendingEntry = null;
+      const workspace = document.getElementById("sales-staff-workspace");
+      if (workspace) workspace.hidden = true;
+      const gate = document.getElementById("sales-staff-lock");
+      if (gate) gate.hidden = false;
+      document.getElementById("sales-staff-unlock-form")?.reset();
+      document.getElementById("sales-staff-entry-form")?.reset();
+      ["sales-staff-entries", "sales-staff-summary", "sales-staff-status", "sales-staff-lock-message"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = "";
+      });
+    }
+
+    function salesStaffContext() {
+      const user = currentUserProfile();
+      if (!user || !document.body.classList.contains("authed") || !salesStaffAccess || salesStaffAccess.sessionPin !== user.pin) throw new Error("กรุณาใส่รหัสผู้จัดการอีกครั้ง");
+      const branch = document.getElementById("sales-staff-branch").value;
+      const date = document.getElementById("sales-staff-date").value;
+      if (!BRANCHES[branch] || (salesStaffAccess.branch !== "all" && branch !== salesStaffAccess.branch)) throw new Error("ไม่มีสิทธิ์กรอกยอดสาขานี้");
+      if (user.br !== "all" && user.br !== branch) throw new Error("สาขาไม่ตรงกับผู้ใช้งาน");
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || new Date(date + "T00:00:00Z").toISOString().slice(0, 10) !== date) throw new Error("กรุณาเลือกวันที่ให้ถูกต้อง");
+      if (!window.db) throw new Error("ยังเชื่อมต่อฐานข้อมูลไม่ได้");
+      return { branch, date, month: date.slice(0, 7), access: salesStaffAccess };
+    }
+
+    async function loadSalesStaffData() {
+      const version = ++salesStaffLoadVersion;
+      const status = document.getElementById("sales-staff-status");
+      try {
+        const context = salesStaffContext();
+        status.textContent = "กำลังโหลดข้อมูล…";
+        ["sales-staff-day-total", "sales-staff-month-total"].forEach(id => document.getElementById(id).textContent = "—");
+        ["sales-staff-summary", "sales-staff-entries"].forEach(id => document.getElementById(id).textContent = "");
+        const [year, month] = context.month.split("-").map(Number);
+        const days = new Date(Date.UTC(year, month, 0)).getUTCDate();
+        const snapshots = await Promise.all(Array.from({ length: days }, (_, index) => {
+          const date = context.month + "-" + String(index + 1).padStart(2, "0");
+          return window.db.ref(`ops_sales_staff/${date}/${context.branch}/entries`).once("value").then(snapshot => ({ date, entries: snapshot.val() || {} }));
+        }));
+        if (version !== salesStaffLoadVersion || salesStaffAccess !== context.access) return;
+        let dayTotal = 0, monthTotal = 0;
+        const people = new Map(), daily = [];
+        snapshots.forEach(({ date, entries }) => Object.values(entries).forEach(entry => {
+          const amount = Number(entry?.amount);
+          if (!entry?.name || !Number.isFinite(amount) || amount < 0) return;
+          const summary = people.get(entry.name) || { day: 0, month: 0 };
+          monthTotal += amount;
+          summary.month += amount;
+          if (date === context.date) { dayTotal += amount; summary.day += amount; daily.push(entry); }
+          people.set(entry.name, summary);
+        }));
+        const money = amount => Number(amount).toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        document.getElementById("sales-staff-day-total").textContent = money(dayTotal) + " บาท";
+        document.getElementById("sales-staff-month-total").textContent = money(monthTotal) + " บาท";
+        document.getElementById("sales-staff-summary").innerHTML = [...people].sort((a, b) => b[1].month - a[1].month).map(([name, value]) => `<tr><td>${escapeHtml(name)}</td><td>${money(value.day)}</td><td>${money(value.month)}</td></tr>`).join("") || '<tr><td colspan="3">ยังไม่มีข้อมูลเดือนนี้</td></tr>';
+        document.getElementById("sales-staff-entries").innerHTML = daily.sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt))).map(entry => {
+          const timestamp = new Date(entry.createdAt);
+          const time = Number.isNaN(timestamp.getTime()) ? "—" : timestamp.toLocaleString("th-TH", { timeZone: "Asia/Bangkok" });
+          return `<tr><td>${escapeHtml(entry.name)}</td><td>${money(entry.amount)}</td><td>${escapeHtml(entry.note)}</td><td>${escapeHtml(time)}</td><td>${escapeHtml(entry.recordedBy)}</td></tr>`;
+        }).join("") || '<tr><td colspan="5">ยังไม่มีรายการวันนี้</td></tr>';
+        status.textContent = `${BRANCHES[context.branch]} · วันที่ ${context.date} · ภาพรวมเดือน ${context.month}`;
+      } catch (error) {
+        if (version === salesStaffLoadVersion) status.textContent = "โหลดไม่สำเร็จ: " + error.message;
+      }
+    }
+
+    function bindSalesStaffPage() {
+      document.getElementById("sales-staff-unlock-form").addEventListener("submit", async event => {
+        event.preventDefault();
+        const session = currentUserProfile();
+        const pinInput = document.getElementById("sales-staff-pin");
+        const manager = USERS[pinInput.value.trim()];
+        pinInput.value = "";
+        if (!session || !document.body.classList.contains("authed") || !manager || !["manager", "admin"].includes(manager.role) || (session.br !== "all" && manager.br !== session.br)) {
+          document.getElementById("sales-staff-lock-message").textContent = "รหัสไม่ถูกต้อง หรือไม่ตรงกับสาขาที่เข้าสู่ระบบ";
+          return;
+        }
+        salesStaffAccess = { branch: manager.br, label: manager.label, sessionPin: session.pin };
+        const branchSelect = document.getElementById("sales-staff-branch");
+        const branch = manager.br === "all" ? allowedBranchForUser("rama9") : manager.br;
+        branchSelect.innerHTML = manager.br === "all" ? branchOptions(branch) : `<option value="${branch}">${escapeHtml(BRANCHES[branch])}</option>`;
+        branchSelect.disabled = manager.br !== "all";
+        document.getElementById("sales-staff-date").value = bangkokToday();
+        document.getElementById("sales-staff-lock").hidden = true;
+        document.getElementById("sales-staff-workspace").hidden = false;
+        await loadSalesStaffData();
+      });
+      document.getElementById("sales-staff-relock").addEventListener("click", lockSalesStaffPage);
+      document.getElementById("sales-staff-refresh").addEventListener("click", loadSalesStaffData);
+      ["sales-staff-branch", "sales-staff-date"].forEach(id => document.getElementById(id).addEventListener("change", () => {
+        salesStaffPendingEntry = null;
+        loadSalesStaffData();
+      }));
+      document.getElementById("sales-staff-entry-form").addEventListener("submit", async event => {
+        event.preventDefault();
+        if (salesStaffSaving) return;
+        const button = document.getElementById("sales-staff-save");
+        const status = document.getElementById("sales-staff-status");
+        try {
+          const context = salesStaffContext();
+          const name = document.getElementById("sales-staff-name").value.trim();
+          const amount = Number(document.getElementById("sales-staff-amount").value);
+          const note = document.getElementById("sales-staff-note").value.trim();
+          if (!name || !Number.isFinite(amount) || amount < 0.01 || !Number.isSafeInteger(Math.round(amount * 100))) throw new Error("กรอกชื่อเซลล์และยอดขายตั้งแต่ 0.01 บาท");
+          const signature = JSON.stringify([context.date, context.branch, name, amount, note]);
+          const parent = window.db.ref(`ops_sales_staff/${context.date}/${context.branch}/entries`);
+          if (!salesStaffPendingEntry || salesStaffPendingEntry.signature !== signature) {
+            salesStaffPendingEntry = { signature, key: parent.push().key, payload: { name, amount: Math.round(amount * 100) / 100, note, createdAt: new Date().toISOString(), recordedBy: context.access.label } };
+          }
+          salesStaffSaving = true;
+          button.disabled = true;
+          status.textContent = "กำลังบันทึก…";
+          await parent.child(salesStaffPendingEntry.key).set(salesStaffPendingEntry.payload);
+          salesStaffPendingEntry = null;
+          if (salesStaffAccess !== context.access) return;
+          document.getElementById("sales-staff-entry-form").reset();
+          await loadSalesStaffData();
+          status.textContent += " · บันทึกสำเร็จ";
+        } catch (error) {
+          if (salesStaffAccess) status.textContent = "บันทึกไม่สำเร็จ: " + error.message + " (ข้อมูลที่กรอกยังอยู่)";
+        } finally {
+          salesStaffSaving = false;
+          button.disabled = false;
+        }
+      });
+    }
+
     function currentUserProfile() {
       try { return JSON.parse(sessionStorage.getItem("lalizaPortalUser") || "null"); } catch (err) { return null; }
     }
@@ -5535,6 +5727,7 @@
     }
 
     function allowedPortalSection(target, user = currentUserProfile()) {
+      if (target === "sales-staff") return !!user && !isMarketingUser(user) && !isReadOnlyUser(user);
       if (isMarketingUser(user)) return target === "product-ranking";
       if ((target === "dashboard" || target === "product-ranking") && !canViewProductRanking(user)) return false;
       if (["settings", "log", "accounting"].includes(target) && !isAdminUser(user)) return false;
@@ -5546,6 +5739,7 @@
       document.querySelectorAll(".nav-item").forEach((x) => x.classList.toggle("active", x.dataset.target === target && x.id !== "sysLogoutBtn"));
       document.querySelectorAll(".section").forEach((x) => x.classList.remove("active"));
       document.getElementById(target)?.classList.add("active");
+      if (target !== "sales-staff") lockSalesStaffPage();
       if (target !== "daily") stopDailyRealtime();
       if (target !== "doctor") stopDoctorRealtime();
       if (target !== "tracking") stopTrackingRealtime();
@@ -5991,6 +6185,7 @@
       if (window.__portalLogoutBusy) return;
       window.__portalLogoutBusy = true;
       try {
+        lockSalesStaffPage();
         if (document.body.classList.contains("authed")) await flushPendingAutoSaves();
         cleanupPortalRuntime();
         sessionStorage.removeItem("lalizaPortalUser");
@@ -9991,6 +10186,7 @@
         if (tab === "dashboard") await buildDashboardChart(options);
         else if (tab === "product-ranking") await buildProductRankingPage();
         else if (tab === "accounting") await buildAccountingDashboard(options);
+        else if (tab === "sales-staff" && salesStaffAccess) await loadSalesStaffData();
         else if (tab === "revenue") await buildRevenueSheet(options);
         else if (tab === "daily") startDailyRealtime(document.getElementById("o-dt")?.value, scopedBranch("o-br", "rama9"), { force: options.force === true, immediate: true });
         else if (tab === "doctor") startDoctorRealtime(document.getElementById("df-mo")?.value, enforceScopedBranchSelect("df-br", "rama9"));
@@ -11629,6 +11825,7 @@
     setDailyOpsSecondDoctorVisible(false);
     restoreRevenueSyncStatus();
 
+    bindSalesStaffPage();
     initStandaloneAuth();
     initSettings();
     hydrateAccountingControls();
