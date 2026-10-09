@@ -4968,7 +4968,8 @@
           <div id="sb-panel-review" role="tabpanel">
             <form id="sales-staff-entry-form">
               <div class="sb-card"><div class="sb-header"><h2 id="sb-editor-title">ตรวจบิลใหม่</h2><button id="sb-new-bill" type="button" class="btn">+ บิลใหม่</button></div>
-                <div class="sb-grid"><label>เลขบิล<input id="sb-receipt" maxlength="80" required placeholder="เช่น A02/116067"></label><label>เซลล์ผู้ขาย<input id="sales-staff-name" list="sb-staff-options" maxlength="100" required placeholder="ชื่อเซลล์"><datalist id="sb-staff-options"></datalist></label><label>หมายเหตุบิล<input id="sales-staff-note" maxlength="500" placeholder="รายละเอียดเพิ่มเติม"></label></div>
+                <div class="sb-grid"><label>เลขบิลจาก Daily Ops<select id="sb-receipt" required><option value="">เลือกเลขบิล</option></select></label><label>เซลล์ผู้ขาย · BC ของสาขา<select id="sales-staff-name" required><option value="">เลือก BC</option></select></label><label>หมายเหตุบิล<input id="sales-staff-note" maxlength="500" placeholder="รายละเอียดเพิ่มเติม"></label></div>
+                <p class="sb-muted" id="sb-bc-source" aria-live="polite"></p>
                 <p class="sb-muted">หนึ่งบิลมีเซลล์ผู้ขายหนึ่งคน ยอดนี้ไม่บวกซ้ำในยอดร้าน · บิลเปล่าที่ยกเลิก: เลือก “ยกเลิกบิล” กรอกยอด 0 และเหตุผล ไม่ต้องติ๊กสินค้า</p>
               </div>
               <div class="sb-card"><h2>ติ๊กรายการที่ขาย</h2><div class="sb-flex"><label>หมวด<select id="sb-category-filter"><option value="">ทุกหมวด</option></select></label><label>ค้นหารายการ<input id="sb-search" placeholder="ชื่อบริการ / สินค้า"></label></div><p class="sb-muted">รายการที่ยังไม่มีราคายืนยัน ต้องตั้งราคาที่แท็บ 3 ก่อน · บิลใช้คอร์สเดิมหรือฟรีคิดยอดขายใหม่เป็น 0 บาท</p><div id="sb-catalog-picker" class="sb-catalog"></div>
@@ -5632,7 +5633,29 @@
       const normalizeName = value => String(value || '').normalize('NFKC').trim().replace(/\s+/g, ' ');
       const billKey = value => 'b_' + btoa(unescape(encodeURIComponent(normalizeName(value).toUpperCase().replace(/\s/g, '')))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
       const operationId = () => window.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-      const state = { version: 0, busy: false, dirty: false, catalog: {}, bills: {}, legacy: [], dailySource: null, lines: [], editing: null, catalogEditing: null, catalogPending: null, pending: null, context: null, ready: false, tab: 'review' };
+      const branchEmployeeKeys = { srinakarin: 'b1', westgate: 'b2', bangkae: 'b3', rangsit: 'b4', promanat: 'b5', ngamwongwan: 'b6', rama9: 'b7', pinklao: 'b8' };
+      const state = { version: 0, busy: false, dirty: false, catalog: {}, bills: {}, legacy: [], dailySource: null, bcStaff: [], bcStatus: 'missing', selectedReceipt: '', lines: [], editing: null, catalogEditing: null, catalogPending: null, pending: null, context: null, ready: false, tab: 'review' };
+      function extractBCEmployees(branch) {
+        const employees = branch?.emps || {};
+        return [...new Set(Object.values(employees).filter(employee => {
+          const role = normalizeName(employee?.pos || employee?.position || employee?.role).toLowerCase();
+          return role === 'bc' || role === 'beauty consultant';
+        }).map(employee => normalizeName([employee.name || employee.fullName || employee.displayName || '', employee.nick || employee.nickname || ''].filter(Boolean).join(' '))).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'th'));
+      }
+      function renderSelectors() {
+        const receipt = $('sb-receipt').value, staff = $('sales-staff-name').value;
+        const oldBill = state.editing ? state.bills[state.editing.key] : null;
+        const progress = dailyBillProgress(state.bills, $('sales-staff-date').value, state.dailySource);
+        $('sb-receipt').innerHTML = `<option value="">${progress.range.verified ? 'เลือกเลขบิลที่ต้องตรวจ' : 'กรุณาตรวจช่วงเลขบิลใน Daily Ops'}</option>` + progress.checklist.map(item => `<option value="${esc(item.receipt)}">${esc(item.receipt)} · ${item.status === 'missing' ? 'ยังไม่ตรวจ' : statuses[item.status] || 'ต้องตรวจ'}</option>`).join('');
+        if (oldBill && !progress.range.receipts.includes(oldBill.receipt)) $('sb-receipt').insertAdjacentHTML('beforeend', `<option value="${esc(oldBill.receipt)}">${esc(oldBill.receipt)} · บิลเดิมนอกช่วง</option>`);
+        $('sb-receipt').value = oldBill?.receipt || (progress.range.receipts.includes(receipt) ? receipt : '');
+        state.selectedReceipt = $('sb-receipt').value;
+        $('sb-receipt').disabled = !!state.editing || !progress.range.verified || !progress.range.receipts.length;
+        $('sales-staff-name').innerHTML = '<option value="">เลือก BC ผู้ขาย</option>' + state.bcStaff.map(name => `<option value="${esc(name)}">${esc(name)}</option>`).join('');
+        if (oldBill?.staff && !state.bcStaff.includes(oldBill.staff)) $('sales-staff-name').insertAdjacentHTML('beforeend', `<option value="${esc(oldBill.staff)}">${esc(oldBill.staff)} · ชื่อเดิมในบิล</option>`);
+        $('sales-staff-name').value = state.bcStaff.includes(staff) || staff === oldBill?.staff ? staff : oldBill?.staff || '';
+        $('sb-bc-source').textContent = state.bcStatus === 'error' ? 'อ่านรายชื่อ BC ไม่สำเร็จ กดโหลดข้อมูลใหม่ · บิลเดิมยังคงชื่อผู้ขายเดิม' : `${BRANCHES[$('sales-staff-branch').value]} · รายชื่อ BC จากทะเบียนพนักงานปฏิทินลา ${state.bcStaff.length} คน${state.bcStaff.length ? ' · ไม่รวม BT / แคชเชียร์' : ' · ยังไม่พบรายชื่อ BC กรุณาตรวจตำแหน่งพนักงานต้นทาง'} · รายชื่อนี้ไม่ใช่การยืนยันว่าเข้ากะในวันที่เลือก`;
+      }
 
       function context() {
         const user = currentUserProfile();
@@ -5799,17 +5822,17 @@
         $('sales-staff-entry-form').reset();
         $('sales-staff-name').required = true;
         state.lines = []; state.editing = null; state.pending = null; state.dirty = false;
-        $('sb-receipt').disabled = false;
+        renderSelectors();
         $('sb-editor-title').textContent = 'ตรวจบิลใหม่';
         $('sb-history-card').hidden = true;
         renderLines(); renderPicker(); recalculate();
       }
       function lock() {
         salesStaffAccess = null; state.version++; state.ready = false; state.context = null;
-        state.bills = {}; state.catalog = {}; state.legacy = []; state.dailySource = null; state.lines = []; state.editing = null; state.catalogEditing = null; state.catalogPending = null; state.pending = null; state.dirty = false;
+        state.bills = {}; state.catalog = {}; state.legacy = []; state.dailySource = null; state.bcStaff = []; state.bcStatus = 'missing'; state.lines = []; state.editing = null; state.catalogEditing = null; state.catalogPending = null; state.pending = null; state.dirty = false;
         $('sales-staff-workspace').hidden = true; $('sales-staff-lock').hidden = false;
         $('sales-staff-unlock-form').reset(); $('sales-staff-entry-form').reset(); $('sb-catalog-form').reset();
-        ['sales-staff-entries', 'sales-staff-summary', 'sb-sales-chart', 'sb-average-chart', 'sb-history', 'sb-legacy', 'sb-catalog-table', 'sb-catalog-picker', 'sb-staff-options', 'sb-lines'].forEach(id => $(id).innerHTML = '');
+        ['sales-staff-entries', 'sales-staff-summary', 'sb-sales-chart', 'sb-average-chart', 'sb-history', 'sb-legacy', 'sb-catalog-table', 'sb-catalog-picker', 'sales-staff-name', 'sb-receipt', 'sb-bc-source', 'sb-lines'].forEach(id => $(id).innerHTML = '');
         $('sales-staff-lock-message').textContent = '';
         clearDataView();
       }
@@ -5857,8 +5880,7 @@
         const date = $('sales-staff-date').value;
         const rows = Object.entries(state.bills).filter(([, bill]) => bill.date === date).sort((a, b) => String(b[1].updatedAt).localeCompare(String(a[1].updatedAt)));
         $('sales-staff-entries').innerHTML = rows.map(([key, bill]) => `<tr><td>${esc(bill.receipt)}</td><td>${esc(bill.staff)}</td><td class="sb-num">${money(bill.expectedCents)}</td><td class="sb-num">${money(bill.actualCents)}</td><td class="sb-num">${money(bill.differenceCents)}</td><td><span class="sb-tag ${esc(bill.status)}">${statuses[bill.status] || 'รอตรวจ'}</span></td><td><button type="button" class="btn" data-sb-edit-bill="${esc(key)}">ดู / แก้ไข</button></td></tr>`).join('') || '<tr><td colspan="7">ยังไม่มีบิลตรวจของวันนี้</td></tr>';
-        const names = [...new Set([...Object.values(state.bills).map(bill => bill.staff), ...state.legacy.map(entry => entry.name)].filter(Boolean))];
-        $('sb-staff-options').innerHTML = names.map(name => `<option value="${esc(name)}"></option>`).join('');
+        renderSelectors();
         $('sb-legacy-card').hidden = state.legacy.length === 0;
         $('sb-legacy').innerHTML = state.legacy.map(entry => `<p>${esc(entry.date)} · ${esc(entry.name)} · ${Number(entry.amount || 0).toLocaleString('th-TH', { minimumFractionDigits: 2 })} บาท</p>`).join('');
       }
@@ -5911,15 +5933,21 @@
             const date = scope.month + '-' + String(index + 1).padStart(2, '0');
             return window.db.ref(`ops_sales_staff/${date}/${scope.branch}/entries`).once('value').then(snapshot => Object.values(snapshot.val() || {}).map(entry => ({ ...entry, date })));
           })).then(parts => ({ rows: parts.flat(), error: false })).catch(() => ({ rows: [], error: true }));
-          const [catalogSnapshot, billsSnapshot, legacy, dailySource] = await Promise.all([
+          const bcPromise = window.db.ref(`branches/${branchEmployeeKeys[scope.branch]}`).once('value').then(async snapshot => {
+            const branch = snapshot.val() || (await window.db.ref(`branches/${scope.branch}`).once('value')).val();
+            return { names: extractBCEmployees(branch), status: 'ok' };
+          }).catch(() => ({ names: [], status: 'error' }));
+          const [catalogSnapshot, billsSnapshot, legacy, dailySource, bc] = await Promise.all([
             window.db.ref(`ops_sales_staff_catalog/${scope.branch}/items`).once('value'),
             window.db.ref(`ops_sales_staff_bills/${scope.branch}`).orderByChild('date').startAt(scope.month + '-01').endAt(scope.month + '-31').once('value'),
             legacyPromise,
-            window.db.ref(`ops_daily/${scope.date}/${scope.branch}`).once('value').then(snapshot => parseDailyBillSource(snapshot.val() || {})).catch(() => ({ status: 'error', count: null, start: '', end: '' }))
+            window.db.ref(`ops_daily/${scope.date}/${scope.branch}`).once('value').then(snapshot => parseDailyBillSource(snapshot.val() || {})).catch(() => ({ status: 'error', count: null, start: '', end: '' })),
+            bcPromise
           ]);
           if (version !== state.version || salesStaffAccess !== scope.access) return;
           state.catalog = { ...seedCatalog(), ...(catalogSnapshot.val() || {}) };
           state.bills = billsSnapshot.val() || {}; state.legacy = legacy.rows; state.dailySource = dailySource; state.context = scope; state.ready = true;
+          state.bcStaff = bc.names; state.bcStatus = bc.status;
           renderCatalog(); renderBills(); renderPerformance();
           notify(`${BRANCHES[scope.branch]} · ${scope.date} · โหลดข้อมูลแล้ว${legacy.error ? ' (อ่านข้อมูลยอดเก่าไม่สำเร็จ)' : ''}`);
         } catch (error) { if (version === state.version) { state.ready = false; notify('โหลดไม่สำเร็จ: ' + error.message, 'error'); } }
@@ -5929,6 +5957,7 @@
         if (state.dirty && !window.confirm('ฟอร์มมีข้อมูลที่ยังไม่บันทึก ต้องการเปลี่ยนไปดูบิลนี้หรือไม่?')) return;
         const bill = state.bills[key]; if (!bill) return;
         resetEditor(); state.editing = { key, revision: bill.revision };
+        renderSelectors();
         $('sb-receipt').value = bill.receipt; $('sb-receipt').disabled = true; $('sales-staff-name').value = bill.staff; $('sales-staff-note').value = bill.note || '';
         state.lines = bill.lines.map(line => ({ ...line }));
         $('sb-discount').value = (bill.discountCents / 100).toFixed(2); $('sb-promotion').value = bill.promotion || ''; $('sales-staff-amount').value = (bill.actualCents / 100).toFixed(2);
@@ -5951,6 +5980,9 @@
         if (calculation.actual == null) throw new Error('กรอกยอดสุทธิที่คิดจริงตามบิล');
         const promotion = $('sb-promotion').value.trim(), reviewReason = $('sb-review-reason').value.trim();
         const range = expectedReceiptSet(state.dailySource);
+        if (!state.editing && !range.verified) throw new Error('กรุณายืนยันช่วงเลขบิลใน Daily Ops ก่อนเลือกบิลใหม่');
+        const oldStaff = state.editing ? state.bills[state.editing.key]?.staff : null;
+        if (staff !== oldStaff && !(status === 'void' && staff === 'ไม่มีผู้ขาย (ยกเลิก)') && !state.bcStaff.includes(staff)) throw new Error('กรุณาเลือก BC ของสาขาจากรายชื่อปฏิทินลา');
         if (range.verified && !range.receipts.some(expected => billKey(expected) === billKey(receipt)) && (!state.editing || status !== 'void')) throw new Error('เลขบิลอยู่นอกช่วงที่ Daily Ops ระบุ กรุณาเลือกเลขจากรายการที่ต้องตรวจ');
         if (!statuses[status]) throw new Error('ผลตรวจไม่ถูกต้อง');
         if (calculation.discount > 0 && !promotion) throw new Error('ระบุโปรโมชั่นหรือเหตุผลส่วนลด');
@@ -5990,7 +6022,7 @@
           const saved = result.snapshot.val(); state.bills[key] = saved;
           resetEditor(); renderBills(); renderPerformance(); notify(`บันทึกบิล ${saved.receipt} สำเร็จ · ${statuses[saved.status]}`, 'ok');
         } catch (error) { if (salesStaffAccess) notify('บันทึกไม่สำเร็จ: ' + error.message + ' · ข้อมูลในฟอร์มยังอยู่', 'error'); }
-        finally { if (state.busy) setBusy(false); $('sb-receipt').disabled = !!state.editing; }
+        finally { if (state.busy) setBusy(false); renderSelectors(); }
       }
 
       function editCatalog(id) {
@@ -6049,7 +6081,7 @@
           if (state.dirty && !window.confirm('มีบิลที่ยังไม่บันทึก ต้องการเปลี่ยนวัน / สาขาและทิ้งฟอร์มหรือไม่?')) {
             if (state.context) { $('sales-staff-branch').value = state.context.branch; $('sales-staff-date').value = state.context.date; } return;
           }
-          state.ready = false; state.bills = {}; state.catalog = {}; state.legacy = []; state.dailySource = null; state.catalogEditing = null; state.catalogPending = null;
+          state.ready = false; state.bills = {}; state.catalog = {}; state.legacy = []; state.dailySource = null; state.bcStaff = []; state.bcStatus = 'missing'; state.catalogEditing = null; state.catalogPending = null;
           $('sb-catalog-form').reset(); resetEditor(); clearDataView(); return load();
         }));
         document.querySelectorAll('[data-sb-tab]').forEach(el => el.addEventListener('click', () => changeTab(el.dataset.sbTab)));
@@ -6071,8 +6103,16 @@
           const line = state.lines[Number(event.target.dataset.sbLineKind)]; if (line) { line.kind = event.target.value; markDirty(); recalculate(); }
         });
         $('sb-lines').addEventListener('click', event => { const button = event.target.closest('[data-sb-remove]'); if (!button) return; state.lines.splice(Number(button.dataset.sbRemove), 1); markDirty(); renderLines(); renderPicker(); recalculate(); });
-        $('sales-staff-entry-form').addEventListener('input', () => { markDirty(); recalculate(); });
-        $('sales-staff-entry-form').addEventListener('change', markDirty);
+        $('sales-staff-entry-form').addEventListener('input', event => { if (event.target.id !== 'sb-receipt') { markDirty(); recalculate(); } });
+        $('sales-staff-entry-form').addEventListener('change', event => { if (event.target.id !== 'sb-receipt') markDirty(); });
+        $('sb-receipt').addEventListener('change', () => {
+          const receipt = $('sb-receipt').value, previous = state.selectedReceipt;
+          if (state.dirty && !window.confirm('เปลี่ยนเลขบิลและทิ้งข้อมูลที่ยังไม่บันทึกหรือไม่?')) { $('sb-receipt').value = previous; return; }
+          const key = Object.keys(state.bills).find(key => state.bills[key].date === $('sales-staff-date').value && billKey(state.bills[key].receipt) === billKey(receipt));
+          state.dirty = false;
+          if (key) { editBill(key); return; }
+          resetEditor(); $('sb-receipt').value = receipt; state.selectedReceipt = receipt; if (receipt) markDirty();
+        });
         $('sb-bill-status').addEventListener('change', () => { $('sales-staff-name').required = $('sb-bill-status').value !== 'void'; });
         $('sales-staff-entry-form').addEventListener('submit', saveBill);
         ['sb-new-bill', 'sb-cancel-edit'].forEach(id => $(id).addEventListener('click', () => { if (!state.dirty || window.confirm('ล้างข้อมูลบิลที่ยังไม่บันทึกหรือไม่?')) resetEditor(); }));
@@ -6081,7 +6121,7 @@
           const button = event.target.closest('[data-sb-check-receipt]'); if (!button || state.busy) return;
           if (button.dataset.sbCheckKey) { editBill(button.dataset.sbCheckKey); return; }
           if (state.dirty && !window.confirm('เปลี่ยนไปตรวจเลขบิลนี้และทิ้งฟอร์มที่ยังไม่บันทึกหรือไม่?')) return;
-          resetEditor(); $('sb-receipt').value = button.dataset.sbCheckReceipt; markDirty(); changeTab('review'); $('sales-staff-name').focus();
+          resetEditor(); $('sb-receipt').value = button.dataset.sbCheckReceipt; state.selectedReceipt = $('sb-receipt').value; markDirty(); changeTab('review'); $('sales-staff-name').focus();
         });
         $('sb-catalog-table').addEventListener('click', event => { const button = event.target.closest('[data-sb-edit-item]'); if (button) editCatalog(button.dataset.sbEditItem); });
         $('sb-catalog-reset').addEventListener('click', () => { state.catalogEditing = null; $('sb-catalog-form').reset(); $('sb-catalog-message').textContent = ''; });
@@ -6089,7 +6129,7 @@
         window.addEventListener('beforeunload', event => { if (state.dirty || state.busy) { event.preventDefault(); event.returnValue = ''; } });
       }
       function canLeave() { return !state.dirty || window.confirm('มีบิลที่ยังไม่บันทึก ต้องการออกจากหน้าและทิ้งฟอร์มหรือไม่?'); }
-      return { lock, load, bind, calculate, allocate, summarize, billKey, nextBill, canLeave, parseDailyBillSource, dailyBillProgress, expectedReceiptSet };
+      return { lock, load, bind, calculate, allocate, summarize, billKey, nextBill, canLeave, parseDailyBillSource, dailyBillProgress, expectedReceiptSet, extractBCEmployees };
     })();
     function lockSalesStaffPage() { salesBillReview.lock(); }
     function loadSalesStaffData() { return salesBillReview.load(); }
