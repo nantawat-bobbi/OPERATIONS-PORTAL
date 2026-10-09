@@ -4931,8 +4931,11 @@
           #sales-staff .sb-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:14px;margin-bottom:18px} #sales-staff .sb-kpi{background:#fff;border:1px solid #dbe4ef;border-radius:12px;padding:18px}
           #sales-staff .sb-kpi strong{display:block;font-size:25px;margin-top:10px;font-variant-numeric:tabular-nums;color:#1d4ed8}
           #sales-staff .sb-catalog{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:18px 0}
-          #sales-staff .sb-price-group{border:1px solid #dbe4ef;border-radius:12px;overflow:hidden;min-width:0}
-          #sales-staff .sb-price-group h3{margin:0;padding:13px 16px;background:#eef4ff;font-size:16px;border-left:5px solid var(--sb-category-color)}
+          #sales-staff .sb-price-group{border:1px solid #b5c1d4;border-radius:0;overflow:hidden;min-width:0}
+          #sales-staff .sb-price-group h3{margin:0;padding:9px 12px;background:#183b92;color:white;font-size:15px}
+          #sales-staff .sb-paper-co2{grid-column:1/-1} #sales-staff .sb-price-table .sb-variant{width:100%;margin-top:6px;max-width:240px;font-size:12px}
+          #sales-staff .sb-paper-heading{text-align:center;border-top:3px solid #183b92;border-bottom:2px solid #183b92;padding:12px;margin:18px 0;color:#183b92}
+          #sales-staff .sb-paper-heading strong{display:block;font-size:23px;letter-spacing:1px} #sales-staff .sb-paper-heading span{font-size:14px}
           #sales-staff .sb-price-table{min-width:550px} #sales-staff .sb-price-table th,#sales-staff .sb-price-table td{padding:10px 8px;font-size:13px}
           #sales-staff .sb-price-table .sb-chosen{background:#eff6ff} #sales-staff .sb-price-table label{flex-direction:row;align-items:center;gap:8px;font-size:13px;cursor:pointer}
           #sales-staff .sb-price-table input[type=checkbox]{width:18px;height:18px;flex-shrink:0;accent-color:#2563eb}
@@ -4981,7 +4984,7 @@
                 <p class="sb-muted" id="sb-bc-source" aria-live="polite"></p>
                 <p class="sb-muted">หนึ่งบิลมีเซลล์ผู้ขายหนึ่งคน ยอดนี้ไม่บวกซ้ำในยอดร้าน · บิลเปล่าที่ยกเลิก: เลือก “ยกเลิกบิล” กรอกยอด 0 และเหตุผล ไม่ต้องติ๊กสินค้า</p>
               </div>
-              <div class="sb-card"><h2>ตารางราคา · ติ๊กตามบิล</h2><div class="sb-flex"><label>หมวด<select id="sb-category-filter"><option value="">ทุกหมวด</option></select></label><label>ค้นหารายการ<input id="sb-search" placeholder="ชื่อบริการ / สินค้า / ขนาด / Shot"></label></div><p class="sb-muted">① ติ๊กรายการ ② เลือกประเภท ③ ใส่จำนวน — ระบบรวมยอดอัตโนมัติ · แต่ละขนาด / รุ่นใช้รายการราคาที่ตั้งไว้ในแท็บ 3</p><div class="sb-notice">ใช้เฉพาะราคาที่ผู้จัดการยืนยันแล้ว ไม่ใช้ราคาเก่าจากรูป · รายการที่ยังไม่ยืนยันราคาแสดงให้เห็นแต่ยังติ๊กไม่ได้ · ใช้คอร์สเดิม / ฟรี = 0 บาท</div><div id="sb-catalog-picker" class="sb-catalog"></div>
+              <div class="sb-card"><div class="sb-paper-heading"><strong>ลลิษา คลินิก</strong><span>ใบตรวจบิล · โปรแกรม / ยา / Treatment</span></div><div class="sb-flex"><label>หมวด<select id="sb-category-filter"><option value="">ทุกหมวด</option></select></label><label>ค้นหารายการ<input id="sb-search" placeholder="ชื่อบริการ / สินค้า / ขนาด / Shot"></label></div><p class="sb-muted">เลือกขนาด / แผนราคาก่อนติ๊ก → เลือกซื้อใหม่ / คอร์ส / ใช้คอร์สเดิม / ฟรี → ใส่จำนวน · ถ้าจะเปลี่ยนขนาดให้เอาติ๊กออกก่อน</p><div class="sb-notice">รายการตามแบบบิลเป็นรายการตั้งต้น ใช้ได้เมื่อ ผจก. ยืนยันราคาปัจจุบันในแท็บ 3 แล้ว · ราคาเก่าในรูปไม่ได้ถูกนำมาใช้ · ยา / โปรแกรมต้องตรงกับบิลจริง ไม่ใช่คำแนะนำการรักษา</div><div id="sb-catalog-picker" class="sb-catalog"></div>
                 <details><summary style="cursor:pointer;font-weight:700;padding:12px 0">ดูเฉพาะรายการที่เลือก / ราคาเดิมในบิล</summary><div class="sb-table-wrap"><table><thead><tr><th>รายการ / หมวด</th><th>ประเภท</th><th>จำนวน</th><th>ราคา / หน่วย (บาท)</th><th>รวม (บาท)</th><th></th></tr></thead><tbody id="sb-lines"></tbody></table></div></details>
               </div>
               <div class="sb-card"><h2>ตรวจยอด 2 ทาง</h2><div class="sb-grid"><label>ส่วนลด (บาท)<input id="sb-discount" type="number" min="0" step="0.01" value="0" required></label><label>โปรโมชั่น / เหตุผลส่วนลด<input id="sb-promotion" maxlength="300" placeholder="ต้องระบุเมื่อมีส่วนลด"></label><label>ยอดสุทธิที่คิดจริงตามบิล (บาท)<input id="sales-staff-amount" type="number" min="0" step="0.01" required placeholder="กรอกแยกจากยอดคำนวณ"></label></div>
@@ -5631,6 +5634,55 @@
         ['ulthera', 'Ulthera — ระบุ Shot', 'lifting', 'ครั้ง'], ['thermage', 'Thermage — ระบุ Shot', 'lifting', 'ครั้ง'],
         ['drip', 'Vitamin Drip — ระบุโปรแกรม', 'drip', 'ครั้ง'], ['procedure', 'หัตถการพิเศษ — ระบุรายการ', 'other', 'ครั้ง']
       ];
+      // Names/variants from the paper form only. No historical image prices are activated.
+      const paperTemplates = [
+        ['co2-form', 'CO2', 'laser', ['ต่อมไขมัน (SGH)', 'ไฝ (Nevus)', 'ขี้แมลงวัน (Lentigines)', 'สิวหิน (Syringoma)', 'ติ่งเนื้อ (Skin tags)', 'กระ (SL)', 'แคลเซียม (Calcinosis cutis)', 'ซีสต์ (Cyst)', 'แผลเป็นนูน (Hypertrophic scars)', 'กระเนื้อ (Seb K)', 'หูด (Wart)', 'ตาปลา (Corn)'], ['A','B','C','D','E','F','G','H'].map(size => `ขนาด ${size}`), 'ครั้ง'],
+        ['acne-form', 'CO2 สิว', 'laser', ['สิวข้าวสาร (Milia)', 'สิวอุดตัน (Comedone)', 'เล็บขบ', 'เชื้อราที่เล็บ', 'สิว / รอยแดง ขนาด S', 'สิว / รอยแดง ขนาด M', 'สิว / รอยแดง ขนาด L'], ['ต่อครั้ง'], 'ครั้ง'],
+        ['vbeam-form', 'Vbeam', 'laser', ['10 Shot', '100 Shot', '200 Shot', '300 Shot'], ['ต่อครั้ง'], 'ครั้ง'],
+        ['matrix-form', 'E-Matrix Pro', 'laser', ['ทั่วหน้า'], ['ต่อครั้ง', 'คอร์ส 3 ครั้ง'], null],
+        ['elos-form', 'Elos Plus Laser', 'laser', ['ทั่วหน้า'], ['ต่อครั้ง', 'คอร์ส 5 ครั้ง'], null],
+        ['pico-form', 'Pico', 'laser', ['Toning', 'Smooth', 'Scar', 'Premium'], ['ต่อครั้ง', 'คอร์ส 5 ครั้ง'], null],
+        ['pico-local', 'Pico เฉพาะจุด', 'laser', ['กระตื้น 1–20 Shot', 'Shot เพิ่ม', 'Hori / Ota', 'Tattoo 1 ตร.ซม.', 'Tattoo 2 ตร.ซม.', 'Tattoo ตร.ซม.เพิ่ม', 'ลบรอยสักคิ้ว 2 ข้าง', 'ลบรอยสักคิ้วบางส่วน', 'ลบรอยสักริมฝีปากบน / ล่าง', 'ลบรอยสักริมฝีปากบนและล่าง'], ['ต่อครั้ง'], 'ครั้ง'],
+        ['ulthera-form', 'Ulthera', 'lifting', ['300 Shot', '450 Shot', '600 Shot', 'Shot เพิ่ม'], ['ต่อครั้ง'], 'ครั้ง'],
+        ['thermage-form', 'Thermage FLX', 'lifting', ['Face 600 Shot', 'Face 900 Shot', 'Body 500 Shot'], ['ต่อครั้ง'], 'ครั้ง'],
+        ['btx-form', 'BTX', 'injection', ['50 Units', '100 Units'], ['ต่อครั้ง'], 'ครั้ง'],
+        ['nbt-form', 'NBT', 'injection', ['50 Units', '100 Units'], ['ต่อครั้ง'], 'ครั้ง'],
+        ['xem-form', 'XEM', 'injection', ['100 Units'], ['ต่อครั้ง'], 'ครั้ง'],
+        ['restylane-form', 'Restylane', 'injection', ['1 CC', '2 CC', 'Next syringe'], ['ต่อครั้ง'], 'ครั้ง'],
+        ['juvederm-form', 'Juvederm', 'injection', ['1 CC', '2 CC', 'Next syringe'], ['ต่อครั้ง'], 'ครั้ง'],
+        ['sculptra-form', 'Sculptra', 'injection', ['10 CC', '20 CC'], ['ต่อครั้ง'], 'ครั้ง'],
+        ['neavia-form', 'Neavia Hydro Deluxe', 'injection', ['2.5 CC', '5 CC'], ['ต่อครั้ง'], 'ครั้ง'],
+        ['juvelook-form', 'Juvelook', 'injection', ['1 ขวด', '2 ขวด'], ['ต่อครั้ง'], 'ครั้ง'],
+        ['beautylips-form', 'Beauty lips', 'injection', ['1 CC'], ['ต่อครั้ง'], 'ครั้ง'],
+        ['reju-form', 'Rejuran Healer', 'injection', ['2 CC', '4 CC', '8 CC', 'Next syringe'], ['ต่อครั้ง'], 'ครั้ง'],
+        ['meso-form', 'Meso', 'injection', ['Melasma Program', "Chanel (L’bess)", 'Skin Booster (Reves)', 'Exosome ASCE', 'MD Collagen', 'BABI Neo on Fat'], ['ต่อครั้ง', 'คอร์ส — ระบุจำนวนครั้ง'], null],
+        ['drip-form', 'Vitamin Drip', 'drip', ['Radiance', 'Anti Acne', 'Brain Booster', 'Super Detox', 'Perfect Skin'], ['ต่อครั้ง', 'คอร์ส 5 ครั้ง', 'คอร์ส 10 ครั้ง'], null],
+        ['acid-form', 'Laliza Fruity Acid', 'treatment', ['หน้า 3 CC', 'ตัว 5 CC', 'ตัว 8 CC', 'ตัว 10 CC'], ['ต่อครั้ง'], 'ครั้ง'],
+        ['treatment-form', 'Treatment', 'treatment', ['Skin Superfood หน้า', 'Skin Superfood หลัง', 'OZONE Peeling หน้า', 'OZONE Peeling หลัง', 'Triple Nourish Skin หน้า'], ['ต่อครั้ง', 'คอร์ส 5 ครั้ง'], null],
+        ['procedure-form', 'หัตถการพิเศษ', 'other', ['Paring', 'ตัดไหม', 'ปะขาว', 'X MILIA', 'กดสิว', 'ตรวจ Lab', 'Consult ต่างชาติ', 'ฉีดสิว 0.1 CC', 'ฉีดคีลอยด์ 0.1 CC'], ['ต่อครั้ง'], 'ครั้ง'],
+        ['tablet-form', 'ยาเม็ด', 'product', ['AM','CF','CX','DO','FU','IU','CL1','CL2','IV','VC','TS','VE','RO','PD','VA'], ['ต่อเม็ด'], 'เม็ด'],
+        ['cream-form', 'ยาครีม', 'product', ['BS 5 g','MT 5 g','HC1 5 g','HC2 5 g','CO5 5 g','PIH 5 g','CZ 5 g','MO-S 15 g','SU 15 g','MO-B 50 g','O2 5 g','CA 50 g','CH 50 g','SR7 5 g','CO1 5 g','SR1 5 g','SR3 5 g','KC 5 g','SR5 5 g','SR9 5 g','TR 5 g','KS 120 g','SS 60 g','UC 30 g'], ['ต่อชิ้น'], 'ชิ้น']
+      ];
+      paperTemplates.forEach(([prefix, program, category, variants, plans, unit]) => variants.forEach((variant, v) => plans.forEach((plan, p) => seeds.push([`${prefix}-${v}-${p}`, `${program} · ${variant} · ${plan}`, category, unit || (plan.includes('คอร์ส') ? plan : 'ครั้ง')]))));
+      const paperGroups = [
+        ['co2', 'CO2 · ชนิด / ขนาด / สิว', 'laser', /^co2/i],
+        ['vbeam', 'Vbeam / E-Matrix Pro', 'laser', /^(vbeam|e-matrix)/i],
+        ['elos', 'Elos Plus Laser', 'laser', /^elos/i],
+        ['pico', 'Picosecond Laser', 'laser', /^pico/i],
+        ['lifting', 'Lifting · Ulthera / Thermage', 'lifting', /./],
+        ['antiaging', 'Anti-Aging · Botox / Filler', 'injection', /^(?!meso)/i],
+        ['meso', 'Meso', 'injection', /^meso/i],
+        ['drip', 'Vitamin Drip', 'drip', /./],
+        ['treatment', 'Treatment', 'treatment', /./],
+        ['special', 'หัตถการพิเศษ', 'other', /./],
+        ['tablet', 'ยาเม็ด', 'product', /^ยาเม็ด/],
+        ['cream', 'ยาครีม', 'product', /^ยาครีม/],
+        ['product', 'ผลิตภัณฑ์ / รายการเพิ่มเติม', 'product', /./],
+        ['laser-extra', 'Laser · รายการเพิ่มเติม', 'laser', /./]
+      ];
+      function paperGroup(item) { return paperGroups.find(([, , category, pattern]) => item.category === category && pattern.test(item.name))?.[0] || 'product'; }
+      const priceVariantChoices = {};
+      function priceFamily(item) { return /-form-\d+-\d+$/.test(item.id) || /^(pico-local|treatment-form)-\d+-\d+$/.test(item.id) ? item.id.replace(/-\d+$/, '') : item.id; }
       const $ = id => document.getElementById(id);
       const esc = value => escapeHtml(value);
       const money = cents => (cents / 100).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -5860,13 +5912,21 @@
         const catalog = { ...state.catalog };
         state.lines.forEach(line => { if (!catalog[line.itemId]) catalog[line.itemId] = { ...line, id: line.itemId }; });
         const items = Object.values(catalog).filter(item => (!filter || item.category === filter) && item.name.toLocaleLowerCase('th-TH').includes(search));
-        $('sb-catalog-picker').innerHTML = Object.entries(categories).map(([key, category]) => {
-          const rows = items.filter(item => item.category === key);
+        $('sb-catalog-picker').innerHTML = paperGroups.map(([group, title, key]) => {
+          const category = categories[key];
+          const grouped = new Map();
+          items.filter(item => paperGroup(item) === group).forEach(item => { const family = priceFamily(item); if (!grouped.has(family)) grouped.set(family, []); grouped.get(family).push(item); });
+          const rows = [...grouped.entries()].flatMap(([family, variants]) => {
+            const chosen = variants.filter(item => state.lines.some(line => line.itemId === item.id));
+            return chosen.length ? chosen : [variants.find(item => item.id === priceVariantChoices[family]) || variants.find(item => item.priceCents != null) || variants[0]];
+          });
           if (!rows.length) return '';
-          return `<section class="sb-price-group" style="--sb-category-color:${category.color}"><h3>${esc(category.label)} · ${rows.length} รายการ</h3><div class="sb-table-wrap"><table class="sb-price-table"><thead><tr><th>ติ๊ก / รายการ</th><th>ราคา (บาท)</th><th>ประเภท</th><th>จำนวน</th><th>รวม (บาท)</th></tr></thead><tbody>` + rows.map(item => {
+          return `<section class="sb-price-group sb-paper-${group}" style="--sb-category-color:${category.color}"><h3>${esc(title)}</h3><div class="sb-table-wrap"><table class="sb-price-table"><thead><tr><th>ติ๊ก / รายการ / ขนาด</th><th>ราคา (บาท)</th><th>ประเภท</th><th>จำนวน</th><th>รวม (บาท)</th></tr></thead><tbody>` + rows.map(item => {
             const line = state.lines.find(line => line.itemId === item.id), selected = !!line;
             const price = line ? line.priceCents : item.priceCents;
-            return `<tr class="${selected ? 'sb-chosen' : ''}"><td><label><input type="checkbox" data-sb-pick="${esc(item.id)}" aria-label="เลือก ${esc(item.name)}"${selected ? ' checked' : ''}${price == null ? ' disabled' : ''}><span>${esc(line?.name || item.name)}<small>${esc(line?.unit || item.unit)}${line && line.priceCents !== item.priceCents ? ' · ราคาเดิมในบิล' : ''}</small></span></label></td><td class="sb-num">${price == null ? '<small>ยังไม่ยืนยัน</small>' : money(price)}</td><td><select data-sb-pick-kind="${esc(item.id)}" aria-label="ประเภท ${esc(item.name)}"${selected ? '' : ' disabled'}>${Object.entries(kinds).map(([kind, label]) => `<option value="${kind}"${(line?.kind || 'new') === kind ? ' selected' : ''}>${label}</option>`).join('')}</select></td><td><input type="number" min="0.01" max="1000000" step="0.01" value="${selected ? line.quantity : 1}" data-sb-pick-qty="${esc(item.id)}" aria-label="จำนวน ${esc(item.name)}"${selected ? ' required' : ' disabled'}></td><td class="sb-num" id="sb-pick-total-${esc(item.id)}">${selected ? money(['new', 'course'].includes(line.kind) ? Math.round(line.priceCents * Number(line.quantity)) : 0) : '—'}</td></tr>`;
+            const variants = grouped.get(priceFamily(item));
+            const variantSelect = variants.length > 1 ? `<select class="sb-variant" data-sb-price-variant="${esc(priceFamily(item))}" aria-label="เลือกขนาด / แผนราคา ${esc(item.name)}"${selected ? ' disabled' : ''}>${variants.map(variant => `<option value="${esc(variant.id)}"${variant.id === item.id ? ' selected' : ''}>${esc(variant.name.split(' · ').slice(2).join(' · '))}${variant.priceCents == null ? ' · รอยืนยันราคา' : ''}</option>`).join('')}</select>` : '';
+            return `<tr class="${selected ? 'sb-chosen' : ''}"><td><label><input type="checkbox" data-sb-pick="${esc(item.id)}" aria-label="เลือก ${esc(item.name)}"${selected ? ' checked' : ''}${price == null ? ' disabled' : ''}><span>${esc(variants.length > 1 ? item.name.split(' · ').slice(0, 2).join(' · ') : line?.name || item.name)}<small>${esc(line?.unit || item.unit)}${line && line.priceCents !== item.priceCents ? ' · ราคาเดิมในบิล' : ''}</small></span></label>${variantSelect}</td><td class="sb-num">${price == null ? '<small>ยังไม่ยืนยัน</small>' : money(price)}</td><td><select data-sb-pick-kind="${esc(item.id)}" aria-label="ประเภท ${esc(item.name)}"${selected ? '' : ' disabled'}>${Object.entries(kinds).map(([kind, label]) => `<option value="${kind}"${(line?.kind || 'new') === kind ? ' selected' : ''}>${label}</option>`).join('')}</select></td><td><input type="number" min="0.01" max="1000000" step="0.01" value="${selected ? line.quantity : 1}" data-sb-pick-qty="${esc(item.id)}" aria-label="จำนวน ${esc(item.name)}"${selected ? ' required' : ' disabled'}></td><td class="sb-num" id="sb-pick-total-${esc(item.id)}">${selected ? money(['new', 'course'].includes(line.kind) ? Math.round(line.priceCents * Number(line.quantity)) : 0) : '—'}</td></tr>`;
           }).join('') + '</tbody></table></div></section>';
         }).join('') || '<p class="sb-muted">ไม่มีรายการที่ตรงกับการค้นหา</p>';
       }
@@ -6109,6 +6169,8 @@
         $('sb-search').addEventListener('input', renderPicker); $('sb-category-filter').addEventListener('change', renderPicker);
         $('sb-catalog-picker').addEventListener('change', event => {
           if (state.busy) return;
+          const variantFamily = event.target.dataset.sbPriceVariant;
+          if (variantFamily) { priceVariantChoices[variantFamily] = event.target.value; renderPicker(); recalculate(); return; }
           const kindId = event.target.dataset.sbPickKind;
           if (kindId) { const line = state.lines.find(line => line.itemId === kindId); if (line) { line.kind = event.target.value; markDirty(); renderLines(); recalculate(); } return; }
           const id = event.target.dataset.sbPick; if (!id || state.busy) return;
