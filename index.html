@@ -4915,57 +4915,75 @@
       </section>
       <section class="section" id="sales-staff">
         <style>
-          #sales-staff [hidden] { display:none !important; }
-          #sales-staff label { display:flex;flex-direction:column;gap:8px;font-weight:700; }
-          #sales-staff input, #sales-staff select { padding:10px 12px;border:1px solid #cbd5e1;border-radius:8px;max-width:100%;font:inherit;background:white; }
-          #sales-staff table { border-collapse:collapse;min-width:520px; }
-          #sales-staff th, #sales-staff td { padding:12px;text-align:left;border-bottom:1px solid #e2e8f0; }
-          #sales-staff th { background:#f1f5f9; }
-          #sales-staff td:nth-child(2), #sales-staff-summary td:nth-child(3) { text-align:right;font-variant-numeric:tabular-nums; }
-          #sales-staff-status, #sales-staff-lock-message { overflow-wrap:anywhere; }
+          #sales-staff {color:#142338} #sales-staff [hidden]{display:none!important}
+          #sales-staff .sb-header{display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:20px}
+          #sales-staff h1{margin:0;font-size:26px} #sales-staff h2{font-size:19px;margin:0 0 16px} #sales-staff p{line-height:1.65}
+          #sales-staff .sb-muted{font-size:13px;color:#64748b} #sales-staff .sb-card{background:white;border:1px solid #dbe4ef;border-radius:14px;padding:22px;margin-bottom:18px}
+          #sales-staff label{display:flex;flex-direction:column;gap:7px;font-size:14px;font-weight:700;min-width:0}
+          #sales-staff input,#sales-staff select,#sales-staff textarea{font:inherit;padding:10px 12px;border:1px solid #cbd5e1;border-radius:8px;max-width:100%;background:#fff;min-width:0}
+          #sales-staff input:focus,#sales-staff select:focus,#sales-staff textarea:focus{outline:2px solid #93c5fd;outline-offset:1px}
+          #sales-staff .sb-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px} #sales-staff .sb-flex{display:flex;align-items:end;gap:12px;flex-wrap:wrap}
+          #sales-staff .sb-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0} #sales-staff .sb-tab{border:1px solid #dbe4ef;background:white;border-radius:9px;padding:11px 18px;font:inherit;cursor:pointer;font-weight:700}
+          #sales-staff .sb-tab[aria-selected=true]{background:#1d4ed8;border-color:#1d4ed8;color:#fff}
+          #sales-staff .sb-table-wrap{overflow:auto} #sales-staff table{border-collapse:collapse;width:100%;min-width:680px}
+          #sales-staff th,#sales-staff td{padding:11px 10px;text-align:left;border-bottom:1px solid #e2e8f0;font-size:14px;vertical-align:middle} #sales-staff th{background:#f1f5f9;white-space:nowrap}
+          #sales-staff .sb-num{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums} #sales-staff table input{width:105px} #sales-staff table select{width:150px}
+          #sales-staff .sb-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:14px;margin-bottom:18px} #sales-staff .sb-kpi{background:#fff;border:1px solid #dbe4ef;border-radius:12px;padding:18px}
+          #sales-staff .sb-kpi strong{display:block;font-size:25px;margin-top:10px;font-variant-numeric:tabular-nums;color:#1d4ed8}
+          #sales-staff .sb-catalog{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:8px;max-height:330px;overflow:auto;margin:14px 0}
+          #sales-staff .sb-pick{display:flex;flex-direction:row;align-items:center;gap:12px;padding:12px;border:1px solid #e2e8f0;border-radius:9px;font-weight:500;background:#f8fafc;cursor:pointer}
+          #sales-staff .sb-pick input{width:18px;height:18px;flex-shrink:0} #sales-staff .sb-pick small{display:block;margin-top:5px;color:#64748b}
+          #sales-staff .sb-notice{padding:12px 15px;border-radius:9px;background:#eff6ff;color:#1e40af;line-height:1.6;margin:12px 0}
+          #sales-staff .sb-notice[data-tone=error]{background:#fff1f2;color:#be123c} #sales-staff .sb-notice[data-tone=ok]{background:#ecfdf5;color:#047857}
+          #sales-staff .sb-check{display:flex;flex-direction:row;align-items:center;gap:10px} #sales-staff .sb-check input{width:18px;height:18px}
+          #sales-staff .sb-chart{min-width:0} #sales-staff .sb-chart svg{width:100%;height:auto;display:block} #sales-staff .sb-chart text{font-family:inherit;font-size:12px}
+          #sales-staff .sb-chart-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:18px} #sales-staff .sb-legend{display:flex;flex-wrap:wrap;gap:12px;font-size:13px;margin-bottom:15px}
+          #sales-staff .sb-legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px}
+          #sales-staff .sb-tag{display:inline-block;padding:4px 9px;background:#f1f5f9;border-radius:20px;font-size:12px} #sales-staff .sb-tag.pass{background:#d1fae5;color:#047857} #sales-staff .sb-tag.needs-fix{background:#ffe4e6;color:#be123c}
+          @media(max-width:650px){#sales-staff .sb-card{padding:15px}#sales-staff .sb-chart-grid{grid-template-columns:1fr}#sales-staff h1{font-size:22px}}
         </style>
-        <h1>💼 ยอดขายเซลล์</h1>
-        <div class="card" id="sales-staff-lock" style="max-width:520px;padding:24px;margin:20px auto;">
-          <h2>สำหรับผู้จัดการสาขา</h2>
-          <p>ใส่รหัสผู้จัดการสาขาเดิมเพื่อเปิดหน้ากรอกยอดขายเซลล์</p>
-          <form id="sales-staff-unlock-form">
-            <label for="sales-staff-pin">รหัสผู้จัดการ</label>
-            <input id="sales-staff-pin" type="password" autocomplete="off" required style="width:100%;margin:12px 0;padding:12px;">
-            <button type="submit" class="btn">เปิดหน้ากรอกยอด</button>
-          </form>
+        <div class="sb-header"><div><h1>💼 ตรวจบิลและผลงานเซลล์</h1><p class="sb-muted">ตรวจราคา · ยืนยันยอด · เปรียบเทียบผลงานจากบิลที่ตรวจผ่าน</p></div></div>
+        <div class="sb-card" id="sales-staff-lock" style="max-width:520px;margin:25px auto">
+          <h2>🔒 สำหรับผู้จัดการสาขา</h2><p>ใช้รหัสผู้จัดการเดิมเพื่อเข้าตรวจบิลของสาขา</p>
+          <form id="sales-staff-unlock-form"><label>รหัสผู้จัดการ<input id="sales-staff-pin" type="password" autocomplete="off" required></label><button class="btn primary" type="submit" style="margin-top:15px">เปิดหน้าตรวจบิล</button></form>
           <p id="sales-staff-lock-message" role="status"></p>
         </div>
         <div id="sales-staff-workspace" hidden>
-          <div class="card" style="padding:20px;margin:16px 0;">
-            <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:end;">
-              <label>สาขา <select id="sales-staff-branch"></select></label>
-              <label>วันที่ <input id="sales-staff-date" type="date" required></label>
-              <button id="sales-staff-refresh" type="button" class="btn">โหลดข้อมูล</button>
-              <button id="sales-staff-relock" type="button" class="btn">🔒 ล็อกหน้า</button>
-            </div>
-            <p id="sales-staff-status" role="status" aria-live="polite"></p>
-          </div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin:16px 0;">
-            <div class="card" style="padding:20px;">ยอดรวมวันนี้ <h2 id="sales-staff-day-total">—</h2></div>
-            <div class="card" style="padding:20px;">ยอดรวมเดือนที่เลือก <h2 id="sales-staff-month-total">—</h2></div>
-          </div>
-          <div class="card" style="padding:20px;margin:16px 0;">
-            <h2>บันทึกยอดขาย</h2>
-            <form id="sales-staff-entry-form" style="display:flex;flex-wrap:wrap;gap:16px;align-items:end;">
-              <label>ชื่อเซลล์ <input id="sales-staff-name" maxlength="100" required placeholder="ชื่อ–นามสกุล / ชื่อเล่น"></label>
-              <label>ยอดขาย (บาท) <input id="sales-staff-amount" type="number" min="0.01" step="0.01" required></label>
-              <label>หมายเหตุ <input id="sales-staff-note" maxlength="500" placeholder="เช่น ยอดรายวัน / ยอดเพิ่มเติม"></label>
-              <button id="sales-staff-save" type="submit" class="btn">บันทึกยอด</button>
+          <div class="sb-card sb-flex"><label>สาขา<select id="sales-staff-branch"></select></label><label>วันที่ตรวจบิล<input id="sales-staff-date" type="date" required></label><button id="sales-staff-refresh" class="btn" type="button">↻ โหลดข้อมูล</button><button id="sales-staff-relock" class="btn" type="button">🔒 ล็อกหน้า</button></div>
+          <div id="sales-staff-status" class="sb-notice" role="status" aria-live="polite">พร้อมตรวจบิล</div>
+          <div class="sb-tabs" role="tablist" aria-label="งานตรวจบิล"><button class="sb-tab" data-sb-tab="review" role="tab" aria-selected="true">1. ตรวจบิล</button><button class="sb-tab" data-sb-tab="performance" role="tab" aria-selected="false">2. ผลงานเซลล์</button><button class="sb-tab" data-sb-tab="catalog" role="tab" aria-selected="false">3. รายการ / ราคามาตรฐาน</button></div>
+          <div id="sb-panel-review" role="tabpanel">
+            <form id="sales-staff-entry-form">
+              <div class="sb-card"><div class="sb-header"><h2 id="sb-editor-title">ตรวจบิลใหม่</h2><button id="sb-new-bill" type="button" class="btn">+ บิลใหม่</button></div>
+                <div class="sb-grid"><label>เลขบิล<input id="sb-receipt" maxlength="80" required placeholder="เช่น A02/116067"></label><label>เซลล์ผู้ขาย<input id="sales-staff-name" list="sb-staff-options" maxlength="100" required placeholder="ชื่อเซลล์"><datalist id="sb-staff-options"></datalist></label><label>หมายเหตุบิล<input id="sales-staff-note" maxlength="500" placeholder="รายละเอียดเพิ่มเติม"></label></div>
+                <p class="sb-muted">หนึ่งบิลมีเซลล์ผู้ขายหนึ่งคน ยอดนี้ใช้ตรวจเทียบและวัดผลงาน โดยไม่บวกซ้ำในยอดร้าน</p>
+              </div>
+              <div class="sb-card"><h2>ติ๊กรายการที่ขาย</h2><div class="sb-flex"><label>หมวด<select id="sb-category-filter"><option value="">ทุกหมวด</option></select></label><label>ค้นหารายการ<input id="sb-search" placeholder="ชื่อบริการ / สินค้า"></label></div><p class="sb-muted">รายการที่ยังไม่มีราคายืนยัน ต้องตั้งราคาที่แท็บ 3 ก่อน · บิลใช้คอร์สเดิมหรือฟรีคิดยอดขายใหม่เป็น 0 บาท</p><div id="sb-catalog-picker" class="sb-catalog"></div>
+                <div class="sb-table-wrap"><table><thead><tr><th>รายการ / หมวด</th><th>ประเภท</th><th>จำนวน</th><th>ราคา / หน่วย (บาท)</th><th>รวม (บาท)</th><th></th></tr></thead><tbody id="sb-lines"></tbody></table></div>
+              </div>
+              <div class="sb-card"><h2>ตรวจยอด 2 ทาง</h2><div class="sb-grid"><label>ส่วนลด (บาท)<input id="sb-discount" type="number" min="0" step="0.01" value="0" required></label><label>โปรโมชั่น / เหตุผลส่วนลด<input id="sb-promotion" maxlength="300" placeholder="ต้องระบุเมื่อมีส่วนลด"></label><label>ยอดสุทธิที่คิดจริงตามบิล (บาท)<input id="sales-staff-amount" type="number" min="0" step="0.01" required placeholder="กรอกแยกจากยอดคำนวณ"></label></div>
+                <div class="sb-kpis" style="margin-top:18px"><div class="sb-kpi">ยอดก่อนส่วนลด<strong id="sb-gross">0.00 บาท</strong></div><div class="sb-kpi">ยอดที่ระบบคำนวณ<strong id="sb-expected">0.00 บาท</strong></div><div class="sb-kpi">ส่วนต่าง: บิล − คำนวณ<strong id="sb-difference">—</strong></div></div><div id="sb-check-result" class="sb-notice" role="status"></div>
+                <div class="sb-grid"><label>ผลตรวจ<select id="sb-bill-status"><option value="pending">รอตรวจ</option><option value="pass">ตรวจผ่าน</option><option value="needs-fix">ต้องแก้ไข</option><option value="void">ยกเลิกบิล</option></select></label><label>เหตุผลผลตรวจ / ส่วนต่าง<input id="sb-review-reason" maxlength="500" placeholder="เช่น โปรโมชั่นเฉพาะ / รอแก้ยอด"></label></div>
+                <label class="sb-check" style="margin:16px 0"><input id="sb-difference-approved" type="checkbox">ตรวจสอบและยืนยันเหตุผลส่วนต่างแล้ว (ใช้เมื่อตรวจผ่านแต่ยอดไม่ตรง)</label>
+                <div class="sb-flex"><button id="sales-staff-save" class="btn primary" type="submit">บันทึกผลตรวจบิล</button><button id="sb-cancel-edit" type="button" class="btn">ล้างฟอร์ม</button></div>
+              </div>
             </form>
-            <p style="color:#64748b;">แต่ละครั้งที่บันทึกเป็นรายการเพิ่มเติม ยอดสรุปรวมทุกรายการของเซลล์แต่ละคน</p>
+            <div class="sb-card"><h2>บิลของวันที่เลือก</h2><div class="sb-table-wrap"><table><thead><tr><th>เลขบิล</th><th>เซลล์</th><th>คำนวณ (บาท)</th><th>ตามบิล (บาท)</th><th>ต่าง (บาท)</th><th>ผลตรวจ</th><th>จัดการ</th></tr></thead><tbody id="sales-staff-entries"></tbody></table></div></div>
+            <div class="sb-card" id="sb-history-card" hidden><h2>ประวัติการตรวจบิล</h2><div id="sb-history"></div></div>
+            <div class="sb-card" id="sb-legacy-card" hidden><h2>ข้อมูลยอดขายที่กรอกไว้ก่อนหน้านี้</h2><p class="sb-muted">เก็บข้อมูลเดิมไว้ครบ ยอดเดิมยังไม่มีรายการสินค้าและผลตรวจ จึงแสดงแยกจากผลงานบิลที่ตรวจผ่าน</p><div id="sb-legacy"></div></div>
           </div>
-          <div class="card" style="padding:20px;margin:16px 0;overflow:auto;">
-            <h2>สรุปยอดตามเซลล์ · เดือนที่เลือก</h2>
-            <table style="width:100%;"><thead><tr><th>เซลล์</th><th>วันนี้ (บาท)</th><th>เดือนนี้ (บาท)</th></tr></thead><tbody id="sales-staff-summary"></tbody></table>
+          <div id="sb-panel-performance" role="tabpanel" hidden>
+            <div class="sb-card sb-flex"><label>ช่วงเปรียบเทียบ<select id="sb-performance-period"><option value="day">วันที่เลือก</option><option value="month">ทั้งเดือนที่เลือก</option></select></label><span id="sb-performance-scope" class="sb-muted"></span></div>
+            <div class="sb-kpis"><div class="sb-kpi">ยอดสุทธิบิลที่ตรวจผ่าน<strong id="sales-staff-day-total">—</strong></div><div class="sb-kpi">ยอดตรวจผ่านทั้งเดือน<strong id="sales-staff-month-total">—</strong></div><div class="sb-kpi">บิลตรวจผ่าน / บิลทั้งหมด<strong id="sb-pass-count">—</strong></div><div class="sb-kpi">บิลที่ยังมียอดต่าง<strong id="sb-mismatch-count">—</strong></div></div>
+            <div class="sb-chart-grid"><div class="sb-card sb-chart"><h2>ยอดสุทธิแยกหมวดต่อเซลล์ (บาท)</h2><div id="sb-sales-legend" class="sb-legend"></div><div id="sb-sales-chart"></div></div><div class="sb-card sb-chart"><h2>ยอดเฉลี่ยต่อบิลขายใหม่ (บาท / บิล)</h2><p class="sb-muted">ใช้เฉพาะบิลที่ตรวจผ่านและมีรายการซื้อใหม่หรือซื้อคอร์ส</p><div id="sb-average-chart"></div></div></div>
+            <div class="sb-card"><h2>เปรียบเทียบผลงานเซลล์</h2><p class="sb-muted">นับยอดสุทธิตามบิลที่ตรวจผ่าน · ใช้คอร์สเดิม / ฟรีไม่เพิ่มยอดขาย · ไม่มีข้อมูลคิวที่ไม่ซื้อ จึงยังไม่คำนวณอัตราปิดการขาย</p><div class="sb-table-wrap"><table><thead><tr><th>เซลล์</th><th>บิลขายใหม่</th><th>ยอดสุทธิ (บาท)</th><th>เฉลี่ย / บิล (บาท)</th><th>Laser</th><th>Treatment</th><th>Product</th><th>หมวดอื่น (บาท)</th></tr></thead><tbody id="sales-staff-summary"></tbody></table></div></div>
           </div>
-          <div class="card" style="padding:20px;margin:16px 0;overflow:auto;">
-            <h2>รายการของวันที่เลือก</h2>
-            <table style="width:100%;"><thead><tr><th>เซลล์</th><th>ยอดขาย (บาท)</th><th>หมายเหตุ</th><th>เวลาบันทึก</th><th>ผู้บันทึก</th></tr></thead><tbody id="sales-staff-entries"></tbody></table>
+          <div id="sb-panel-catalog" role="tabpanel" hidden>
+            <div class="sb-card"><h2>รายการและราคามาตรฐานของสาขา</h2><p class="sb-muted">รายการเริ่มต้นมีเฉพาะชื่อจากแบบบิล ราคายังไม่ยืนยัน กรุณากรอกราคาปัจจุบันก่อนใช้ตรวจ · การแก้ราคามีผลกับรายการใหม่ บิลที่บันทึกแล้วเก็บราคาเดิม</p>
+              <form id="sb-catalog-form"><div class="sb-grid"><label>ชื่อรายการ<input id="sb-item-name" maxlength="150" required placeholder="ระบุชื่อและขนาดให้ชัด เช่น Pico 100 Shot"></label><label>หมวด<select id="sb-item-category"></select></label><label>หน่วย<input id="sb-item-unit" maxlength="30" required value="ครั้ง" placeholder="ครั้ง / คอร์ส / ชิ้น / Shot"></label><label>ราคามาตรฐาน (บาท)<input id="sb-item-price" type="number" min="0" step="0.01" required></label></div><div class="sb-flex" style="margin-top:16px"><button class="btn primary" id="sb-catalog-save" type="submit">ยืนยันและบันทึกราคา</button><button class="btn" id="sb-catalog-reset" type="button">+ รายการใหม่</button></div></form>
+              <div id="sb-catalog-message" class="sb-notice" role="status"></div>
+            </div>
+            <div class="sb-card sb-table-wrap"><table><thead><tr><th>รายการ</th><th>หมวด</th><th>หน่วย</th><th>ราคา (บาท)</th><th>ยืนยันล่าสุด</th><th>จัดการ</th></tr></thead><tbody id="sb-catalog-table"></tbody></table></div>
           </div>
         </div>
       </section>
@@ -5568,139 +5586,410 @@
 
 
     let salesStaffAccess = null;
-    let salesStaffLoadVersion = 0;
-    let salesStaffSaving = false;
-    let salesStaffPendingEntry = null;
+    const salesBillReview = (() => {
+      const categories = {
+        laser: { label: 'Laser', color: '#2563eb' },
+        treatment: { label: 'Treatment', color: '#14b8a6' },
+        product: { label: 'Product / ยา', color: '#f59e0b' },
+        injection: { label: 'ฉีด / หัตถการ', color: '#8b5cf6' },
+        lifting: { label: 'ยกกระชับ', color: '#ec4899' },
+        drip: { label: 'Vitamin Drip', color: '#06b6d4' },
+        other: { label: 'อื่น ๆ', color: '#64748b' }
+      };
+      const kinds = { new: 'ซื้อใหม่', course: 'ซื้อคอร์ส', redeem: 'ใช้คอร์สเดิม', free: 'ฟรี' };
+      const statuses = { pending: 'รอตรวจ', pass: 'ตรวจผ่าน', 'needs-fix': 'ต้องแก้ไข', void: 'ยกเลิก' };
+      const seeds = [
+        ['co2', 'CO2 — ระบุชนิด / ขนาด', 'laser', 'ครั้ง'], ['vbeam', 'Vbeam — ระบุ Shot', 'laser', 'ครั้ง'],
+        ['pico', 'Pico — ระบุโปรแกรม / Shot', 'laser', 'ครั้ง'], ['elos', 'Elos Plus Laser', 'laser', 'ครั้ง'],
+        ['fruit-acid', 'Laliza Fruity Acid — ระบุบริเวณ', 'treatment', 'ครั้ง'], ['skin-superfood', 'Skin Superfood — ระบุบริเวณ', 'treatment', 'ครั้ง'],
+        ['ozone', 'OZONE Peeling — ระบุบริเวณ', 'treatment', 'ครั้ง'], ['triple-nourish', 'Triple Nourish Skin', 'treatment', 'ครั้ง'],
+        ['tablet', 'ยาเม็ด — ระบุชื่อยา', 'product', 'เม็ด'], ['cream', 'ยาครีม — ระบุชื่อ / ขนาด', 'product', 'ชิ้น'], ['skincare', 'ผลิตภัณฑ์ — ระบุชื่อ / ขนาด', 'product', 'ชิ้น'],
+        ['botox', 'Botox — ระบุยี่ห้อ / Units', 'injection', 'ครั้ง'], ['filler', 'Filler — ระบุยี่ห้อ / CC', 'injection', 'ครั้ง'], ['meso', 'Meso — ระบุโปรแกรม', 'injection', 'ครั้ง'],
+        ['ulthera', 'Ulthera — ระบุ Shot', 'lifting', 'ครั้ง'], ['thermage', 'Thermage — ระบุ Shot', 'lifting', 'ครั้ง'],
+        ['drip', 'Vitamin Drip — ระบุโปรแกรม', 'drip', 'ครั้ง'], ['procedure', 'หัตถการพิเศษ — ระบุรายการ', 'other', 'ครั้ง']
+      ];
+      const $ = id => document.getElementById(id);
+      const esc = value => escapeHtml(value);
+      const money = cents => (cents / 100).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const cents = value => {
+        const number = Number(value);
+        if (value === '' || value == null || !Number.isFinite(number) || number < 0 || !Number.isSafeInteger(Math.round(number * 100))) throw new Error('จำนวนเงินต้องเป็นตัวเลขตั้งแต่ 0 บาท');
+        return Math.round(number * 100);
+      };
+      const normalizeName = value => String(value || '').normalize('NFKC').trim().replace(/\s+/g, ' ');
+      const billKey = value => 'b_' + btoa(unescape(encodeURIComponent(normalizeName(value).toUpperCase().replace(/\s/g, '')))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+      const operationId = () => window.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      const state = { version: 0, busy: false, dirty: false, catalog: {}, bills: {}, legacy: [], lines: [], editing: null, catalogEditing: null, catalogPending: null, pending: null, context: null, ready: false, tab: 'review' };
 
-    function lockSalesStaffPage() {
-      salesStaffAccess = null;
-      salesStaffLoadVersion++;
-      salesStaffPendingEntry = null;
-      const workspace = document.getElementById("sales-staff-workspace");
-      if (workspace) workspace.hidden = true;
-      const gate = document.getElementById("sales-staff-lock");
-      if (gate) gate.hidden = false;
-      document.getElementById("sales-staff-unlock-form")?.reset();
-      document.getElementById("sales-staff-entry-form")?.reset();
-      ["sales-staff-entries", "sales-staff-summary", "sales-staff-status", "sales-staff-lock-message"].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.textContent = "";
-      });
-    }
-
-    function salesStaffContext() {
-      const user = currentUserProfile();
-      if (!user || !document.body.classList.contains("authed") || !salesStaffAccess || salesStaffAccess.sessionPin !== user.pin) throw new Error("กรุณาใส่รหัสผู้จัดการอีกครั้ง");
-      const branch = document.getElementById("sales-staff-branch").value;
-      const date = document.getElementById("sales-staff-date").value;
-      if (!BRANCHES[branch] || (salesStaffAccess.branch !== "all" && branch !== salesStaffAccess.branch)) throw new Error("ไม่มีสิทธิ์กรอกยอดสาขานี้");
-      if (user.br !== "all" && user.br !== branch) throw new Error("สาขาไม่ตรงกับผู้ใช้งาน");
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || new Date(date + "T00:00:00Z").toISOString().slice(0, 10) !== date) throw new Error("กรุณาเลือกวันที่ให้ถูกต้อง");
-      if (!window.db) throw new Error("ยังเชื่อมต่อฐานข้อมูลไม่ได้");
-      return { branch, date, month: date.slice(0, 7), access: salesStaffAccess };
-    }
-
-    async function loadSalesStaffData() {
-      const version = ++salesStaffLoadVersion;
-      const status = document.getElementById("sales-staff-status");
-      try {
-        const context = salesStaffContext();
-        status.textContent = "กำลังโหลดข้อมูล…";
-        ["sales-staff-day-total", "sales-staff-month-total"].forEach(id => document.getElementById(id).textContent = "—");
-        ["sales-staff-summary", "sales-staff-entries"].forEach(id => document.getElementById(id).textContent = "");
-        const [year, month] = context.month.split("-").map(Number);
-        const days = new Date(Date.UTC(year, month, 0)).getUTCDate();
-        const snapshots = await Promise.all(Array.from({ length: days }, (_, index) => {
-          const date = context.month + "-" + String(index + 1).padStart(2, "0");
-          return window.db.ref(`ops_sales_staff/${date}/${context.branch}/entries`).once("value").then(snapshot => ({ date, entries: snapshot.val() || {} }));
-        }));
-        if (version !== salesStaffLoadVersion || salesStaffAccess !== context.access) return;
-        let dayTotal = 0, monthTotal = 0;
-        const people = new Map(), daily = [];
-        snapshots.forEach(({ date, entries }) => Object.values(entries).forEach(entry => {
-          const amount = Number(entry?.amount);
-          if (!entry?.name || !Number.isFinite(amount) || amount < 0) return;
-          const summary = people.get(entry.name) || { day: 0, month: 0 };
-          monthTotal += amount;
-          summary.month += amount;
-          if (date === context.date) { dayTotal += amount; summary.day += amount; daily.push(entry); }
-          people.set(entry.name, summary);
-        }));
-        const money = amount => Number(amount).toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        document.getElementById("sales-staff-day-total").textContent = money(dayTotal) + " บาท";
-        document.getElementById("sales-staff-month-total").textContent = money(monthTotal) + " บาท";
-        document.getElementById("sales-staff-summary").innerHTML = [...people].sort((a, b) => b[1].month - a[1].month).map(([name, value]) => `<tr><td>${escapeHtml(name)}</td><td>${money(value.day)}</td><td>${money(value.month)}</td></tr>`).join("") || '<tr><td colspan="3">ยังไม่มีข้อมูลเดือนนี้</td></tr>';
-        document.getElementById("sales-staff-entries").innerHTML = daily.sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt))).map(entry => {
-          const timestamp = new Date(entry.createdAt);
-          const time = Number.isNaN(timestamp.getTime()) ? "—" : timestamp.toLocaleString("th-TH", { timeZone: "Asia/Bangkok" });
-          return `<tr><td>${escapeHtml(entry.name)}</td><td>${money(entry.amount)}</td><td>${escapeHtml(entry.note)}</td><td>${escapeHtml(time)}</td><td>${escapeHtml(entry.recordedBy)}</td></tr>`;
-        }).join("") || '<tr><td colspan="5">ยังไม่มีรายการวันนี้</td></tr>';
-        status.textContent = `${BRANCHES[context.branch]} · วันที่ ${context.date} · ภาพรวมเดือน ${context.month}`;
-      } catch (error) {
-        if (version === salesStaffLoadVersion) status.textContent = "โหลดไม่สำเร็จ: " + error.message;
+      function context() {
+        const user = currentUserProfile();
+        if (!user || !document.body.classList.contains('authed') || !salesStaffAccess || salesStaffAccess.sessionPin !== user.pin) throw new Error('กรุณาใส่รหัสผู้จัดการอีกครั้ง');
+        const branch = $('sales-staff-branch').value, date = $('sales-staff-date').value;
+        if (!BRANCHES[branch] || (salesStaffAccess.branch !== 'all' && branch !== salesStaffAccess.branch) || (user.br !== 'all' && user.br !== branch)) throw new Error('ไม่มีสิทธิ์เข้าถึงสาขานี้');
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || new Date(date + 'T00:00:00Z').toISOString().slice(0, 10) !== date) throw new Error('กรุณาเลือกวันที่ให้ถูกต้อง');
+        if (!window.db || window.__lalizaDbMode !== 'firebase') throw new Error('ยังไม่เชื่อมต่อ Firebase กรุณาโหลดหน้าใหม่ก่อนบันทึกข้อมูลจริง');
+        return { branch, date, month: date.slice(0, 7), access: salesStaffAccess };
       }
-    }
 
-    function bindSalesStaffPage() {
-      document.getElementById("sales-staff-unlock-form").addEventListener("submit", async event => {
-        event.preventDefault();
-        const session = currentUserProfile();
-        const pinInput = document.getElementById("sales-staff-pin");
-        const manager = USERS[pinInput.value.trim()];
-        pinInput.value = "";
-        if (!session || !document.body.classList.contains("authed") || !manager || !["manager", "admin"].includes(manager.role) || (session.br !== "all" && manager.br !== session.br)) {
-          document.getElementById("sales-staff-lock-message").textContent = "รหัสไม่ถูกต้อง หรือไม่ตรงกับสาขาที่เข้าสู่ระบบ";
-          return;
+      // Integer satang allocation keeps category totals exactly equal to the bill.
+      function allocate(total, weights) {
+        const result = Object.fromEntries(Object.keys(categories).map(key => [key, 0]));
+        const sum = Object.values(weights).reduce((a, b) => a + b, 0);
+        if (!sum || !total) return result;
+        const fractions = [];
+        let assigned = 0;
+        for (const key of Object.keys(categories)) {
+          const raw = total * (weights[key] || 0) / sum;
+          result[key] = Math.floor(raw);
+          assigned += result[key];
+          fractions.push({ key, remainder: raw - result[key] });
         }
-        salesStaffAccess = { branch: manager.br, label: manager.label, sessionPin: session.pin };
-        const branchSelect = document.getElementById("sales-staff-branch");
-        const branch = manager.br === "all" ? allowedBranchForUser("rama9") : manager.br;
-        branchSelect.innerHTML = manager.br === "all" ? branchOptions(branch) : `<option value="${branch}">${escapeHtml(BRANCHES[branch])}</option>`;
-        branchSelect.disabled = manager.br !== "all";
-        document.getElementById("sales-staff-date").value = bangkokToday();
-        document.getElementById("sales-staff-lock").hidden = true;
-        document.getElementById("sales-staff-workspace").hidden = false;
-        await loadSalesStaffData();
-      });
-      document.getElementById("sales-staff-relock").addEventListener("click", lockSalesStaffPage);
-      document.getElementById("sales-staff-refresh").addEventListener("click", loadSalesStaffData);
-      ["sales-staff-branch", "sales-staff-date"].forEach(id => document.getElementById(id).addEventListener("change", () => {
-        salesStaffPendingEntry = null;
-        loadSalesStaffData();
-      }));
-      document.getElementById("sales-staff-entry-form").addEventListener("submit", async event => {
-        event.preventDefault();
-        if (salesStaffSaving) return;
-        const button = document.getElementById("sales-staff-save");
-        const status = document.getElementById("sales-staff-status");
+        fractions.sort((a, b) => b.remainder - a.remainder);
+        for (let index = 0; index < total - assigned; index++) result[fractions[index % fractions.length].key]++;
+        return result;
+      }
+
+      function calculate(lines, discountValue, actualValue) {
+        const grossByCategory = Object.fromEntries(Object.keys(categories).map(key => [key, 0]));
+        let gross = 0, paidLines = 0;
+        for (const line of lines) {
+          const quantity = Number(line.quantity);
+          if (!categories[line.category] || !kinds[line.kind] || !Number.isFinite(quantity) || quantity <= 0 || quantity > 1000000) throw new Error('ตรวจสอบหมวด ประเภท และจำนวนของรายการ');
+          if (!Number.isSafeInteger(line.priceCents) || line.priceCents < 0) throw new Error('รายการยังไม่มีราคามาตรฐานยืนยัน');
+          if (line.kind === 'course' && !String(line.unit || '').includes('คอร์ส')) throw new Error('ซื้อคอร์สต้องเลือกรายการที่ตั้งราคาและหน่วยเป็นคอร์ส ไม่ใช้ราคาต่อครั้ง');
+          const amount = ['new', 'course'].includes(line.kind) ? Math.round(line.priceCents * quantity) : 0;
+          if (!Number.isSafeInteger(amount) || !Number.isSafeInteger(gross + amount)) throw new Error('ยอดเงินเกินขอบเขตที่คำนวณได้');
+          gross += amount;
+          grossByCategory[line.category] += amount;
+          if (['new', 'course'].includes(line.kind)) paidLines++;
+        }
+        const discount = cents(discountValue);
+        if (discount > gross) throw new Error('ส่วนลดต้องไม่เกินยอดรายการขายใหม่');
+        const expected = gross - discount;
+        const actual = actualValue === '' || actualValue == null ? null : cents(actualValue);
+        return { gross, discount, expected, actual, difference: actual == null ? null : actual - expected, grossByCategory, expectedByCategory: allocate(expected, grossByCategory), actualByCategory: allocate(actual || 0, grossByCategory), paidLines };
+      }
+
+      function summarize(bills, date, period) {
+        const rows = new Map();
+        let count = 0, pass = 0, mismatch = 0, total = 0, monthTotal = 0;
+        for (const bill of Object.values(bills)) {
+          if (!bill || bill.date?.slice(0, 7) !== date.slice(0, 7)) continue;
+          if (bill.status === 'pass') monthTotal += Number(bill.actualCents) || 0;
+          if (period === 'day' && bill.date !== date) continue;
+          count++;
+          if (bill.status !== 'void' && bill.differenceCents !== 0) mismatch++;
+          if (bill.status !== 'pass') continue;
+          pass++;
+          const key = normalizeName(bill.staff).toLocaleLowerCase('th-TH');
+          const row = rows.get(key) || { name: bill.staff, total: 0, salesBills: 0, categories: Object.fromEntries(Object.keys(categories).map(key => [key, 0])) };
+          total += bill.actualCents;
+          row.total += bill.actualCents;
+          if (bill.hasNewSale) row.salesBills++;
+          for (const category of Object.keys(categories)) row.categories[category] += Number(bill.actualByCategory?.[category]) || 0;
+          rows.set(key, row);
+        }
+        return { rows: [...rows.values()].sort((a, b) => b.total - a.total), count, pass, mismatch, total, monthTotal };
+      }
+
+      function notify(message, tone = '') { $('sales-staff-status').textContent = message; $('sales-staff-status').dataset.tone = tone; }
+      function clearDataView() {
+        ['sales-staff-day-total', 'sales-staff-month-total', 'sb-pass-count', 'sb-mismatch-count'].forEach(id => $(id).textContent = '—');
+        ['sales-staff-summary', 'sb-sales-chart', 'sb-average-chart', 'sb-performance-scope', 'sales-staff-entries', 'sb-catalog-picker', 'sb-catalog-table'].forEach(id => $(id).innerHTML = '');
+      }
+      function markDirty() { state.dirty = true; state.pending = null; }
+      function setBusy(busy) {
+        state.busy = busy;
+        document.querySelectorAll('#sales-staff-workspace input, #sales-staff-workspace select, #sales-staff-workspace button, #sales-staff-workspace textarea').forEach(el => {
+          if (busy) { el.dataset.sbWasDisabled = el.disabled ? '1' : '0'; el.disabled = true; }
+          else { el.disabled = el.dataset.sbWasDisabled === '1'; delete el.dataset.sbWasDisabled; }
+        });
+      }
+      function resetEditor() {
+        $('sales-staff-entry-form').reset();
+        state.lines = []; state.editing = null; state.pending = null; state.dirty = false;
+        $('sb-receipt').disabled = false;
+        $('sb-editor-title').textContent = 'ตรวจบิลใหม่';
+        $('sb-history-card').hidden = true;
+        renderLines(); renderPicker(); recalculate();
+      }
+      function lock() {
+        salesStaffAccess = null; state.version++; state.ready = false; state.context = null;
+        state.bills = {}; state.catalog = {}; state.legacy = []; state.lines = []; state.editing = null; state.catalogEditing = null; state.catalogPending = null; state.pending = null; state.dirty = false;
+        $('sales-staff-workspace').hidden = true; $('sales-staff-lock').hidden = false;
+        $('sales-staff-unlock-form').reset(); $('sales-staff-entry-form').reset(); $('sb-catalog-form').reset();
+        ['sales-staff-entries', 'sales-staff-summary', 'sb-sales-chart', 'sb-average-chart', 'sb-history', 'sb-legacy', 'sb-catalog-table', 'sb-catalog-picker', 'sb-staff-options', 'sb-lines'].forEach(id => $(id).innerHTML = '');
+        $('sales-staff-lock-message').textContent = '';
+        clearDataView();
+      }
+      function changeTab(tab) {
+        state.tab = tab;
+        document.querySelectorAll('[data-sb-tab]').forEach(el => el.setAttribute('aria-selected', String(el.dataset.sbTab === tab)));
+        ['review', 'performance', 'catalog'].forEach(key => $(`sb-panel-${key}`).hidden = key !== tab);
+        if (tab === 'performance') renderPerformance();
+      }
+      function seedCatalog() {
+        return Object.fromEntries(seeds.map(([id, name, category, unit]) => [id, { id, name, category, unit, priceCents: null, revision: 0 }]));
+      }
+      function categoryOptions(selected = '') { return Object.entries(categories).map(([key, item]) => `<option value="${key}"${selected === key ? ' selected' : ''}>${esc(item.label)}</option>`).join(''); }
+      function renderPicker() {
+        const search = $('sb-search').value.trim().toLocaleLowerCase('th-TH'), filter = $('sb-category-filter').value;
+        const selected = new Set(state.lines.map(line => line.itemId));
+        const items = Object.values(state.catalog).filter(item => (!filter || item.category === filter) && item.name.toLocaleLowerCase('th-TH').includes(search));
+        $('sb-catalog-picker').innerHTML = items.map(item => `<label class="sb-pick"><input type="checkbox" data-sb-pick="${esc(item.id)}"${selected.has(item.id) ? ' checked' : ''}${item.priceCents == null ? ' disabled' : ''}><span>${esc(item.name)}<small>${esc(categories[item.category]?.label || 'อื่น ๆ')} · ${item.priceCents == null ? 'ยังไม่ยืนยันราคา' : money(item.priceCents) + ' บาท / ' + esc(item.unit)}</small></span></label>`).join('') || '<p class="sb-muted">ไม่มีรายการที่ตรงกับการค้นหา</p>';
+      }
+      function renderLines() {
+        $('sb-lines').innerHTML = state.lines.map((line, index) => `<tr><td><strong>${esc(line.name)}</strong><div class="sb-muted">${esc(categories[line.category].label)} · ${esc(line.unit)}</div></td><td><select data-sb-line-kind="${index}">${Object.entries(kinds).map(([key, label]) => `<option value="${key}"${line.kind === key ? ' selected' : ''}>${label}</option>`).join('')}</select></td><td><input type="number" min="0.01" max="1000000" step="0.01" value="${line.quantity}" data-sb-line-qty="${index}" aria-label="จำนวน ${esc(line.name)}" required></td><td class="sb-num">${money(line.priceCents)}</td><td class="sb-num" id="sb-line-total-${index}">—</td><td><button type="button" class="btn" data-sb-remove="${index}" aria-label="ลบ ${esc(line.name)}">ลบ</button></td></tr>`).join('') || '<tr><td colspan="6">ติ๊กรายการด้านบนเพื่อเริ่มตรวจบิล</td></tr>';
+      }
+      function recalculate() {
         try {
-          const context = salesStaffContext();
-          const name = document.getElementById("sales-staff-name").value.trim();
-          const amount = Number(document.getElementById("sales-staff-amount").value);
-          const note = document.getElementById("sales-staff-note").value.trim();
-          if (!name || !Number.isFinite(amount) || amount < 0.01 || !Number.isSafeInteger(Math.round(amount * 100))) throw new Error("กรอกชื่อเซลล์และยอดขายตั้งแต่ 0.01 บาท");
-          const signature = JSON.stringify([context.date, context.branch, name, amount, note]);
-          const parent = window.db.ref(`ops_sales_staff/${context.date}/${context.branch}/entries`);
-          if (!salesStaffPendingEntry || salesStaffPendingEntry.signature !== signature) {
-            salesStaffPendingEntry = { signature, key: parent.push().key, payload: { name, amount: Math.round(amount * 100) / 100, note, createdAt: new Date().toISOString(), recordedBy: context.access.label } };
-          }
-          salesStaffSaving = true;
-          button.disabled = true;
-          status.textContent = "กำลังบันทึก…";
-          await parent.child(salesStaffPendingEntry.key).set(salesStaffPendingEntry.payload);
-          salesStaffPendingEntry = null;
-          if (salesStaffAccess !== context.access) return;
-          document.getElementById("sales-staff-entry-form").reset();
-          await loadSalesStaffData();
-          status.textContent += " · บันทึกสำเร็จ";
+          const result = calculate(state.lines, $('sb-discount').value, $('sales-staff-amount').value);
+          $('sb-gross').textContent = money(result.gross) + ' บาท'; $('sb-expected').textContent = money(result.expected) + ' บาท';
+          $('sb-difference').textContent = result.difference == null ? '—' : (result.difference > 0 ? '+' : '') + money(result.difference) + ' บาท';
+          state.lines.forEach((line, index) => { const el = $(`sb-line-total-${index}`); if (el) el.textContent = money(['new', 'course'].includes(line.kind) ? Math.round(line.priceCents * Number(line.quantity)) : 0); });
+          const matched = result.difference === 0;
+          $('sb-check-result').textContent = result.actual == null ? 'กรอกยอดตามบิลแยกต่างหาก เพื่อเทียบกับยอดที่ระบบคำนวณ' : matched ? '✓ ยอดตรงกัน ตรวจรายการ ส่วนลด และผู้ขายก่อนเลือก “ตรวจผ่าน”' : `ยอดไม่ตรง: ตามบิล${result.difference > 0 ? 'มากกว่า' : 'น้อยกว่า'}ยอดคำนวณ ${money(Math.abs(result.difference))} บาท กรุณาตรวจราคา / โปรโมชั่น`;
+          $('sb-check-result').dataset.tone = matched ? 'ok' : result.actual == null ? '' : 'error';
+          return result;
         } catch (error) {
-          if (salesStaffAccess) status.textContent = "บันทึกไม่สำเร็จ: " + error.message + " (ข้อมูลที่กรอกยังอยู่)";
-        } finally {
-          salesStaffSaving = false;
-          button.disabled = false;
+          $('sb-expected').textContent = 'ตรวจข้อมูล'; $('sb-difference').textContent = '—';
+          $('sb-check-result').textContent = error.message; $('sb-check-result').dataset.tone = 'error';
+          return null;
         }
-      });
-    }
+      }
+      function renderCatalog() {
+        $('sb-catalog-table').innerHTML = Object.values(state.catalog).map(item => `<tr><td>${esc(item.name)}</td><td>${esc(categories[item.category]?.label)}</td><td>${esc(item.unit)}</td><td class="sb-num">${item.priceCents == null ? 'ยังไม่ยืนยัน' : money(item.priceCents)}</td><td>${item.updatedAt ? esc(new Date(item.updatedAt).toLocaleDateString('th-TH', { timeZone: 'Asia/Bangkok' })) : '—'}</td><td><button type="button" class="btn" data-sb-edit-item="${esc(item.id)}">${item.priceCents == null ? 'ตั้งราคา' : 'แก้ไข'}</button></td></tr>`).join('');
+        renderPicker();
+      }
+      function renderBills() {
+        const date = $('sales-staff-date').value;
+        const rows = Object.entries(state.bills).filter(([, bill]) => bill.date === date).sort((a, b) => String(b[1].updatedAt).localeCompare(String(a[1].updatedAt)));
+        $('sales-staff-entries').innerHTML = rows.map(([key, bill]) => `<tr><td>${esc(bill.receipt)}</td><td>${esc(bill.staff)}</td><td class="sb-num">${money(bill.expectedCents)}</td><td class="sb-num">${money(bill.actualCents)}</td><td class="sb-num">${money(bill.differenceCents)}</td><td><span class="sb-tag ${esc(bill.status)}">${statuses[bill.status] || 'รอตรวจ'}</span></td><td><button type="button" class="btn" data-sb-edit-bill="${esc(key)}">ดู / แก้ไข</button></td></tr>`).join('') || '<tr><td colspan="7">ยังไม่มีบิลตรวจของวันนี้</td></tr>';
+        const names = [...new Set([...Object.values(state.bills).map(bill => bill.staff), ...state.legacy.map(entry => entry.name)].filter(Boolean))];
+        $('sb-staff-options').innerHTML = names.map(name => `<option value="${esc(name)}"></option>`).join('');
+        $('sb-legacy-card').hidden = state.legacy.length === 0;
+        $('sb-legacy').innerHTML = state.legacy.map(entry => `<p>${esc(entry.date)} · ${esc(entry.name)} · ${Number(entry.amount || 0).toLocaleString('th-TH', { minimumFractionDigits: 2 })} บาท</p>`).join('');
+      }
+      function chart(rows, average = false) {
+        if (!rows.length) return '<p class="sb-muted">ยังไม่มีบิลที่ตรวจผ่านในช่วงนี้</p>';
+        const values = rows.map(row => average ? Math.round(row.total / (row.salesBills || 1)) : row.total);
+        const maximum = Math.max(...values, 100);
+        const scaleMaximum = Math.ceil(maximum / Math.pow(10, Math.floor(Math.log10(maximum)))) * Math.pow(10, Math.floor(Math.log10(maximum)));
+        const width = 700, left = 120, plotWidth = 460, top = 25, rowHeight = 42, height = top + rows.length * rowHeight + 45;
+        let svg = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${average ? 'ยอดเฉลี่ยต่อบิล' : 'ยอดขายแยกหมวด'} หน่วยบาท"><text x="${left}" y="14" fill="#64748b">หน่วย: บาท</text>`;
+        for (let tick = 0; tick <= 4; tick++) {
+          const x = left + plotWidth * tick / 4;
+          svg += `<line x1="${x}" x2="${x}" y1="${top}" y2="${height - 35}" stroke="#e2e8f0"/><text x="${x}" y="${height - 13}" text-anchor="middle" fill="#64748b">${Math.round(scaleMaximum * tick / 400).toLocaleString('th-TH')}</text>`;
+        }
+        rows.forEach((row, index) => {
+          const y = top + index * rowHeight + 8;
+          svg += `<text x="${left - 10}" y="${y + 18}" text-anchor="end"><title>${esc(row.name)}</title>${esc(row.name.length > 12 ? row.name.slice(0, 11) + '…' : row.name)}</text>`;
+          let offset = 0;
+          const parts = average ? { average: values[index] } : row.categories;
+          Object.entries(parts).forEach(([key, amount]) => {
+            const barWidth = plotWidth * amount / scaleMaximum;
+            if (barWidth > 0) svg += `<rect x="${left + offset}" y="${y}" width="${barWidth}" height="26" fill="${average ? '#1d4ed8' : categories[key].color}"><title>${esc(row.name)} · ${average ? 'เฉลี่ยต่อบิล' : esc(categories[key].label)}: ${money(amount)} บาท</title></rect>`;
+            offset += barWidth;
+          });
+          svg += `<text x="${left + plotWidth + 12}" y="${y + 18}" fill="#1e293b">${money(values[index])}</text>`;
+        });
+        return svg + '</svg>';
+      }
+      function renderPerformance() {
+        if (!state.ready) return;
+        const date = $('sales-staff-date').value, period = $('sb-performance-period').value;
+        const summary = summarize(state.bills, date, period);
+        $('sales-staff-day-total').textContent = money(summary.total) + ' บาท'; $('sales-staff-month-total').textContent = money(summary.monthTotal) + ' บาท';
+        $('sb-pass-count').textContent = `${summary.pass} / ${summary.count}`; $('sb-mismatch-count').textContent = String(summary.mismatch);
+        $('sb-performance-scope').textContent = `${BRANCHES[$('sales-staff-branch').value]} · ${period === 'day' ? date : date.slice(0, 7)} · เฉพาะบิลตรวจผ่าน`;
+        $('sales-staff-summary').innerHTML = summary.rows.map(row => `<tr><td>${esc(row.name)}</td><td class="sb-num">${row.salesBills}</td><td class="sb-num">${money(row.total)}</td><td class="sb-num">${row.salesBills ? money(Math.round(row.total / row.salesBills)) : '—'}</td><td class="sb-num">${money(row.categories.laser)}</td><td class="sb-num">${money(row.categories.treatment)}</td><td class="sb-num">${money(row.categories.product)}</td><td class="sb-num">${money(row.total - row.categories.laser - row.categories.treatment - row.categories.product)}</td></tr>`).join('') || '<tr><td colspan="8">ยังไม่มีบิลตรวจผ่านในช่วงนี้</td></tr>';
+        $('sb-sales-legend').innerHTML = Object.values(categories).map(item => `<span><i style="background:${item.color}"></i>${item.label}</span>`).join('');
+        $('sb-sales-chart').innerHTML = chart(summary.rows); $('sb-average-chart').innerHTML = chart(summary.rows.filter(row => row.salesBills), true);
+      }
+
+      async function load() {
+        if (state.busy) return;
+        const version = ++state.version;
+        try {
+          const scope = context();
+          if (!state.context || state.context.branch !== scope.branch || state.context.month !== scope.month || state.context.date !== scope.date) clearDataView();
+          notify('กำลังโหลดบิลและราคามาตรฐาน…');
+          const [year, month] = scope.month.split('-').map(Number), days = new Date(Date.UTC(year, month, 0)).getUTCDate();
+          const legacyPromise = Promise.all(Array.from({ length: days }, (_, index) => {
+            const date = scope.month + '-' + String(index + 1).padStart(2, '0');
+            return window.db.ref(`ops_sales_staff/${date}/${scope.branch}/entries`).once('value').then(snapshot => Object.values(snapshot.val() || {}).map(entry => ({ ...entry, date })));
+          })).then(parts => ({ rows: parts.flat(), error: false })).catch(() => ({ rows: [], error: true }));
+          const [catalogSnapshot, billsSnapshot, legacy] = await Promise.all([
+            window.db.ref(`ops_sales_staff_catalog/${scope.branch}/items`).once('value'),
+            window.db.ref(`ops_sales_staff_bills/${scope.branch}`).orderByChild('date').startAt(scope.month + '-01').endAt(scope.month + '-31').once('value'),
+            legacyPromise
+          ]);
+          if (version !== state.version || salesStaffAccess !== scope.access) return;
+          state.catalog = { ...seedCatalog(), ...(catalogSnapshot.val() || {}) };
+          state.bills = billsSnapshot.val() || {}; state.legacy = legacy.rows; state.context = scope; state.ready = true;
+          renderCatalog(); renderBills(); renderPerformance();
+          notify(`${BRANCHES[scope.branch]} · ${scope.date} · โหลดข้อมูลแล้ว${legacy.error ? ' (อ่านข้อมูลยอดเก่าไม่สำเร็จ)' : ''}`);
+        } catch (error) { if (version === state.version) { state.ready = false; notify('โหลดไม่สำเร็จ: ' + error.message, 'error'); } }
+      }
+
+      function editBill(key) {
+        if (state.dirty && !window.confirm('ฟอร์มมีข้อมูลที่ยังไม่บันทึก ต้องการเปลี่ยนไปดูบิลนี้หรือไม่?')) return;
+        const bill = state.bills[key]; if (!bill) return;
+        resetEditor(); state.editing = { key, revision: bill.revision };
+        $('sb-receipt').value = bill.receipt; $('sb-receipt').disabled = true; $('sales-staff-name').value = bill.staff; $('sales-staff-note').value = bill.note || '';
+        state.lines = bill.lines.map(line => ({ ...line }));
+        $('sb-discount').value = (bill.discountCents / 100).toFixed(2); $('sb-promotion').value = bill.promotion || ''; $('sales-staff-amount').value = (bill.actualCents / 100).toFixed(2);
+        $('sb-bill-status').value = bill.status; $('sb-review-reason').value = bill.reviewReason || ''; $('sb-difference-approved').checked = !!bill.differenceApproved;
+        $('sb-editor-title').textContent = 'ตรวจ / แก้ไขบิล ' + bill.receipt;
+        $('sb-history-card').hidden = false;
+        const history = Object.values(bill.history || {}).sort((a, b) => String(b.savedAt).localeCompare(String(a.savedAt)));
+        $('sb-history').innerHTML = `<p>ล่าสุด: ${esc(bill.reviewedBy)} · ${esc(new Date(bill.updatedAt).toLocaleString('th-TH', { timeZone: 'Asia/Bangkok' }))} · ครั้งที่ ${bill.revision}</p>` + history.map(item => `<p>ก่อนแก้: ${esc(statuses[item.status])} · ${money(item.actualCents)} บาท · ${esc(item.staff)} · ${esc(item.reviewedBy)} · ${esc(new Date(item.savedAt).toLocaleString('th-TH', { timeZone: 'Asia/Bangkok' }))}</p>`).join('');
+        renderLines(); renderPicker(); recalculate();
+        changeTab('review'); $('sb-editor-title').scrollIntoView({ block: 'start', behavior: 'smooth' });
+      }
+
+      function makePayload(scope) {
+        const calculation = calculate(state.lines, $('sb-discount').value, $('sales-staff-amount').value);
+        if (!state.lines.length) throw new Error('กรุณาติ๊กอย่างน้อยหนึ่งรายการ');
+        const receipt = normalizeName($('sb-receipt').value), staff = normalizeName($('sales-staff-name').value);
+        if (!receipt || receipt.length > 80 || !staff || staff.length > 100) throw new Error('กรอกเลขบิลและชื่อเซลล์ให้ครบ');
+        if (calculation.actual == null) throw new Error('กรอกยอดสุทธิที่คิดจริงตามบิล');
+        const promotion = $('sb-promotion').value.trim(), reviewReason = $('sb-review-reason').value.trim(), status = $('sb-bill-status').value;
+        if (!statuses[status]) throw new Error('ผลตรวจไม่ถูกต้อง');
+        if (calculation.discount > 0 && !promotion) throw new Error('ระบุโปรโมชั่นหรือเหตุผลส่วนลด');
+        if (['needs-fix', 'void'].includes(status) && !reviewReason) throw new Error('ระบุเหตุผลที่ต้องแก้ไขหรือยกเลิกบิล');
+        if (calculation.gross === 0 && calculation.actual > 0 && status === 'pass') throw new Error('บิลฟรี / ใช้คอร์สเดิมไม่ควรมียอดขายใหม่ กรุณาเพิ่มรายการขายที่ตรงกับบิล');
+        if (status === 'pass' && calculation.difference !== 0 && (!reviewReason || !$('sb-difference-approved').checked)) throw new Error('ยอดไม่ตรง กรุณาระบุเหตุผลและติ๊กยืนยันส่วนต่างก่อนตรวจผ่าน');
+        return {
+          schemaVersion: 2, receipt, staff, staffKey: normalizeName(staff).toLocaleLowerCase('th-TH'), date: scope.date, branch: scope.branch,
+          lines: state.lines.map(line => ({ ...line, quantity: Number(line.quantity) })),
+          grossCents: calculation.gross, discountCents: calculation.discount, expectedCents: calculation.expected,
+          actualCents: calculation.actual, differenceCents: calculation.difference, expectedByCategory: calculation.expectedByCategory, actualByCategory: calculation.actualByCategory,
+          hasNewSale: calculation.paidLines > 0, promotion, reviewReason, differenceApproved: status === 'pass' && calculation.difference !== 0 && $('sb-difference-approved').checked,
+          status, note: $('sales-staff-note').value.trim(), reviewedBy: scope.access.label, updatedAt: new Date().toISOString()
+        };
+      }
+      // Atomic compare-and-swap protects duplicate receipts and concurrent reviewers.
+      function nextBill(current, payload, editing, op) {
+        if (current?.lastOperation === op) return current;
+        if ((!editing && current) || (editing && (!current || current.revision !== editing.revision || current.date !== payload.date))) return undefined;
+        const history = { ...(current?.history || {}) };
+        if (current) { const { history: omitted, ...prior } = current; history[op] = { ...prior, savedAt: current.updatedAt }; }
+        return { ...payload, revision: (current?.revision || 0) + 1, createdAt: current?.createdAt || payload.updatedAt, lastOperation: op, history };
+      }
+      async function saveBill(event) {
+        event.preventDefault(); if (state.busy) return;
+        let scope;
+        try {
+          scope = context(); if (!state.ready) throw new Error('รอโหลดข้อมูลสาขาให้สำเร็จก่อนบันทึก');
+          const payload = makePayload(scope), key = state.editing?.key || billKey(payload.receipt);
+          const signature = JSON.stringify({ ...payload, updatedAt: null });
+          if (!state.pending || state.pending.signature !== signature) state.pending = { signature, op: operationId(), payload };
+          const pending = state.pending, editing = state.editing;
+          setBusy(true); notify('กำลังบันทึกผลตรวจ…');
+          const result = await window.db.ref(`ops_sales_staff_bills/${scope.branch}/${key}`).transaction(current => nextBill(current, pending.payload, editing, pending.op), undefined, false);
+          if (salesStaffAccess !== scope.access) return;
+          if (!result.committed) throw new Error(editing ? 'บิลถูกแก้ไขจากอีกหน้าจอแล้ว กรุณาโหลดข้อมูลและเปิดบิลอีกครั้ง' : 'เลขบิลนี้มีอยู่แล้วในสาขา กรุณาเปิดบิลเดิมเพื่อแก้ไข');
+          const saved = result.snapshot.val(); state.bills[key] = saved;
+          resetEditor(); renderBills(); renderPerformance(); notify(`บันทึกบิล ${saved.receipt} สำเร็จ · ${statuses[saved.status]}`, 'ok');
+        } catch (error) { if (salesStaffAccess) notify('บันทึกไม่สำเร็จ: ' + error.message + ' · ข้อมูลในฟอร์มยังอยู่', 'error'); }
+        finally { if (state.busy) setBusy(false); $('sb-receipt').disabled = !!state.editing; }
+      }
+
+      function editCatalog(id) {
+        const item = state.catalog[id]; if (!item) return;
+        state.catalogEditing = { id, revision: item.revision || 0 };
+        $('sb-item-name').value = item.name; $('sb-item-category').value = item.category; $('sb-item-unit').value = item.unit; $('sb-item-price').value = item.priceCents == null ? '' : (item.priceCents / 100).toFixed(2);
+        $('sb-catalog-message').textContent = item.priceCents == null ? 'กรอกราคาปัจจุบันและยืนยันก่อนใช้ตรวจบิล' : 'บิลที่บันทึกแล้วจะคงราคาเดิม';
+        $('sb-item-name').focus();
+      }
+      async function saveCatalog(event) {
+        event.preventDefault(); if (state.busy) return;
+        try {
+          const scope = context(); if (!state.ready) throw new Error('รอโหลดข้อมูลให้สำเร็จก่อนตั้งราคา');
+          const name = normalizeName($('sb-item-name').value), unit = normalizeName($('sb-item-unit').value), category = $('sb-item-category').value;
+          if (!name || !unit || !categories[category]) throw new Error('กรอกชื่อ หมวด และหน่วยให้ครบ');
+          const priceCents = cents($('sb-item-price').value), editing = state.catalogEditing;
+          const signature = JSON.stringify([scope.branch, editing, name, unit, category, priceCents]);
+          if (!state.catalogPending || state.catalogPending.signature !== signature) {
+            const op = operationId();
+            state.catalogPending = { signature, op, id: editing?.id || 'item-' + op, updatedAt: new Date().toISOString() };
+          }
+          const pending = state.catalogPending, id = pending.id;
+          const payload = { id, name, unit, category, priceCents, updatedAt: pending.updatedAt, confirmedBy: scope.access.label, lastOperation: pending.op };
+          setBusy(true);
+          const result = await window.db.ref(`ops_sales_staff_catalog/${scope.branch}/items/${id}`).transaction(current => {
+            if (current?.lastOperation === pending.op) return current;
+            if ((!editing && current) || (editing && (current?.revision || 0) !== editing.revision)) return undefined;
+            const history = { ...(current?.history || {}) };
+            if (current) { const { history: omitted, ...prior } = current; history[pending.op] = prior; }
+            return { ...payload, revision: (current?.revision || 0) + 1, history };
+          }, undefined, false);
+          if (salesStaffAccess !== scope.access) return;
+          if (!result.committed) throw new Error('รายการถูกแก้ไขจากหน้าจออื่นแล้ว กรุณาโหลดข้อมูลใหม่');
+          state.catalog[id] = result.snapshot.val(); state.catalogEditing = null; state.catalogPending = null; $('sb-catalog-form').reset(); renderCatalog();
+          $('sb-catalog-message').textContent = 'บันทึกราคายืนยันแล้ว: ' + name; $('sb-catalog-message').dataset.tone = 'ok';
+        } catch (error) { if (salesStaffAccess) { $('sb-catalog-message').textContent = error.message; $('sb-catalog-message').dataset.tone = 'error'; } }
+        finally { if (state.busy) setBusy(false); }
+      }
+
+      function bind() {
+        $('sb-category-filter').insertAdjacentHTML('beforeend', categoryOptions()); $('sb-item-category').innerHTML = categoryOptions();
+        $('sales-staff-unlock-form').addEventListener('submit', async event => {
+          event.preventDefault(); if (state.busy) return;
+          const session = currentUserProfile(), pin = $('sales-staff-pin'), manager = USERS[pin.value.trim()]; pin.value = '';
+          if (!session || !document.body.classList.contains('authed') || !manager || !['manager', 'admin'].includes(manager.role) || (session.br !== 'all' && manager.br !== session.br)) { $('sales-staff-lock-message').textContent = 'รหัสไม่ถูกต้อง หรือไม่ตรงกับสาขาที่เข้าสู่ระบบ'; return; }
+          salesStaffAccess = { branch: manager.br, label: manager.label, sessionPin: session.pin };
+          const branch = manager.br === 'all' ? allowedBranchForUser('rama9') : manager.br;
+          $('sales-staff-branch').innerHTML = manager.br === 'all' ? branchOptions(branch) : `<option value="${branch}">${esc(BRANCHES[branch])}</option>`;
+          $('sales-staff-branch').value = branch; $('sales-staff-branch').disabled = manager.br !== 'all'; $('sales-staff-date').value = bangkokToday();
+          $('sales-staff-lock').hidden = true; $('sales-staff-workspace').hidden = false;
+          resetEditor(); changeTab('review'); await load();
+        });
+        $('sales-staff-relock').addEventListener('click', () => { if (!state.dirty || window.confirm('มีบิลที่ยังไม่บันทึก ต้องการล็อกหน้าและทิ้งฟอร์มหรือไม่?')) lock(); });
+        $('sales-staff-refresh').addEventListener('click', load);
+        ['sales-staff-branch', 'sales-staff-date'].forEach(id => $(id).addEventListener('change', () => {
+          if (state.dirty && !window.confirm('มีบิลที่ยังไม่บันทึก ต้องการเปลี่ยนวัน / สาขาและทิ้งฟอร์มหรือไม่?')) {
+            if (state.context) { $('sales-staff-branch').value = state.context.branch; $('sales-staff-date').value = state.context.date; } return;
+          }
+          state.ready = false; state.bills = {}; state.catalog = {}; state.legacy = []; state.catalogEditing = null; state.catalogPending = null;
+          $('sb-catalog-form').reset(); resetEditor(); clearDataView(); return load();
+        }));
+        document.querySelectorAll('[data-sb-tab]').forEach(el => el.addEventListener('click', () => changeTab(el.dataset.sbTab)));
+        $('sb-performance-period').addEventListener('change', renderPerformance);
+        $('sb-search').addEventListener('input', renderPicker); $('sb-category-filter').addEventListener('change', renderPicker);
+        $('sb-catalog-picker').addEventListener('change', event => {
+          const id = event.target.dataset.sbPick; if (!id || state.busy) return;
+          const item = state.catalog[id]; if (!item || item.priceCents == null) return;
+          if (event.target.checked && !state.lines.some(line => line.itemId === id)) state.lines.push({ itemId: id, name: item.name, category: item.category, unit: item.unit, priceCents: item.priceCents, catalogRevision: item.revision || 0, catalogConfirmedAt: item.updatedAt || null, quantity: 1, kind: 'new' });
+          else if (!event.target.checked) state.lines = state.lines.filter(line => line.itemId !== id);
+          markDirty(); renderLines(); recalculate();
+        });
+        $('sb-lines').addEventListener('input', event => {
+          if (event.target.dataset.sbLineQty == null) return;
+          const line = state.lines[Number(event.target.dataset.sbLineQty)]; if (line) { line.quantity = Number(event.target.value); markDirty(); recalculate(); }
+        });
+        $('sb-lines').addEventListener('change', event => {
+          if (event.target.dataset.sbLineKind == null) return;
+          const line = state.lines[Number(event.target.dataset.sbLineKind)]; if (line) { line.kind = event.target.value; markDirty(); recalculate(); }
+        });
+        $('sb-lines').addEventListener('click', event => { const button = event.target.closest('[data-sb-remove]'); if (!button) return; state.lines.splice(Number(button.dataset.sbRemove), 1); markDirty(); renderLines(); renderPicker(); recalculate(); });
+        $('sales-staff-entry-form').addEventListener('input', () => { markDirty(); recalculate(); });
+        $('sales-staff-entry-form').addEventListener('change', markDirty);
+        $('sales-staff-entry-form').addEventListener('submit', saveBill);
+        ['sb-new-bill', 'sb-cancel-edit'].forEach(id => $(id).addEventListener('click', () => { if (!state.dirty || window.confirm('ล้างข้อมูลบิลที่ยังไม่บันทึกหรือไม่?')) resetEditor(); }));
+        $('sales-staff-entries').addEventListener('click', event => { const button = event.target.closest('[data-sb-edit-bill]'); if (button) editBill(button.dataset.sbEditBill); });
+        $('sb-catalog-table').addEventListener('click', event => { const button = event.target.closest('[data-sb-edit-item]'); if (button) editCatalog(button.dataset.sbEditItem); });
+        $('sb-catalog-reset').addEventListener('click', () => { state.catalogEditing = null; $('sb-catalog-form').reset(); $('sb-catalog-message').textContent = ''; });
+        $('sb-catalog-form').addEventListener('submit', saveCatalog);
+        window.addEventListener('beforeunload', event => { if (state.dirty || state.busy) { event.preventDefault(); event.returnValue = ''; } });
+      }
+      function canLeave() { return !state.dirty || window.confirm('มีบิลที่ยังไม่บันทึก ต้องการออกจากหน้าและทิ้งฟอร์มหรือไม่?'); }
+      return { lock, load, bind, calculate, allocate, summarize, billKey, nextBill, canLeave };
+    })();
+    function lockSalesStaffPage() { salesBillReview.lock(); }
+    function loadSalesStaffData() { return salesBillReview.load(); }
+    function bindSalesStaffPage() { salesBillReview.bind(); }
 
     function currentUserProfile() {
       try { return JSON.parse(sessionStorage.getItem("lalizaPortalUser") || "null"); } catch (err) { return null; }
@@ -5736,6 +6025,7 @@
 
     function activatePortalSection(target) {
       if (!target || !document.getElementById(target)) return;
+      if (target !== "sales-staff" && document.getElementById("sales-staff")?.classList.contains("active") && !salesBillReview.canLeave()) return;
       document.querySelectorAll(".nav-item").forEach((x) => x.classList.toggle("active", x.dataset.target === target && x.id !== "sysLogoutBtn"));
       document.querySelectorAll(".section").forEach((x) => x.classList.remove("active"));
       document.getElementById(target)?.classList.add("active");
